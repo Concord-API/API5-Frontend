@@ -1,0 +1,88 @@
+name: Frontend Release
+
+on:
+  workflow_run:
+    workflows: ["Frontend CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: frontend-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish release
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Plan the release
+        id: plan
+        run: |
+          if [ -n "$(git tag --points-at "$SHA" --list 'v*')" ]; then
+            echo "Commit $SHA already has a release tag"
+            exit 0
+          fi
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SHA/pulls" --jq '[.[] | select(.merged_at != null and .base.ref == "main")][0].number // empty')
+          if [ -z "$pr" ]; then
+            echo "No merged pull request found for $SHA"
+            exit 0
+          fi
+          labels=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json labels --jq '[.labels[].name] | join(",")')
+          tag=$(bash .github/scripts/release-version.sh "$labels")
+          if [ "$tag" = "none" ]; then
+            echo "Pull request #$pr is labeled release:none"
+            exit 0
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Releasing $tag from pull request #$pr"
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: ${{ steps.plan.outputs.tag != '' }}
+        with:
+          node-version-file: ratio/.node-version
+          cache: npm
+          cache-dependency-path: ratio/package-lock.json
+
+      - name: Use the project npm version
+        if: ${{ steps.plan.outputs.tag != '' }}
+        run: npm install --global npm@11.12.1
+
+      - name: Install locked dependencies
+        if: ${{ steps.plan.outputs.tag != '' }}
+        working-directory: ratio
+        run: npm ci
+
+      - name: Build production assets
+        if: ${{ steps.plan.outputs.tag != '' }}
+        working-directory: ratio
+        run: npm run build
+
+      - name: Package the release
+        if: ${{ steps.plan.outputs.tag != '' }}
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: |
+          cd ratio/apps/web/dist
+          zip -qr "$GITHUB_WORKSPACE/ratio-web-${TAG}.zip" .
+          cd "$GITHUB_WORKSPACE"
+          sha256sum "ratio-web-${TAG}.zip" > "ratio-web-${TAG}.zip.sha256"
+
+      - name: Create the GitHub release
+        if: ${{ steps.plan.outputs.tag != '' }}
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+        run: gh release create "$TAG" "ratio-web-${TAG}.zip" "ratio-web-${TAG}.zip.sha256" --repo "$GITHUB_REPOSITORY" --target "$SHA" --title "$TAG" --generate-notes
