@@ -1,4 +1,4 @@
-import { Button } from "@workspace/ui/components/button"
+import { buttonVariants } from "@workspace/ui/components/button"
 import { Link, createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/")({
@@ -8,7 +8,9 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="flex min-h-svh items-center justify-center">
-      <Button render={<Link to="/result" />}>Ir para a tela 2</Button>
+      <Link to="/result" className={buttonVariants()}>
+        Ir para a tela 2
+      </Link>
     </div>
   )
 }
