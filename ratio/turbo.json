@@ -16,6 +16,13 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:ci": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**", "test-results/**"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

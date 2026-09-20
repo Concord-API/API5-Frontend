@@ -7,7 +7,10 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "turbo format",
-    "typecheck": "turbo typecheck"
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx}\" \"packages/**/*.{ts,tsx}\"",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:ci": "turbo test:ci"
   },
   "devDependencies": {
     "prettier": "^3.8.3",
@@ -17,7 +20,8 @@
   },
   "packageManager": "npm@11.12.1",
   "engines": {
-    "node": ">=20"
+    "node": ">=24.15.0 <25",
+    "npm": "11.12.1"
   },
   "workspaces": [
     "apps/*",
