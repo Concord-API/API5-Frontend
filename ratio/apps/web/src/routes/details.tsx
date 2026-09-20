@@ -5,9 +5,5 @@ export const Route = createFileRoute("/details")({
 })
 
 function Details() {
-  return (
-    <div className="flex min-h-svh items-center justify-center">
-      
-    </div>
-  )
+  return <div className="flex min-h-svh items-center justify-center"></div>
 }
