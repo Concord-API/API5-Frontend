@@ -1,0 +1,72 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main, 'us*']
+  push:
+    branches: [main, 'us*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Frontend checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ratio
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: ratio/.node-version
+          cache: npm
+          cache-dependency-path: ratio/package-lock.json
+
+      - name: Use the project npm version
+        run: npm install --global npm@11.12.1
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test with coverage
+        run: npm run test:ci
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Upload test results and coverage
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: frontend-test-results-${{ github.sha }}
+          path: |
+            ratio/apps/web/test-results/
+            ratio/apps/web/coverage/
+          retention-days: 14
+
+      - name: Upload validated frontend
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ratio-web-${{ github.sha }}
+          path: ratio/apps/web/dist/
+          if-no-files-found: error
+          retention-days: 30
