@@ -98,3 +98,29 @@ describe("results without a term", () => {
     expect(screen.queryByRole("list", { name: "Temas" })).toBeNull()
   })
 })
+
+describe("results ordering label", () => {
+  it("shows that the themes are ordered by strength on a search", async () => {
+    answerThemes()
+
+    await renderSummary("/busca?q=inscricao%20indevida")
+
+    expect(screen.getByText("ORDENADO POR FORÇA")).toBeInTheDocument()
+  })
+
+  it("shows no ordering label without a term", async () => {
+    answerThemes({ ...fullList, query: "" })
+
+    await renderSummary("/busca")
+
+    expect(screen.queryByText("ORDENADO POR FORÇA")).toBeNull()
+  })
+
+  it("shows no ordering label when no theme is found", async () => {
+    answerThemes(emptyList)
+
+    await renderSummary("/busca?q=contrato%20de%20arrendamento%20de%20satelite")
+
+    expect(screen.queryByText("ORDENADO POR FORÇA")).toBeNull()
+  })
+})
