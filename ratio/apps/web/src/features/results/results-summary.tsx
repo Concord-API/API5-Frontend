@@ -23,9 +23,18 @@ function countMessage(term: string, total: number) {
 }
 
 export function ResultsSummary({ term, total }: ResultsSummaryProps) {
+  const searching = term.trim() !== ""
+
   return (
-    <h1 className="mb-6 font-sans text-lg text-foreground">
-      {term.trim() === "" ? browseMessage(total) : countMessage(term, total)}
-    </h1>
+    <div className="mb-6 flex items-baseline justify-between gap-4">
+      <h1 className="font-sans text-lg text-foreground">
+        {searching ? countMessage(term, total) : browseMessage(total)}
+      </h1>
+      {searching && total > 0 && (
+        <p className="shrink-0 font-mono text-[11px] tracking-[0.14em] text-muted-foreground">
+          ORDENADO POR FORÇA
+        </p>
+      )}
+    </div>
   )
 }
