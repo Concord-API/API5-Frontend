@@ -23,6 +23,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    env: { VITE_API_URL: "" },
     setupFiles: ["./src/test/setup.ts"],
     reporters: ["default", "junit"],
     outputFile: { junit: "./test-results/junit.xml" },
