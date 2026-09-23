@@ -7,7 +7,10 @@ import {
 import { render } from "@testing-library/react"
 import { routeTree } from "../routeTree.gen"
 
-export async function renderRoute(path: string) {
+export async function renderRoute(
+  path: string,
+  { waitForLoad = true }: { waitForLoad?: boolean } = {}
+) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
@@ -15,9 +18,12 @@ export async function renderRoute(path: string) {
     routeTree,
     context: { queryClient },
     history: createMemoryHistory({ initialEntries: [path] }),
+    defaultPendingMs: 0,
     defaultPendingMinMs: 0,
   })
-  await router.load()
+  if (waitForLoad) {
+    await router.load()
+  }
   render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
