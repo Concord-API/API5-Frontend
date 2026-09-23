@@ -74,3 +74,27 @@ describe("results empty message", () => {
     expect(screen.queryByRole("alert")).toBeNull()
   })
 })
+
+describe("results without a term", () => {
+  it("shows the title of the most judged themes, with no count", async () => {
+    answerThemes({ ...fullList, query: "" })
+
+    const heading = await renderSummary("/busca")
+
+    expect(heading).toHaveTextContent(/^Temas com mais processos julgados$/)
+    expect(
+      await screen.findByRole("list", { name: "Temas" })
+    ).toBeInTheDocument()
+  })
+
+  it("shows the declared scope when no theme is available", async () => {
+    answerThemes({ ...emptyList, query: "" })
+
+    const heading = await renderSummary("/busca")
+
+    expect(heading).toHaveTextContent(
+      /^Nenhum tema disponível no escopo TJSP, TJRJ e TJMG\.$/
+    )
+    expect(screen.queryByRole("list", { name: "Temas" })).toBeNull()
+  })
+})
