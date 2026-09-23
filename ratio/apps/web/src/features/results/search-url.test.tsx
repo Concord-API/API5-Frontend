@@ -117,4 +117,29 @@ describe("search term in the URL", () => {
     await waitFor(() => expect(searchField()).toHaveValue("inscricao indevida"))
     expect(screen.getByRole("list", { name: "Temas" })).toBeInTheDocument()
   })
+
+  it("searches a numeric term of the URL as text", async () => {
+    const requests = answerThemes()
+
+    await renderRoute("/busca?q=385")
+
+    await screen.findByRole("list", { name: "Temas" })
+    expect(searchField()).toHaveValue("385")
+    expect(requests.at(-1)?.searchParams.get("q")).toBe("385")
+  })
+
+  it("writes a numeric term in the URL without quotes", async () => {
+    const user = userEvent.setup()
+    answerThemes()
+    const { router } = await renderRoute("/busca?q=inscricao%20indevida")
+    await screen.findByRole("list", { name: "Temas" })
+
+    await user.clear(searchField())
+    await user.type(searchField(), "385{Enter}")
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ q: "385" })
+    )
+    expect(router.state.location.searchStr).toBe("?q=385")
+  })
 })
