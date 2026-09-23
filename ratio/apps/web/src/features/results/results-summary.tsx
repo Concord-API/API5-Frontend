@@ -7,6 +7,13 @@ type ResultsSummaryProps = {
 
 const SCOPE = "no escopo TJSP, TJRJ e TJMG"
 
+function browseMessage(total: number) {
+  if (total === 0) {
+    return `Nenhum tema disponível ${SCOPE}.`
+  }
+  return "Temas com mais processos julgados"
+}
+
 function countMessage(term: string, total: number) {
   if (total === 0) {
     return `Nenhum tema encontrado para «${term}» ${SCOPE}.`
@@ -18,7 +25,7 @@ function countMessage(term: string, total: number) {
 export function ResultsSummary({ term, total }: ResultsSummaryProps) {
   return (
     <h1 className="mb-6 font-sans text-lg text-foreground">
-      {countMessage(term, total)}
+      {term.trim() === "" ? browseMessage(total) : countMessage(term, total)}
     </h1>
   )
 }
