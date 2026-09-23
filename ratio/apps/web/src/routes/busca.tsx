@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { themesQueryOptions } from "@/api/themes"
+import { ResultsError, ResultsPending } from "@/features/results/results-states"
 import { ThemeList } from "@/features/results/theme-list"
 
 const searchSchema = z.object({
@@ -13,6 +14,8 @@ export const Route = createFileRoute("/busca")({
   loaderDeps: ({ search }) => ({ q: search.q }),
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(themesQueryOptions(deps.q)),
+  pendingComponent: ResultsPending,
+  errorComponent: ResultsError,
   component: Search,
 })
 
