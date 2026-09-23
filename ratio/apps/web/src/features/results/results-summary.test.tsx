@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
-import { answerThemes, fullList } from "../../test/themes"
+import { answerThemes, emptyList, fullList } from "../../test/themes"
 
 async function renderSummary(path: string) {
   await renderRoute(path)
@@ -49,5 +49,28 @@ describe("results count message", () => {
     expect(heading).toHaveTextContent(
       /^3 temas encontrados para «Inscrição Indevida»\.$/
     )
+  })
+})
+
+describe("results empty message", () => {
+  it("shows the declared scope when no theme is found", async () => {
+    answerThemes(emptyList)
+
+    const heading = await renderSummary(
+      "/busca?q=contrato%20de%20arrendamento%20de%20satelite"
+    )
+
+    expect(heading).toHaveTextContent(
+      /^Nenhum tema encontrado para «contrato de arrendamento de satelite» no escopo TJSP, TJRJ e TJMG\.$/
+    )
+  })
+
+  it("shows no theme list when no theme is found", async () => {
+    answerThemes(emptyList)
+
+    await renderSummary("/busca?q=contrato%20de%20arrendamento%20de%20satelite")
+
+    expect(screen.queryByRole("list", { name: "Temas" })).toBeNull()
+    expect(screen.queryByRole("alert")).toBeNull()
   })
 })
