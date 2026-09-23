@@ -8,8 +8,8 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="flex min-h-svh items-center justify-center">
-      <Link to="/result" className={buttonVariants()}>
-        Ir para a tela 2
+      <Link to="/busca" search={{ q: "" }} className={buttonVariants()}>
+        Ir para a busca
       </Link>
     </div>
   )
