@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw"
+import { delay, http, HttpResponse } from "msw"
 import type { ThemeList } from "../api/themes"
 import { server } from "./server"
 
@@ -86,5 +86,18 @@ export function answerShortTerm() {
         headers: { "Content-Type": "application/problem+json" },
       })
     )
+  )
+}
+
+export function answerNetworkError() {
+  server.use(http.get("/api/themes", () => HttpResponse.error()))
+}
+
+export function answerNever() {
+  server.use(
+    http.get("/api/themes", async () => {
+      await delay("infinite")
+      return HttpResponse.json(fullList)
+    })
   )
 }

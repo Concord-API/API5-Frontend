@@ -1,7 +1,14 @@
 import { screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
-import { answerThemes, fullList } from "../../test/themes"
+import {
+  answerNetworkError,
+  answerNever,
+  answerShortTerm,
+  answerThemes,
+  fullList,
+} from "../../test/themes"
 
 async function renderResults(path = "/busca?q=inscricao%20indevida") {
   const rendered = await renderRoute(path)
@@ -84,5 +91,56 @@ describe("results list", () => {
         name: "Inscrição indevida em cadastro de inadimplentes",
       })
     ).toHaveAttribute("href", "/tema/412")
+  })
+})
+
+describe("results states", () => {
+  it("shows the loading state while the themes are on the way", async () => {
+    answerNever()
+
+    await renderRoute("/busca?q=inscricao%20indevida", { waitForLoad: false })
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Carregando temas…"
+    )
+  })
+
+  it("falls into the error state when the response is outside the contract", async () => {
+    const theme: Record<string, unknown> = { ...fullList.themes[0] }
+    delete theme.strengthScore
+    answerThemes({ ...fullList, themes: [theme] })
+
+    await renderRoute("/busca?q=inscricao%20indevida")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível carregar os temas."
+    )
+    expect(screen.queryByRole("list", { name: "Temas" })).toBeNull()
+  })
+
+  it("falls into the error state when the network fails and searches again on retry", async () => {
+    const user = userEvent.setup()
+    answerNetworkError()
+    await renderRoute("/busca?q=inscricao%20indevida")
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível carregar os temas."
+    )
+
+    answerThemes()
+    await user.click(screen.getByRole("button", { name: "Tentar novamente" }))
+
+    expect(
+      await screen.findByRole("list", { name: "Temas" })
+    ).toBeInTheDocument()
+  })
+
+  it("shows the message of the API when the term is too short", async () => {
+    answerShortTerm()
+
+    await renderRoute("/busca?q=ab")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Digite ao menos 3 caracteres para buscar."
+    )
   })
 })
