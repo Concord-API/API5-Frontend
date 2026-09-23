@@ -1,14 +1,30 @@
-import { useRouter, type ErrorComponentProps } from "@tanstack/react-router"
+import {
+  useNavigate,
+  useRouter,
+  useSearch,
+  type ErrorComponentProps,
+} from "@tanstack/react-router"
 import type { ReactNode } from "react"
 import { ApiError } from "@/api/client"
+import { ResultsHeader } from "./results-header"
 
 const LOAD_FAILED_MESSAGE = "Não foi possível carregar os temas."
 
-function ResultsFrame({ children }: { children: ReactNode }) {
+export function ResultsFrame({ children }: { children: ReactNode }) {
+  const { q } = useSearch({ from: "/busca" })
+  const navigate = useNavigate()
+
+  function search(term: string) {
+    void navigate({ to: "/busca", search: { q: term } })
+  }
+
   return (
-    <main className="min-h-svh bg-background px-4 py-10">
-      <div className="mx-auto w-full max-w-[1110px]">{children}</div>
-    </main>
+    <div className="min-h-svh bg-background">
+      <ResultsHeader term={q} onSearch={search} />
+      <main className="px-4 py-10">
+        <div className="mx-auto w-full max-w-[1110px]">{children}</div>
+      </main>
+    </div>
   )
 }
 

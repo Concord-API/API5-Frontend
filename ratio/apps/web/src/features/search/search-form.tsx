@@ -6,12 +6,13 @@ export const SEARCH_PLACEHOLDER =
 
 type SearchFormProps = {
   onSearch: (term: string) => void
+  initialTerm?: string
 }
 
-export function SearchForm({ onSearch }: SearchFormProps) {
+export function SearchForm({ onSearch, initialTerm = "" }: SearchFormProps) {
   const fieldId = useId()
   const messageId = useId()
-  const [value, setValue] = useState("")
+  const [value, setValue] = useState(initialTerm)
   const [isShort, setIsShort] = useState(false)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
