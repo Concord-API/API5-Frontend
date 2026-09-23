@@ -16,7 +16,7 @@ export function ResultsHeader({ term, onSearch }: ResultsHeaderProps) {
         >
           Rat<span className="text-primary italic">i</span>o
         </Link>
-        <SearchForm initialTerm={term} onSearch={onSearch} />
+        <SearchForm key={term} initialTerm={term} onSearch={onSearch} />
       </div>
     </header>
   )
