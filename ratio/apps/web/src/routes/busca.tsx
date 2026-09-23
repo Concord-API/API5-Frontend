@@ -1,6 +1,14 @@
+import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { themesQueryOptions } from "@/api/themes"
+import {
+  ResultsError,
+  ResultsFrame,
+  ResultsPending,
+} from "@/features/results/results-states"
+import { ResultsSummary } from "@/features/results/results-summary"
+import { ThemeList } from "@/features/results/theme-list"
 
 const searchSchema = z.object({
   q: z.string().catch(""),
@@ -11,9 +19,19 @@ export const Route = createFileRoute("/busca")({
   loaderDeps: ({ search }) => ({ q: search.q }),
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(themesQueryOptions(deps.q)),
+  pendingComponent: ResultsPending,
+  errorComponent: ResultsError,
   component: Search,
 })
 
 function Search() {
-  return <main className="min-h-svh"></main>
+  const { q } = Route.useSearch()
+  const { data } = useSuspenseQuery(themesQueryOptions(q))
+
+  return (
+    <ResultsFrame>
+      <ResultsSummary term={q} total={data.total} />
+      {data.themes.length > 0 && <ThemeList themes={data.themes} />}
+    </ResultsFrame>
+  )
 }

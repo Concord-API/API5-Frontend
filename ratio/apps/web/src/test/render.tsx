@@ -1,23 +1,24 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import {
-  createMemoryHistory,
-  createRouter,
-  RouterProvider,
-} from "@tanstack/react-router"
+import { createMemoryHistory, RouterProvider } from "@tanstack/react-router"
 import { render } from "@testing-library/react"
-import { routeTree } from "../routeTree.gen"
+import { createAppRouter } from "../router"
 
-export async function renderRoute(path: string) {
+export async function renderRoute(
+  path: string,
+  { waitForLoad = true }: { waitForLoad?: boolean } = {}
+) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   })
-  const router = createRouter({
-    routeTree,
-    context: { queryClient },
+  const router = createAppRouter({
+    queryClient,
     history: createMemoryHistory({ initialEntries: [path] }),
+    defaultPendingMs: 0,
     defaultPendingMinMs: 0,
   })
-  await router.load()
+  if (waitForLoad) {
+    await router.load()
+  }
   render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />

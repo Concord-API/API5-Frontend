@@ -12,5 +12,6 @@ afterEach(() => {
   document.documentElement.className = ""
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
 })
 afterAll(() => server.close())

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { z } from "zod"
 import { server } from "../test/server"
 import { ApiError, getJson } from "./client"
@@ -19,6 +19,37 @@ describe("getJson", () => {
     const body = await getJson("/api/sample", schema)
 
     expect(body).toEqual({ name: "Atraso de voo" })
+    expect(requested?.origin).toBe(window.location.origin)
+  })
+
+  it("prefixes the path with the API URL of the environment", async () => {
+    vi.stubEnv("VITE_API_URL", "http://127.0.0.1:5000")
+    let requested: URL | undefined
+    server.use(
+      http.get("http://127.0.0.1:5000/api/sample", ({ request }) => {
+        requested = new URL(request.url)
+        return HttpResponse.json({ name: "Atraso de voo" })
+      })
+    )
+
+    const body = await getJson("/api/sample", schema)
+
+    expect(body).toEqual({ name: "Atraso de voo" })
+    expect(requested?.origin).toBe("http://127.0.0.1:5000")
+  })
+
+  it("keeps the relative path when the API URL of the environment is empty", async () => {
+    vi.stubEnv("VITE_API_URL", "")
+    let requested: URL | undefined
+    server.use(
+      http.get("/api/sample", ({ request }) => {
+        requested = new URL(request.url)
+        return HttpResponse.json({ name: "Atraso de voo" })
+      })
+    )
+
+    await getJson("/api/sample", schema)
+
     expect(requested?.origin).toBe(window.location.origin)
   })
 
