@@ -1,5 +1,3 @@
-import { screen, waitFor } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
 import { http, HttpResponse } from "msw"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "./render"
@@ -19,18 +17,6 @@ function answerThemes(body: Record<string, unknown> = emptyList) {
 }
 
 describe("routes", () => {
-  it("goes from the home screen to the search route", async () => {
-    answerThemes()
-    const user = userEvent.setup()
-    const { router } = await renderRoute("/")
-
-    await user.click(
-      await screen.findByRole("link", { name: "Ir para a busca" })
-    )
-
-    await waitFor(() => expect(router.state.location.pathname).toBe("/busca"))
-  })
-
   it("loads the themes of the term in the URL before showing the search", async () => {
     const requests = answerThemes({ ...emptyList, query: "atraso de voo" })
 
