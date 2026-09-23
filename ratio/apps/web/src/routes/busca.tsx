@@ -7,6 +7,7 @@ import {
   ResultsFrame,
   ResultsPending,
 } from "@/features/results/results-states"
+import { ResultsSummary } from "@/features/results/results-summary"
 import { ThemeList } from "@/features/results/theme-list"
 
 const searchSchema = z.object({
@@ -29,6 +30,7 @@ function Search() {
 
   return (
     <ResultsFrame>
+      <ResultsSummary term={q} total={data.total} />
       <ThemeList themes={data.themes} />
     </ResultsFrame>
   )
