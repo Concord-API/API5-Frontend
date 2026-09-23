@@ -28,7 +28,8 @@ export async function getJson<T>(
   path: string,
   schema: z.ZodType<T>
 ): Promise<T> {
-  const response = await fetch(path, {
+  const baseUrl: string = import.meta.env.VITE_API_URL ?? ""
+  const response = await fetch(`${baseUrl}${path}`, {
     headers: { Accept: "application/json" },
   })
   if (!response.ok) {
