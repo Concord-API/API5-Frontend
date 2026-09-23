@@ -10,53 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DetailsRouteImport } from './routes/details'
-import { Route as ResultRouteImport } from './routes/result'
+import { Route as BuscaRouteImport } from './routes/busca'
+import { Route as TemaKeyRouteImport } from './routes/tema.$key'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DetailsRoute = DetailsRouteImport.update({
-  id: '/details',
-  path: '/details',
+const BuscaRoute = BuscaRouteImport.update({
+  id: '/busca',
+  path: '/busca',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ResultRoute = ResultRouteImport.update({
-  id: '/result',
-  path: '/result',
+const TemaKeyRoute = TemaKeyRouteImport.update({
+  id: '/tema/$key',
+  path: '/tema/$key',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/details': typeof DetailsRoute
-  '/result': typeof ResultRoute
+  '/busca': typeof BuscaRoute
+  '/tema/$key': typeof TemaKeyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/details': typeof DetailsRoute
-  '/result': typeof ResultRoute
+  '/busca': typeof BuscaRoute
+  '/tema/$key': typeof TemaKeyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/details': typeof DetailsRoute
-  '/result': typeof ResultRoute
+  '/busca': typeof BuscaRoute
+  '/tema/$key': typeof TemaKeyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/details' | '/result'
+  fullPaths: '/' | '/busca' | '/tema/$key'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/details' | '/result'
-  id: '__root__' | '/' | '/details' | '/result'
+  to: '/' | '/busca' | '/tema/$key'
+  id: '__root__' | '/' | '/busca' | '/tema/$key'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DetailsRoute: typeof DetailsRoute
-  ResultRoute: typeof ResultRoute
+  BuscaRoute: typeof BuscaRoute
+  TemaKeyRoute: typeof TemaKeyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,18 +68,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/details': {
-      id: '/details'
-      path: '/details'
-      fullPath: '/details'
-      preLoaderRoute: typeof DetailsRouteImport
+    '/busca': {
+      id: '/busca'
+      path: '/busca'
+      fullPath: '/busca'
+      preLoaderRoute: typeof BuscaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/result': {
-      id: '/result'
-      path: '/result'
-      fullPath: '/result'
-      preLoaderRoute: typeof ResultRouteImport
+    '/tema/$key': {
+      id: '/tema/$key'
+      path: '/tema/$key'
+      fullPath: '/tema/$key'
+      preLoaderRoute: typeof TemaKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,8 +87,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DetailsRoute: DetailsRoute,
-  ResultRoute: ResultRoute,
+  BuscaRoute: BuscaRoute,
+  TemaKeyRoute: TemaKeyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
