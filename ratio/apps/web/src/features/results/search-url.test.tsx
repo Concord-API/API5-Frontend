@@ -1,4 +1,5 @@
-import { screen } from "@testing-library/react"
+import { screen, waitFor } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import { answerShortTerm, answerThemes } from "../../test/themes"
@@ -48,5 +49,72 @@ describe("search bar on the results route", () => {
       "href",
       "/"
     )
+  })
+})
+
+describe("search term in the URL", () => {
+  it("puts a new search from the results bar in the URL and searches it", async () => {
+    const user = userEvent.setup()
+    const requests = answerThemes()
+    const { router } = await renderRoute("/busca?q=inscricao%20indevida")
+    await screen.findByRole("list", { name: "Temas" })
+
+    await user.clear(searchField())
+    await user.type(searchField(), "negativação indevida{Enter}")
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({
+        q: "negativação indevida",
+      })
+    )
+    expect(router.state.location.searchStr).toBe(
+      "?q=negativa%C3%A7%C3%A3o+indevida"
+    )
+    await waitFor(() =>
+      expect(requests.at(-1)?.searchParams.get("q")).toBe(
+        "negativação indevida"
+      )
+    )
+    expect(
+      await screen.findByRole("list", { name: "Temas" })
+    ).toBeInTheDocument()
+  })
+
+  it("keeps the URL when the term typed in the results bar is too short", async () => {
+    const user = userEvent.setup()
+    answerThemes()
+    const { router } = await renderRoute("/busca?q=inscricao%20indevida")
+    await screen.findByRole("list", { name: "Temas" })
+
+    await user.clear(searchField())
+    await user.type(searchField(), "ab{Enter}")
+
+    expect(
+      screen.getByText("Digite ao menos 3 caracteres para buscar.")
+    ).toBeInTheDocument()
+    expect(router.state.location.search).toEqual({ q: "inscricao indevida" })
+  })
+
+  it("restores the previous term when going back", async () => {
+    const user = userEvent.setup()
+    const requests = answerThemes()
+    const { router } = await renderRoute("/busca?q=inscricao%20indevida")
+    await screen.findByRole("list", { name: "Temas" })
+    await user.clear(searchField())
+    await user.type(searchField(), "atraso de voo{Enter}")
+    await waitFor(() =>
+      expect(requests.at(-1)?.searchParams.get("q")).toBe("atraso de voo")
+    )
+    await screen.findByRole("list", { name: "Temas" })
+
+    router.history.back()
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({
+        q: "inscricao indevida",
+      })
+    )
+    await waitFor(() => expect(searchField()).toHaveValue("inscricao indevida"))
+    expect(screen.getByRole("list", { name: "Temas" })).toBeInTheDocument()
   })
 })
