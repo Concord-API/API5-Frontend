@@ -5,7 +5,12 @@ type ResultsSummaryProps = {
   total: number
 }
 
+const SCOPE = "no escopo TJSP, TJRJ e TJMG"
+
 function countMessage(term: string, total: number) {
+  if (total === 0) {
+    return `Nenhum tema encontrado para «${term}» ${SCOPE}.`
+  }
   const found = total === 1 ? "tema encontrado" : "temas encontrados"
   return `${formatNumber(total)} ${found} para «${term}».`
 }
