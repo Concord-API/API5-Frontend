@@ -578,6 +578,16 @@ describe("outcome figure below the percentage floor", () => {
     expect(rows[2]).toHaveTextContent("Improcedente0 decisões")
   })
 
+  it("names a one-decision figure in the singular", async () => {
+    answerThemeDetail({ ...themeDetail, outcomeBreakdown: [belowFloorFamily] })
+
+    await renderTheme()
+
+    expect(
+      screen.getByRole("figure", { name: "FIG. 1 — Desfecho de 1 decisão" })
+    ).toBeInTheDocument()
+  })
+
   it("shows no percentage and no proportional bar", async () => {
     answerThemeDetail({ ...themeDetail, outcomeBreakdown: [belowFloorFamily] })
 
