@@ -489,6 +489,56 @@ describe("outcome figure", () => {
     ).toBeTruthy()
   })
 
+  it("highlights the outcome with the most cases", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      outcomeBreakdown: [meritFamily, appealFamily],
+    })
+
+    await renderTheme()
+
+    const predominant = (figure: HTMLElement) =>
+      within(figure)
+        .getAllByTestId("outcome-bar")
+        .map((bar) => bar.dataset.predominant)
+    expect(predominant(outcomeFigure(1, "144"))).toEqual([
+      "true",
+      "false",
+      "false",
+    ])
+    expect(predominant(outcomeFigure(2, "30"))).toEqual([
+      "false",
+      "false",
+      "true",
+    ])
+  })
+
+  it("highlights every outcome tied for the most cases", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      outcomeBreakdown: [
+        {
+          ...meritFamily,
+          judged: 24,
+          categories: [
+            { outcome: "Procedente", count: 10, ratio: 0.4167 },
+            { outcome: "Parcialmente procedente", count: 4, ratio: 0.1667 },
+            { outcome: "Improcedente", count: 10, ratio: 0.4167 },
+          ],
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    const bars = within(outcomeFigure(1, "24")).getAllByTestId("outcome-bar")
+    expect(bars.map((bar) => bar.dataset.predominant)).toEqual([
+      "true",
+      "false",
+      "true",
+    ])
+  })
+
   it("draws no figure when no family has judged cases", async () => {
     answerThemeDetail({ ...themeDetail, outcomeBreakdown: [] })
 
