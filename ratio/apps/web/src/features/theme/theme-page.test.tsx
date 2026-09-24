@@ -193,6 +193,29 @@ describe("article column", () => {
     )
   })
 
+  it("says the text was generated from the analytical base", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-origin")).toHaveTextContent(
+      "Texto gerado a partir da base analítica"
+    )
+  })
+
+  it("says the text was reviewed by the curation when it is curated", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: { ...themeDetail.summary, textOrigin: "curated" },
+    })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-origin")).toHaveTextContent(
+      "Texto revisado pela curadoria"
+    )
+  })
+
   it("renders no article when the theme has no summary", async () => {
     answerThemeDetail({ ...themeDetail, summary: null })
 
