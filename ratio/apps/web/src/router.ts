@@ -34,6 +34,12 @@ export function createAppRouter({ queryClient, ...options }: AppRouterOptions) {
   })
 }
 
+declare module "@tanstack/history" {
+  interface HistoryState {
+    fromSearch?: { q: string; total: number }
+  }
+}
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof createAppRouter>

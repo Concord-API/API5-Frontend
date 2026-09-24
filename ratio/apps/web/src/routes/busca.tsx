@@ -31,7 +31,9 @@ function Search() {
   return (
     <ResultsFrame>
       <ResultsSummary term={q} total={data.total} />
-      {data.themes.length > 0 && <ThemeList themes={data.themes} />}
+      {data.themes.length > 0 && (
+        <ThemeList themes={data.themes} term={q} total={data.total} />
+      )}
     </ResultsFrame>
   )
 }

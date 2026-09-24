@@ -4,13 +4,14 @@ import { formatNumber } from "@/lib/format"
 
 type ThemeItemProps = {
   theme: ThemeSummary
+  fromSearch: { q: string; total: number }
 }
 
 function judgedLabel(count: number) {
   return `${formatNumber(count)} ${count === 1 ? "julgado" : "julgados"}`
 }
 
-export function ThemeItem({ theme }: ThemeItemProps) {
+export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
   return (
     <li className="flex gap-9 border-b border-[#DCD6C9] py-8">
       <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
@@ -32,6 +33,7 @@ export function ThemeItem({ theme }: ThemeItemProps) {
           <Link
             to="/tema/$key"
             params={{ key: theme.themeKey }}
+            state={{ fromSearch }}
             className="hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             {theme.name}
