@@ -4,6 +4,7 @@ import { z } from "zod"
 import { themeDetailQueryOptions } from "@/api/themes"
 import { ThemeFrame } from "@/features/theme/theme-frame"
 import { ThemeHeader } from "@/features/theme/theme-header"
+import { ThemeError, ThemePending } from "@/features/theme/theme-states"
 
 const keySchema = z.coerce.number().int().positive()
 
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/tema/$key")({
   },
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(themeDetailQueryOptions(params.key)),
+  pendingComponent: ThemePending,
+  errorComponent: ThemeError,
   component: Theme,
 })
 
