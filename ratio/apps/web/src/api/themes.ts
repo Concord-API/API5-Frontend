@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 import { z } from "zod"
 import { getJson } from "./client"
+import { unavailableBlockSchema } from "./unavailable"
 
 export const strengthLevelSchema = z.enum([
   "Consolidada",
@@ -73,6 +74,7 @@ export const themeDetailSchema = z.object({
   periodEndYear: z.number().int().nullable(),
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
+  unavailable: z.array(unavailableBlockSchema),
 })
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
