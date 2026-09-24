@@ -1,6 +1,26 @@
 import { delay, http, HttpResponse } from "msw"
 import { server } from "./server"
 
+export const meritFamily = {
+  polarityLabel: "acolhimento da pretensão do autor",
+  judged: 144,
+  categories: [
+    { outcome: "Procedente", count: 100, ratio: 0.6944 },
+    { outcome: "Parcialmente procedente", count: 42, ratio: 0.2917 },
+    { outcome: "Improcedente", count: 2, ratio: 0.0139 },
+  ],
+}
+
+export const appealFamily = {
+  polarityLabel: "acolhimento da pretensão de quem recorreu",
+  judged: 30,
+  categories: [
+    { outcome: "Procedente", count: 12, ratio: 0.4 },
+    { outcome: "Parcialmente procedente", count: 3, ratio: 0.1 },
+    { outcome: "Improcedente", count: 15, ratio: 0.5 },
+  ],
+}
+
 export const themeDetail = {
   themeKey: 412,
   name: "Inscrição indevida em cadastro de inadimplentes",
@@ -24,9 +44,17 @@ export const themeDetail = {
     methodologyVersion: "1.0",
     generatedAt: "2026-09-23",
   },
-  outcomeBreakdown: [],
+  outcomeBreakdown: [meritFamily],
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
+  provenance: [
+    {
+      block: "cases",
+      source: "DataJud/CNJ",
+      sourceUrl: "https://datajud-wiki.cnj.jus.br/api-publica/",
+      extractedAt: "2026-08-28",
+    },
+  ],
   unavailable: [
     {
       block: "caseLawCitation",

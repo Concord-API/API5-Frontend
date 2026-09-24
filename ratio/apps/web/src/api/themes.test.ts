@@ -135,6 +135,27 @@ const detailExample = {
     methodologyVersion: "1.0",
     generatedAt: "2026-09-23",
   },
+  outcomeBreakdown: [
+    {
+      polarityLabel: "acolhimento da pretensão do autor",
+      judged: 144,
+      categories: [
+        { outcome: "Procedente", count: 100, ratio: 0.6944 },
+        { outcome: "Parcialmente procedente", count: 42, ratio: 0.2917 },
+        { outcome: "Improcedente", count: 2, ratio: 0.0139 },
+      ],
+    },
+  ],
+  partialTreatment:
+    "Na nota de força, a procedência em parte conta como acolhimento.",
+  provenance: [
+    {
+      block: "cases",
+      source: "DataJud/CNJ",
+      sourceUrl: "https://datajud-wiki.cnj.jus.br/api-publica/",
+      extractedAt: "2026-08-28",
+    },
+  ],
   unavailable: [
     {
       block: "reporterJudge",
@@ -222,6 +243,41 @@ describe("fetchThemeDetail", () => {
       ...detailExample,
       summary: { ...detailExample.summary, textOrigin: "llm" },
     })
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("accepts an outcome category without a ratio below the percentage floor", async () => {
+    respondWithDetail({
+      ...detailExample,
+      outcomeBreakdown: [
+        {
+          polarityLabel: "acolhimento da pretensão do autor",
+          judged: 1,
+          categories: [{ outcome: "Procedente", count: 1, ratio: null }],
+        },
+      ],
+    })
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.outcomeBreakdown[0].categories[0].ratio).toBeNull()
+  })
+
+  it("breaks on the parse when an outcome family comes without its judged count", async () => {
+    const family: Record<string, unknown> = {
+      ...detailExample.outcomeBreakdown[0],
+    }
+    delete family.judged
+    respondWithDetail({ ...detailExample, outcomeBreakdown: [family] })
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when the provenance comes without its extraction date", async () => {
+    const source: Record<string, unknown> = { ...detailExample.provenance[0] }
+    delete source.extractedAt
+    respondWithDetail({ ...detailExample, provenance: [source] })
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })

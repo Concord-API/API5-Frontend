@@ -61,6 +61,25 @@ export const themeSummaryTextSchema = z.object({
   generatedAt: z.string(),
 })
 
+export const outcomeCategorySchema = z.object({
+  outcome: z.string(),
+  count: z.number().int(),
+  ratio: z.number().nullable(),
+})
+
+export const outcomeFamilySchema = z.object({
+  polarityLabel: z.string(),
+  judged: z.number().int(),
+  categories: z.array(outcomeCategorySchema),
+})
+
+export const provenanceSchema = z.object({
+  block: z.string(),
+  source: z.string(),
+  sourceUrl: z.string(),
+  extractedAt: z.string(),
+})
+
 export const themeDetailSchema = z.object({
   themeKey: z.number().int(),
   name: z.string(),
@@ -74,6 +93,9 @@ export const themeDetailSchema = z.object({
   periodEndYear: z.number().int().nullable(),
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
+  outcomeBreakdown: z.array(outcomeFamilySchema),
+  partialTreatment: z.string(),
+  provenance: z.array(provenanceSchema),
   unavailable: z.array(unavailableBlockSchema),
 })
 
@@ -82,6 +104,8 @@ export type ThemeList = z.infer<typeof themeListSchema>
 export type ThemeDetail = z.infer<typeof themeDetailSchema>
 export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
+export type OutcomeFamily = z.infer<typeof outcomeFamilySchema>
+export type Provenance = z.infer<typeof provenanceSchema>
 
 export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   const params = new URLSearchParams()
