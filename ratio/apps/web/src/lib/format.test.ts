@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatDate, formatNumber } from "./format"
+import { formatDate, formatNumber, formatPercent } from "./format"
 
 describe("formatNumber", () => {
   it("separates thousands with a dot", () => {
@@ -22,5 +22,19 @@ describe("formatDate", () => {
 
   it("returns null when there is no date", () => {
     expect(formatDate(null)).toBeNull()
+  })
+})
+
+describe("formatPercent", () => {
+  it("writes the ratio as a percentage with one decimal and a comma", () => {
+    expect(formatPercent(0.9861)).toBe("98,6%")
+  })
+
+  it("keeps the decimal when it is zero", () => {
+    expect(formatPercent(0.62)).toBe("62,0%")
+  })
+
+  it("writes a whole ratio as one hundred percent", () => {
+    expect(formatPercent(1)).toBe("100,0%")
   })
 })
