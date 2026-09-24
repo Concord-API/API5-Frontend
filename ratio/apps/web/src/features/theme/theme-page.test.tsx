@@ -337,6 +337,28 @@ describe("sourceless blocks", () => {
     expect(screen.queryByText(/\[\d+\]/)).not.toBeInTheDocument()
   })
 
+  it("explains why a theme has no summary with the message from the API", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: null,
+      unavailable: [
+        {
+          block: "summary",
+          reason: "notLoaded",
+          message:
+            "O texto deste tema ainda não foi gerado; ele sai na próxima carga.",
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    expect(noteOf("summary")).toHaveTextContent(
+      "O texto deste tema ainda não foi gerado; ele sai na próxima carga."
+    )
+    expect(screen.queryByRole("article")).not.toBeInTheDocument()
+  })
+
   it("explains nothing when the API sends no unavailable block", async () => {
     answerThemeDetail({ ...themeDetail, unavailable: [] })
 
