@@ -10,6 +10,10 @@ type FigureProps = {
 export function Figure({ number, title, source, children }: FigureProps) {
   const captionId = useId()
 
+  if (!source?.trim()) {
+    return null
+  }
+
   return (
     <figure aria-labelledby={captionId} className="my-8">
       <figcaption
