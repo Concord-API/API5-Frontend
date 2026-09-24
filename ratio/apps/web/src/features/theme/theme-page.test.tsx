@@ -267,6 +267,22 @@ describe("numbers in the summary text", () => {
     expect(body).not.toHaveTextContent("%")
   })
 
+  it("does not print a percentage whose judged count is zero", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: {
+        ...themeDetail.summary,
+        body: [{ text: "Sem base: " }, { ratio: 1, n: 0, unit: "decisões" }],
+      },
+    })
+
+    await renderTheme()
+
+    const body = screen.getByTestId("summary-body")
+    expect(body).toHaveTextContent("Sem base:")
+    expect(body).not.toHaveTextContent("%")
+  })
+
   it("separates thousands in the judged count", async () => {
     answerThemeDetail({
       ...themeDetail,

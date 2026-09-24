@@ -180,6 +180,18 @@ describe("fetchThemeDetail", () => {
     expect(detail.summary).toBeNull()
   })
 
+  it("breaks on the parse when a percentage comes without its judged count", async () => {
+    respondWithDetail({
+      ...detailExample,
+      summary: {
+        ...detailExample.summary,
+        lead: [{ ratio: 0.9861, unit: "decisões" }],
+      },
+    })
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
   it("breaks on the parse when the text origin is not template or curated", async () => {
     respondWithDetail({
       ...detailExample,
