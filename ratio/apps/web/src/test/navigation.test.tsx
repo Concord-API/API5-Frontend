@@ -2,6 +2,7 @@ import { http, HttpResponse } from "msw"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "./render"
 import { server } from "./server"
+import { answerThemeDetail } from "./theme-detail"
 
 const emptyList = { query: "", total: 0, themes: [] }
 
@@ -38,6 +39,8 @@ describe("routes", () => {
   })
 
   it("opens a theme by its numeric key", async () => {
+    answerThemeDetail()
+
     const { router } = await renderRoute("/tema/412")
 
     const match = router.state.matches.at(-1)
