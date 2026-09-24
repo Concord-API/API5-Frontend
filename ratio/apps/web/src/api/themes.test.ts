@@ -25,6 +25,27 @@ const contractExample = {
       lastDecisionDate: "2026-08-30",
     },
   ],
+  provenance: {
+    sources: [
+      {
+        block: "cases",
+        source: "datajud",
+        name: "DataJud/CNJ",
+        sourceUrl: "https://www.cnj.jus.br/sistemas/datajud/",
+        extractedAt: "2026-08-28T13:00:00+00:00",
+        count: 12418,
+      },
+    ],
+    methodologyVersion: "1.0",
+  },
+}
+
+const provenance = contractExample.provenance
+
+function withoutProvenance(body: Record<string, unknown>) {
+  const copy = { ...body }
+  delete copy.provenance
+  return copy
 }
 
 function respondWith(body: Record<string, unknown>) {
@@ -85,11 +106,20 @@ describe("fetchThemes", () => {
     ).rejects.toBeInstanceOf(z.ZodError)
   })
 
+  it("breaks on the parse when the provenance is missing", async () => {
+    respondWith(withoutProvenance(contractExample))
+
+    await expect(
+      fetchThemes({ q: "inscricao indevida" })
+    ).rejects.toBeInstanceOf(z.ZodError)
+  })
+
   it("sends the term and the limit as query parameters", async () => {
     const requested = respondWith({
       query: "atraso de voo",
       total: 0,
       themes: [],
+      provenance,
     })
 
     await fetchThemes({ q: "atraso de voo", limit: 5 })
@@ -100,7 +130,12 @@ describe("fetchThemes", () => {
   })
 
   it("leaves the term out when it is empty", async () => {
-    const requested = respondWith({ query: "", total: 0, themes: [] })
+    const requested = respondWith({
+      query: "",
+      total: 0,
+      themes: [],
+      provenance,
+    })
 
     await fetchThemes({ q: "" })
 
@@ -142,6 +177,7 @@ const detailExample = {
       message: "O DataJud não publica o relator.",
     },
   ],
+  provenance,
 }
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
@@ -185,6 +221,12 @@ describe("fetchThemeDetail", () => {
 
     expect(detail.lastDecisionDate).toBeNull()
     expect(detail.summary).toBeNull()
+  })
+
+  it("breaks on the parse when the provenance is missing", async () => {
+    respondWithDetail(withoutProvenance(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
 
   it("accepts a theme without a strength score", async () => {
