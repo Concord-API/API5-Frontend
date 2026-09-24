@@ -48,7 +48,11 @@ function OutcomeFigure({
   return (
     <Figure
       number={number}
-      title={`Desfecho das ${formatNumber(family.judged)} decisões`}
+      title={
+        family.judged === 1
+          ? "Desfecho de 1 decisão"
+          : `Desfecho das ${formatNumber(family.judged)} decisões`
+      }
       source={source}
     >
       <p className="mb-4 font-mono text-[11px] text-muted-foreground">
