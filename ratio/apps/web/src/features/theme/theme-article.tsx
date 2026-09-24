@@ -1,6 +1,11 @@
 import type { ThemeSummaryText } from "@/api/themes"
 import { SummarySegments } from "./summary-segments"
 
+const ORIGIN_LABEL = {
+  template: "Texto gerado a partir da base analítica",
+  curated: "Texto revisado pela curadoria",
+} as const
+
 type ThemeArticleProps = {
   summary: ThemeSummaryText | null
 }
@@ -23,6 +28,12 @@ export function ThemeArticle({ summary }: ThemeArticleProps) {
         className="font-sans text-[17px] leading-[1.75] text-foreground"
       >
         <SummarySegments segments={summary.body} />
+      </p>
+      <p
+        data-testid="summary-origin"
+        className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase"
+      >
+        {ORIGIN_LABEL[summary.textOrigin]}
       </p>
     </article>
   )
