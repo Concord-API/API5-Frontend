@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { themeDetailQueryOptions } from "@/api/themes"
+import { ProvenanceFooter } from "@/components/provenance-footer"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
@@ -31,6 +32,7 @@ function Theme() {
       <ThemeBackLink />
       <ThemeHeader theme={data} />
       <ThemeArticle summary={data.summary} unavailable={data.unavailable} />
+      <ProvenanceFooter provenance={data.provenance} />
     </ThemeFrame>
   )
 }

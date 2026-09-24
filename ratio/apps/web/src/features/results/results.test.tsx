@@ -144,3 +144,15 @@ describe("results states", () => {
     )
   })
 })
+
+describe("results provenance", () => {
+  it("states the source and the extraction date under the results", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    expect(screen.getByTestId("provenance-footer")).toHaveTextContent(
+      "Fonte: DataJud/CNJ, 12.418 processos, extração de 28.08.2026 · metodologia v1.0"
+    )
+  })
+})
