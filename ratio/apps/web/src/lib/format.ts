@@ -10,6 +10,14 @@ export function formatNumber(value: number): string {
   return numberFormat.format(value)
 }
 
+export function formatCount(
+  count: number,
+  singular: string,
+  plural: string
+): string {
+  return `${formatNumber(count)} ${count === 1 ? singular : plural}`
+}
+
 export function formatDate(value: string | null): string | null {
   if (value === null) {
     return null

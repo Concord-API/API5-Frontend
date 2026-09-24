@@ -1,5 +1,5 @@
 import type { ThemeDetail } from "@/api/themes"
-import { formatDate, formatNumber } from "@/lib/format"
+import { formatCount, formatDate } from "@/lib/format"
 
 type ThemeMetadata = Pick<
   ThemeDetail,
@@ -9,10 +9,6 @@ type ThemeMetadata = Pick<
   | "periodEndYear"
   | "lastDecisionDate"
 >
-
-function counted(count: number, singular: string, plural: string) {
-  return `${formatNumber(count)} ${count === 1 ? singular : plural}`
-}
 
 function period(start: number | null, end: number | null) {
   if (start === null || end === null) {
@@ -24,8 +20,8 @@ function period(start: number | null, end: number | null) {
 export function metadataParts(metadata: ThemeMetadata): string[] {
   const lastDecision = formatDate(metadata.lastDecisionDate)
   return [
-    counted(metadata.caseCount, "processo", "processos"),
-    counted(metadata.courtCount, "tribunal", "tribunais"),
+    formatCount(metadata.caseCount, "processo", "processos"),
+    formatCount(metadata.courtCount, "tribunal", "tribunais"),
     period(metadata.periodStartYear, metadata.periodEndYear),
     lastDecision === null ? null : `última decisão ${lastDecision}`,
   ].filter((part) => part !== null)
