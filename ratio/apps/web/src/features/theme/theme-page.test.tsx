@@ -9,6 +9,7 @@ import {
   answerThemeNever,
   answerThemeNotFound,
   appealFamily,
+  belowFloorFamily,
   meritFamily,
   themeDetail,
 } from "../../test/theme-detail"
@@ -556,5 +557,102 @@ describe("outcome figure", () => {
     await renderTheme()
 
     expect(screen.queryByRole("figure")).not.toBeInTheDocument()
+  })
+})
+
+describe("outcome figure below the percentage floor", () => {
+  function figureNumber(number: number) {
+    return screen.getByRole("figure", {
+      name: new RegExp(`^FIG\\. ${number} — `),
+    })
+  }
+
+  it("shows only the counts of each outcome, in decisions", async () => {
+    answerThemeDetail({ ...themeDetail, outcomeBreakdown: [belowFloorFamily] })
+
+    await renderTheme()
+
+    const rows = within(figureNumber(1)).getAllByTestId("outcome-row")
+    expect(rows[0]).toHaveTextContent("Procedente1 decisão")
+    expect(rows[1]).toHaveTextContent("Parcialmente procedente0 decisões")
+    expect(rows[2]).toHaveTextContent("Improcedente0 decisões")
+  })
+
+  it("names a one-decision figure in the singular", async () => {
+    answerThemeDetail({ ...themeDetail, outcomeBreakdown: [belowFloorFamily] })
+
+    await renderTheme()
+
+    expect(
+      screen.getByRole("figure", { name: "FIG. 1 — Desfecho de 1 decisão" })
+    ).toBeInTheDocument()
+  })
+
+  it("shows no percentage and no proportional bar", async () => {
+    answerThemeDetail({ ...themeDetail, outcomeBreakdown: [belowFloorFamily] })
+
+    await renderTheme()
+
+    const figure = figureNumber(1)
+    expect(figure).not.toHaveTextContent("%")
+    expect(within(figure).queryByTestId("outcome-bar")).not.toBeInTheDocument()
+  })
+
+  it("follows the null ratio from the API, not a fixed floor", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      outcomeBreakdown: [
+        {
+          ...belowFloorFamily,
+          judged: 3,
+          categories: [
+            { outcome: "Procedente", count: 2, ratio: null },
+            { outcome: "Parcialmente procedente", count: 0, ratio: null },
+            { outcome: "Improcedente", count: 1, ratio: null },
+          ],
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    const figure = figureNumber(1)
+    expect(figure).not.toHaveTextContent("%")
+    expect(within(figure).queryByTestId("outcome-bar")).not.toBeInTheDocument()
+    expect(within(figure).getAllByTestId("outcome-row")[0]).toHaveTextContent(
+      "Procedente2 decisões"
+    )
+  })
+
+  it("applies the floor to each family on its own", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      outcomeBreakdown: [meritFamily, belowFloorFamily],
+    })
+
+    await renderTheme()
+
+    expect(within(figureNumber(1)).getAllByTestId("outcome-bar")).toHaveLength(
+      3
+    )
+    expect(figureNumber(1)).toHaveTextContent("69,4%")
+    expect(
+      within(figureNumber(2)).queryByTestId("outcome-bar")
+    ).not.toBeInTheDocument()
+    expect(figureNumber(2)).not.toHaveTextContent("%")
+  })
+
+  it("keeps the source and the partial treatment below the counts", async () => {
+    answerThemeDetail({ ...themeDetail, outcomeBreakdown: [belowFloorFamily] })
+
+    await renderTheme()
+
+    const figure = figureNumber(1)
+    expect(
+      within(figure).getByText(themeDetail.partialTreatment)
+    ).toBeInTheDocument()
+    expect(
+      within(figure).getByText("Fonte: DataJud/CNJ, extração de 28.08.2026")
+    ).toBeInTheDocument()
   })
 })

@@ -21,6 +21,16 @@ export const appealFamily = {
   ],
 }
 
+export const belowFloorFamily = {
+  polarityLabel: "acolhimento da pretensão de quem recorreu",
+  judged: 1,
+  categories: [
+    { outcome: "Procedente", count: 1, ratio: null },
+    { outcome: "Parcialmente procedente", count: 0, ratio: null },
+    { outcome: "Improcedente", count: 0, ratio: null },
+  ],
+}
+
 export const themeDetail = {
   themeKey: 412,
   name: "Inscrição indevida em cadastro de inadimplentes",
