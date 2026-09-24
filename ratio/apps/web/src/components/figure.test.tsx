@@ -27,4 +27,21 @@ describe("figure", () => {
       content.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
   })
+
+  it.each(["", "   "])("renders nothing when the source is %j", (source) => {
+    const { container } = renderFigure(source)
+
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it("does not compile and renders nothing without a source", () => {
+    const { container } = render(
+      // @ts-expect-error source is required
+      <Figure number={1} title="Desfecho das 144 decisões">
+        <p>Procedente 100</p>
+      </Figure>
+    )
+
+    expect(container).toBeEmptyDOMElement()
+  })
 })
