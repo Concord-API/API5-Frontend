@@ -27,6 +27,14 @@ export const themeDetail = {
   outcomeBreakdown: [],
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
+  provenance: [
+    {
+      block: "cases",
+      source: "DataJud/CNJ",
+      sourceUrl: "https://datajud-wiki.cnj.jus.br/api-publica/",
+      extractedAt: "2026-08-28",
+    },
+  ],
   unavailable: [
     {
       block: "caseLawCitation",
