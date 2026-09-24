@@ -33,8 +33,23 @@ export const themeListSchema = z.object({
   themes: z.array(themeSummarySchema),
 })
 
+export const themeDetailSchema = z.object({
+  themeKey: z.number().int(),
+  name: z.string(),
+  subjectArea: z.string().nullable(),
+  strengthScore: z.number().int(),
+  level: strengthLevelSchema,
+  caseCount: z.number().int(),
+  judgedCount: z.number().int(),
+  courtCount: z.number().int(),
+  periodStartYear: z.number().int().nullable(),
+  periodEndYear: z.number().int().nullable(),
+  lastDecisionDate: z.string().nullable(),
+})
+
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
 export type ThemeList = z.infer<typeof themeListSchema>
+export type ThemeDetail = z.infer<typeof themeDetailSchema>
 
 export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   const params = new URLSearchParams()
@@ -52,5 +67,16 @@ export function themesQueryOptions(q: string) {
   return queryOptions({
     queryKey: ["themes", q],
     queryFn: () => fetchThemes({ q }),
+  })
+}
+
+export function fetchThemeDetail(key: number) {
+  return getJson(`/api/themes/${key}`, themeDetailSchema)
+}
+
+export function themeDetailQueryOptions(key: number) {
+  return queryOptions({
+    queryKey: ["theme", key],
+    queryFn: () => fetchThemeDetail(key),
   })
 }

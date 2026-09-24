@@ -2,7 +2,8 @@ import { http, HttpResponse } from "msw"
 import { describe, expect, it } from "vitest"
 import { z } from "zod"
 import { server } from "../test/server"
-import { fetchThemes } from "./themes"
+import { ApiError } from "./client"
+import { fetchThemeDetail, fetchThemes } from "./themes"
 
 const contractExample = {
   query: "inscricao indevida",
@@ -104,5 +105,86 @@ describe("fetchThemes", () => {
     await fetchThemes({ q: "" })
 
     expect(requested()?.searchParams.has("q")).toBe(false)
+  })
+})
+
+const detailExample = {
+  themeKey: 412,
+  name: "Inscrição indevida em cadastro de inadimplentes",
+  subjectArea: "CONSUMIDOR",
+  strengthScore: 78,
+  level: "Dominante",
+  caseCount: 203,
+  judgedCount: 144,
+  courtCount: 3,
+  periodStartYear: 2021,
+  periodEndYear: 2026,
+  lastDecisionDate: "2026-08-30",
+}
+
+function respondWithDetail(body: Record<string, unknown>, status = 200) {
+  let requested: URL | undefined
+  server.use(
+    http.get("/api/themes/:key", ({ request }) => {
+      requested = new URL(request.url)
+      return HttpResponse.json(body, {
+        status,
+        headers:
+          status === 200
+            ? undefined
+            : { "Content-Type": "application/problem+json" },
+      })
+    })
+  )
+  return () => requested
+}
+
+describe("fetchThemeDetail", () => {
+  it("requests the theme by its key and accepts the contract", async () => {
+    const requested = respondWithDetail(detailExample)
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(requested()?.pathname).toBe("/api/themes/412")
+    expect(detail).toEqual(detailExample)
+  })
+
+  it("accepts the fields the contract allows to be null", async () => {
+    respondWithDetail({
+      ...detailExample,
+      subjectArea: null,
+      periodStartYear: null,
+      periodEndYear: null,
+      lastDecisionDate: null,
+    })
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.lastDecisionDate).toBeNull()
+  })
+
+  it("breaks on the parse when a header field is missing", async () => {
+    const body: Record<string, unknown> = { ...detailExample }
+    delete body.caseCount
+    respondWithDetail(body)
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("rejects with the status and the detail when the theme does not exist", async () => {
+    respondWithDetail(
+      {
+        title: "Recurso não encontrado",
+        status: 404,
+        detail: "Tema não encontrado.",
+      },
+      404
+    )
+
+    const error = await fetchThemeDetail(999999).catch((reason) => reason)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error.status).toBe(404)
+    expect(error.detail).toBe("Tema não encontrado.")
   })
 })
