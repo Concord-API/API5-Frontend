@@ -2,6 +2,7 @@ import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
+import { answerThemes, fullList } from "../../test/themes"
 import {
   answerThemeDetail,
   answerThemeNetworkError,
@@ -111,5 +112,46 @@ describe("theme states", () => {
     expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent(
       themeDetail.name
     )
+  })
+})
+
+describe("link back to the search", () => {
+  it("goes back to the results the theme was opened from", async () => {
+    answerThemes()
+    answerThemeDetail()
+    await renderRoute("/busca?q=inscricao%20indevida")
+
+    await userEvent.click(
+      await screen.findByRole("link", { name: fullList.themes[0].name })
+    )
+
+    const back = await screen.findByRole("link", {
+      name: "Voltar aos 3 resultados",
+    })
+    expect(back).toHaveAttribute("href", "/busca?q=inscricao+indevida")
+  })
+
+  it("uses the singular when the search had a single result", async () => {
+    answerThemes({ ...fullList, total: 1, themes: [fullList.themes[0]] })
+    answerThemeDetail()
+    await renderRoute("/busca?q=inscricao%20indevida")
+
+    await userEvent.click(
+      await screen.findByRole("link", { name: fullList.themes[0].name })
+    )
+
+    expect(
+      await screen.findByRole("link", { name: "Voltar ao resultado" })
+    ).toBeInTheDocument()
+  })
+
+  it("goes back to the search screen when the theme was opened directly", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      screen.getByRole("link", { name: "Voltar à busca" })
+    ).toHaveAttribute("href", "/")
   })
 })
