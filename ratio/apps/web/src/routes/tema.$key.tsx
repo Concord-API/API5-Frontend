@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { themeDetailQueryOptions } from "@/api/themes"
+import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
 import { ThemeHeader } from "@/features/theme/theme-header"
 import { ThemeError, ThemePending } from "@/features/theme/theme-states"
@@ -26,6 +27,7 @@ function Theme() {
 
   return (
     <ThemeFrame>
+      <ThemeBackLink />
       <ThemeHeader theme={data} />
     </ThemeFrame>
   )
