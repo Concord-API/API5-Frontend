@@ -1,6 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { createMemoryHistory, RouterProvider } from "@tanstack/react-router"
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRouter,
+  RouterProvider,
+} from "@tanstack/react-router"
 import { render } from "@testing-library/react"
+import type { ReactNode } from "react"
 import { createAppRouter } from "../router"
 
 export async function renderRoute(
@@ -25,4 +31,13 @@ export async function renderRoute(
     </QueryClientProvider>
   )
   return { router, queryClient }
+}
+
+export async function renderInRouter(ui: ReactNode) {
+  const router = createRouter({
+    routeTree: createRootRoute({ component: () => ui }),
+    history: createMemoryHistory({ initialEntries: ["/"] }),
+  })
+  await router.load()
+  render(<RouterProvider router={router} />)
 }
