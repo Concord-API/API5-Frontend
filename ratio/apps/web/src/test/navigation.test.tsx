@@ -3,8 +3,9 @@ import { describe, expect, it } from "vitest"
 import { renderRoute } from "./render"
 import { server } from "./server"
 import { answerThemeDetail } from "./theme-detail"
+import { emptyList as emptySearch } from "./themes"
 
-const emptyList = { query: "", total: 0, themes: [] }
+const emptyList = { ...emptySearch, query: "" }
 
 function answerThemes(body: Record<string, unknown> = emptyList) {
   const requests: URL[] = []

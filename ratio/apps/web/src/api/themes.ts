@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 import { z } from "zod"
 import { getJson } from "./client"
+import { provenanceSchema } from "./provenance"
 import { unavailableBlockSchema } from "./unavailable"
 
 export const strengthLevelSchema = z.enum([
@@ -32,6 +33,7 @@ export const themeListSchema = z.object({
   query: z.string(),
   total: z.number().int(),
   themes: z.array(themeSummarySchema),
+  provenance: provenanceSchema,
 })
 
 export const textSegmentSchema = z.object({ text: z.string() })
@@ -75,6 +77,7 @@ export const themeDetailSchema = z.object({
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
   unavailable: z.array(unavailableBlockSchema),
+  provenance: provenanceSchema,
 })
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
