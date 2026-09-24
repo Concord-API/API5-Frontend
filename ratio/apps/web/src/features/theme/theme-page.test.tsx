@@ -1,7 +1,14 @@
 import { screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
-import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
+import {
+  answerThemeDetail,
+  answerThemeNetworkError,
+  answerThemeNever,
+  answerThemeNotFound,
+  themeDetail,
+} from "../../test/theme-detail"
 
 async function renderTheme(path = "/tema/412") {
   const rendered = await renderRoute(path)
@@ -59,6 +66,50 @@ describe("theme header", () => {
 
     expect(screen.getByTestId("theme-metadata")).toHaveTextContent(
       "12.418 processos · 3 tribunais · 2021 — 2026 · última decisão 30.08.2026"
+    )
+  })
+})
+
+describe("theme states", () => {
+  it("shows the loading state while the theme is on its way", async () => {
+    answerThemeNever()
+
+    await renderRoute("/tema/412", { waitForLoad: false })
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Carregando tema…"
+    )
+  })
+
+  it("says the theme was not found when the API answers 404", async () => {
+    answerThemeNotFound()
+
+    await renderRoute("/tema/999999")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Tema não encontrado."
+    )
+    expect(
+      screen.getByRole("link", { name: "Ir para a busca" })
+    ).toHaveAttribute("href", "/")
+  })
+
+  it("offers to try again when the theme fails to load", async () => {
+    answerThemeNetworkError()
+
+    await renderRoute("/tema/412")
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível carregar o tema."
+    )
+
+    answerThemeDetail()
+    await userEvent.click(
+      screen.getByRole("button", { name: "Tentar novamente" })
+    )
+
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent(
+      themeDetail.name
     )
   })
 })
