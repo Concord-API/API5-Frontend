@@ -21,7 +21,7 @@ export function ThemeArticle({ summary }: ThemeArticleProps) {
         data-testid="summary-lead"
         className="border-l-2 border-primary pl-[18px] font-sans text-xl leading-snug text-foreground"
       >
-        <SummarySegments segments={summary.lead} />
+        <SummarySegments segments={summary.lead} emphasis />
       </p>
       <p
         data-testid="summary-body"
