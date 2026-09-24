@@ -52,6 +52,27 @@ export const themeDetail = {
       message: "O DataJud não publica o relator.",
     },
   ],
+  provenance: {
+    sources: [
+      {
+        block: "cases",
+        source: "datajud",
+        name: "DataJud/CNJ",
+        sourceUrl: "https://www.cnj.jus.br/sistemas/datajud/",
+        extractedAt: "2026-08-28T13:00:00+00:00",
+        count: 203,
+      },
+      {
+        block: "doctrine",
+        source: "doaj",
+        name: "DOAJ",
+        sourceUrl: "https://doaj.org/",
+        extractedAt: "2026-09-02T11:00:00+00:00",
+        count: 4,
+      },
+    ],
+    methodologyVersion: "1.0",
+  },
 }
 
 export const themeNotFoundProblem = {

@@ -52,12 +52,26 @@ export const fullList: ThemeList = {
       lastDecisionDate: null,
     },
   ],
+  provenance: {
+    sources: [
+      {
+        block: "cases",
+        source: "datajud",
+        name: "DataJud/CNJ",
+        sourceUrl: "https://www.cnj.jus.br/sistemas/datajud/",
+        extractedAt: "2026-08-28T13:00:00+00:00",
+        count: 12418,
+      },
+    ],
+    methodologyVersion: "1.0",
+  },
 }
 
 export const emptyList: ThemeList = {
   query: "contrato de arrendamento de satelite",
   total: 0,
   themes: [],
+  provenance: fullList.provenance,
 }
 
 export const shortTermProblem = {
