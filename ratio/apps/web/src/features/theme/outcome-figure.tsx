@@ -1,6 +1,11 @@
 import type { OutcomeFamily, Provenance } from "@/api/themes"
 import { Figure } from "@/components/figure"
-import { formatDate, formatNumber, formatPercent } from "@/lib/format"
+import {
+  formatCount,
+  formatDate,
+  formatNumber,
+  formatPercent,
+} from "@/lib/format"
 
 type OutcomeFiguresProps = {
   breakdown: OutcomeFamily[]
@@ -25,7 +30,7 @@ function casesSource(provenance: Provenance[]) {
 
 function countLabel(count: number, ratio: number | null) {
   if (ratio === null) {
-    return formatNumber(count)
+    return formatCount(count, "decisão", "decisões")
   }
   return `${formatNumber(count)} · ${formatPercent(ratio)}`
 }
