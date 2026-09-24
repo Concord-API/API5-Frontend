@@ -13,7 +13,7 @@ export function ThemeHeader({ theme }: ThemeHeaderProps) {
         className="flex size-[104px] shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-[#C9C2B4]"
       >
         <span className="font-sans text-[40px] leading-none font-bold text-foreground">
-          {theme.strengthScore}
+          {theme.strengthScore ?? "—"}
         </span>
         <span className="max-w-[72px] text-center font-mono text-[8px] leading-tight tracking-[0.12em] text-muted-foreground uppercase">
           Força do entendimento
