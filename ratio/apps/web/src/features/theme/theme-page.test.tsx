@@ -340,6 +340,28 @@ describe("sourceless blocks", () => {
     )
   })
 
+  it("replaces the amount figure with the unavailable message after the outcome figures", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const outcomeFigure = screen.getByRole("figure", {
+      name: /^FIG\. 1 — Desfecho/,
+    })
+    const amountNote = noteOf("amountAwarded")
+    expect(amountNote).toHaveTextContent(
+      "O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão."
+    )
+    expect(
+      outcomeFigure.compareDocumentPosition(amountNote!) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(
+      screen.queryByRole("figure", { name: /valor fixado/i })
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/R\$|P25|mediana|P75/i)).not.toBeInTheDocument()
+  })
+
   it("renders no quotation, full-text button or citation marker", async () => {
     answerThemeDetail()
 
