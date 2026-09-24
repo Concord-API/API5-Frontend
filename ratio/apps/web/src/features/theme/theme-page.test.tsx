@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react"
+import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
@@ -367,6 +367,27 @@ describe("sourceless blocks", () => {
       "O texto deste tema ainda não foi gerado; ele sai na próxima carga."
     )
     expect(screen.queryByRole("article")).not.toBeInTheDocument()
+  })
+
+  it("leads from a sourceless block to the explanation of the limitations page", async () => {
+    answerThemeDetail()
+    const user = userEvent.setup()
+    const { router } = await renderTheme()
+
+    const note = noteOf("caseLawCitation")
+    const link = within(note?.parentElement as HTMLElement).getByRole("link", {
+      name: "Entenda por que este dado falta",
+    })
+    await user.click(link)
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Limitações dos dados",
+      })
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe("/limitacoes")
+    expect(router.state.location.hash).toBe("caseLawCitation")
   })
 
   it("explains nothing when the API sends no unavailable block", async () => {
