@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react"
+import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
@@ -8,6 +8,8 @@ import {
   answerThemeNetworkError,
   answerThemeNever,
   answerThemeNotFound,
+  appealFamily,
+  meritFamily,
   themeDetail,
 } from "../../test/theme-detail"
 
@@ -375,5 +377,134 @@ describe("sourceless blocks", () => {
     await renderTheme()
 
     expect(screen.queryByRole("note")).not.toBeInTheDocument()
+  })
+})
+
+describe("outcome figure", () => {
+  function outcomeFigure(number: number, judged: string) {
+    return screen.getByRole("figure", {
+      name: `FIG. ${number} — Desfecho das ${judged} decisões`,
+    })
+  }
+
+  function rowsOf(figure: HTMLElement) {
+    return within(figure).getAllByTestId("outcome-row")
+  }
+
+  it("names the figure with its number and the judged count of the family", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(outcomeFigure(1, "144")).toBeInTheDocument()
+  })
+
+  it("says whose claim the outcomes refer to", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(outcomeFigure(1, "144")).toHaveTextContent(
+      "acolhimento da pretensão do autor"
+    )
+  })
+
+  it("shows one bar per outcome with its count and percentage", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const rows = rowsOf(outcomeFigure(1, "144"))
+    expect(rows).toHaveLength(3)
+    expect(rows[0]).toHaveTextContent("Procedente100 · 69,4%")
+    expect(rows[1]).toHaveTextContent("Parcialmente procedente42 · 29,2%")
+    expect(rows[2]).toHaveTextContent("Improcedente2 · 1,4%")
+  })
+
+  it("sizes each bar by the ratio from the API", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const bars = within(outcomeFigure(1, "144")).getAllByTestId("outcome-bar")
+    expect(parseFloat(bars[0].style.width)).toBeCloseTo(69.44)
+    expect(parseFloat(bars[2].style.width)).toBeCloseTo(1.39)
+  })
+
+  it("separates thousands in the counts and in the title", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      outcomeBreakdown: [
+        {
+          ...meritFamily,
+          judged: 12418,
+          categories: [{ outcome: "Procedente", count: 7699, ratio: 0.62 }],
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    expect(rowsOf(outcomeFigure(1, "12.418"))[0]).toHaveTextContent(
+      "7.699 · 62,0%"
+    )
+  })
+
+  it("draws one figure per family, never adding merit and appeal", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      outcomeBreakdown: [meritFamily, appealFamily],
+    })
+
+    await renderTheme()
+
+    expect(outcomeFigure(1, "144")).toHaveTextContent(
+      "acolhimento da pretensão do autor"
+    )
+    expect(outcomeFigure(2, "30")).toHaveTextContent(
+      "acolhimento da pretensão de quem recorreu"
+    )
+    expect(rowsOf(outcomeFigure(2, "30"))[2]).toHaveTextContent(
+      "Improcedente15 · 50,0%"
+    )
+  })
+
+  it("declares the source and the partial treatment below the bars", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const figure = outcomeFigure(1, "144")
+    const lastRow = rowsOf(figure)[2]
+    const partial = within(figure).getByText(themeDetail.partialTreatment)
+    const source = within(figure).getByText(
+      "Fonte: DataJud/CNJ, extração de 28.08.2026"
+    )
+    expect(
+      lastRow.compareDocumentPosition(partial) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(
+      partial.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
+  it("draws no figure when no family has judged cases", async () => {
+    answerThemeDetail({ ...themeDetail, outcomeBreakdown: [] })
+
+    await renderTheme()
+
+    expect(screen.queryByRole("figure")).not.toBeInTheDocument()
+  })
+
+  it("draws no figure when the API sends no provenance for the cases", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      provenance: [{ ...themeDetail.provenance[0], block: "doctrine" }],
+    })
+
+    await renderTheme()
+
+    expect(screen.queryByRole("figure")).not.toBeInTheDocument()
   })
 })
