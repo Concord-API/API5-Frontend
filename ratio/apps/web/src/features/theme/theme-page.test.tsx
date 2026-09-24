@@ -377,3 +377,31 @@ describe("sourceless blocks", () => {
     expect(screen.queryByRole("note")).not.toBeInTheDocument()
   })
 })
+
+describe("provenance footer", () => {
+  it("lists every source that fed the theme page", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const footer = screen.getByTestId("provenance-footer")
+    expect(footer).toHaveTextContent(
+      "DataJud/CNJ, 203 processos, extração de 28.08.2026"
+    )
+    expect(footer).toHaveTextContent(
+      "DOAJ, 4 artigos de doutrina, extração de 02.09.2026"
+    )
+    expect(footer).toHaveTextContent("metodologia v1.0")
+  })
+
+  it("shows no footer when the theme has no provenance", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      provenance: { sources: [], methodologyVersion: "1.0" },
+    })
+
+    await renderTheme()
+
+    expect(screen.queryByTestId("provenance-footer")).not.toBeInTheDocument()
+  })
+})
