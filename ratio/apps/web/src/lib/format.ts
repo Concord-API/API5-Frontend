@@ -1,5 +1,12 @@
 const numberFormat = new Intl.NumberFormat("pt-BR")
 
+const extractionDateFormat = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+})
+
 const percentFormat = new Intl.NumberFormat("pt-BR", {
   style: "percent",
   minimumFractionDigits: 1,
@@ -20,4 +27,8 @@ export function formatDate(value: string | null): string | null {
 
 export function formatPercent(ratio: number): string {
   return percentFormat.format(ratio).replace(/\s/g, "")
+}
+
+export function formatExtractionDate(value: string): string {
+  return extractionDateFormat.format(new Date(value)).replaceAll("/", ".")
 }

@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest"
-import { formatDate, formatNumber, formatPercent } from "./format"
+import {
+  formatDate,
+  formatExtractionDate,
+  formatNumber,
+  formatPercent,
+} from "./format"
 
 describe("formatNumber", () => {
   it("separates thousands with a dot", () => {
@@ -36,5 +41,15 @@ describe("formatPercent", () => {
 
   it("writes a whole ratio as one hundred percent", () => {
     expect(formatPercent(1)).toBe("100,0%")
+  })
+})
+
+describe("formatExtractionDate", () => {
+  it("writes the day of the extraction in Brasília time", () => {
+    expect(formatExtractionDate("2026-08-28T13:00:00+00:00")).toBe("28.08.2026")
+  })
+
+  it("keeps an early UTC extraction on the day it was in Brasília", () => {
+    expect(formatExtractionDate("2026-08-28T02:00:00+00:00")).toBe("27.08.2026")
   })
 })
