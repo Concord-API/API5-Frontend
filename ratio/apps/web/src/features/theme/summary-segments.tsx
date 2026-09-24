@@ -16,17 +16,29 @@ function segmentText(segment: SummarySegment) {
   return `${formatNumber(segment.count)} ${segment.unit}`
 }
 
+function renderSegment(
+  segment: SummarySegment,
+  index: number,
+  emphasis: boolean
+) {
+  if ("ratio" in segment && segment.n < 1) {
+    return null
+  }
+  if ("text" in segment || !emphasis) {
+    return <span key={index}>{segmentText(segment)}</span>
+  }
+  return (
+    <strong key={index} className="font-bold">
+      {segmentText(segment)}
+    </strong>
+  )
+}
+
 export function SummarySegments({
   segments,
   emphasis = false,
 }: SummarySegmentsProps) {
   return segments.map((segment, index) =>
-    "text" in segment || !emphasis ? (
-      <span key={index}>{segmentText(segment)}</span>
-    ) : (
-      <strong key={index} className="font-bold">
-        {segmentText(segment)}
-      </strong>
-    )
+    renderSegment(segment, index, emphasis)
   )
 }
