@@ -36,6 +36,10 @@ function OutcomeFigure({
   partialTreatment,
   source,
 }: OutcomeFigureProps) {
+  const highestCount = Math.max(
+    ...family.categories.map((category) => category.count)
+  )
+
   return (
     <Figure
       number={number}
@@ -64,7 +68,12 @@ function OutcomeFigure({
               <div className="h-2 bg-muted">
                 <div
                   data-testid="outcome-bar"
-                  className="h-full bg-muted-foreground"
+                  data-predominant={category.count === highestCount}
+                  className={
+                    category.count === highestCount
+                      ? "h-full bg-primary"
+                      : "h-full bg-muted-foreground"
+                  }
                   style={{ width: `${category.ratio * 100}%` }}
                 />
               </div>
