@@ -224,3 +224,62 @@ describe("article column", () => {
     expect(screen.queryByRole("article")).not.toBeInTheDocument()
   })
 })
+
+describe("numbers in the summary text", () => {
+  it("prints the percentage with the judged count it comes from", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-lead")).toHaveTextContent(
+      "Em 98,6% das 144 decisões julgadas, houve acolhimento da pretensão do autor."
+    )
+  })
+
+  it("highlights the number that opens the lead", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const lead = screen.getByTestId("summary-lead")
+    expect(lead.querySelector("strong")).toHaveTextContent(
+      "98,6% das 144 decisões"
+    )
+  })
+
+  it("prints a count without a percentage", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: {
+        ...themeDetail.summary,
+        body: [
+          { text: "Há " },
+          { count: 1, unit: "decisão" },
+          { text: " no recurso." },
+        ],
+      },
+    })
+
+    await renderTheme()
+
+    const body = screen.getByTestId("summary-body")
+    expect(body).toHaveTextContent("Há 1 decisão no recurso.")
+    expect(body).not.toHaveTextContent("%")
+  })
+
+  it("separates thousands in the judged count", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: {
+        ...themeDetail.summary,
+        body: [{ ratio: 0.62, n: 12418, unit: "decisões" }],
+      },
+    })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-body")).toHaveTextContent(
+      "62,0% das 12.418 decisões"
+    )
+  })
+})
