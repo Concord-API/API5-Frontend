@@ -30,7 +30,7 @@ function Theme() {
     <ThemeFrame>
       <ThemeBackLink />
       <ThemeHeader theme={data} />
-      <ThemeArticle summary={data.summary} />
+      <ThemeArticle summary={data.summary} unavailable={data.unavailable} />
     </ThemeFrame>
   )
 }

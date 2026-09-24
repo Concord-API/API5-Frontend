@@ -135,6 +135,13 @@ const detailExample = {
     methodologyVersion: "1.0",
     generatedAt: "2026-09-23",
   },
+  unavailable: [
+    {
+      block: "reporterJudge",
+      reason: "sourceUnavailable",
+      message: "O DataJud não publica o relator.",
+    },
+  ],
 }
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
@@ -187,6 +194,15 @@ describe("fetchThemeDetail", () => {
         ...detailExample.summary,
         lead: [{ ratio: 0.9861, unit: "decisões" }],
       },
+    })
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when an unavailable block has a reason outside the contract", async () => {
+    respondWithDetail({
+      ...detailExample,
+      unavailable: [{ ...detailExample.unavailable[0], reason: "unknown" }],
     })
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)

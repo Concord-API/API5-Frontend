@@ -27,6 +27,31 @@ export const themeDetail = {
   outcomeBreakdown: [],
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
+  unavailable: [
+    {
+      block: "caseLawCitation",
+      reason: "sourceUnavailable",
+      message:
+        "A citação de acórdão depende do inteiro teor da decisão, e os tribunais do escopo bloqueiam a coleta desse texto.",
+    },
+    {
+      block: "citedDecisions",
+      reason: "sourceUnavailable",
+      message:
+        "As decisões citadas dependem do inteiro teor, que os tribunais do escopo não liberam para coleta.",
+    },
+    {
+      block: "amountAwarded",
+      reason: "sourceUnavailable",
+      message:
+        "O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão.",
+    },
+    {
+      block: "reporterJudge",
+      reason: "sourceUnavailable",
+      message: "O DataJud não publica o relator.",
+    },
+  ],
 }
 
 export const themeNotFoundProblem = {
