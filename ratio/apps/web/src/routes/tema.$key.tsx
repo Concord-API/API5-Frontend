@@ -8,6 +8,7 @@ import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
 import { ThemeHeader } from "@/features/theme/theme-header"
 import { ThemeError, ThemePending } from "@/features/theme/theme-states"
+import { themeSearchSchema } from "@/features/theme/theme-tab"
 
 const keySchema = z.coerce.number().int().positive()
 
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/tema/$key")({
     parse: ({ key }) => ({ key: keySchema.parse(key) }),
     stringify: ({ key }) => ({ key: String(key) }),
   },
+  validateSearch: themeSearchSchema,
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(themeDetailQueryOptions(params.key)),
   pendingComponent: ThemePending,
