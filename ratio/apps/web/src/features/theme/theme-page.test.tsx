@@ -44,6 +44,16 @@ describe("theme header", () => {
     expect(score).toHaveTextContent("Força do entendimento")
   })
 
+  it("shows a dash in place of the score when the theme has none", async () => {
+    answerThemeDetail({ ...themeDetail, strengthScore: null, level: null })
+
+    await renderTheme()
+
+    const score = screen.getByTestId("strength-score")
+    expect(score).toHaveTextContent("—")
+    expect(score).toHaveTextContent("Força do entendimento")
+  })
+
   it("shows the area tag of the theme", async () => {
     answerThemeDetail()
 

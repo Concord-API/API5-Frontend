@@ -187,6 +187,15 @@ describe("fetchThemeDetail", () => {
     expect(detail.summary).toBeNull()
   })
 
+  it("accepts a theme without a strength score", async () => {
+    respondWithDetail({ ...detailExample, strengthScore: null, level: null })
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.strengthScore).toBeNull()
+    expect(detail.level).toBeNull()
+  })
+
   it("breaks on the parse when a percentage comes without its judged count", async () => {
     respondWithDetail({
       ...detailExample,
