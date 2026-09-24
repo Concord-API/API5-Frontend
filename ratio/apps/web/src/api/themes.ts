@@ -33,6 +33,33 @@ export const themeListSchema = z.object({
   themes: z.array(themeSummarySchema),
 })
 
+export const textSegmentSchema = z.object({ text: z.string() })
+
+export const ratioSegmentSchema = z.object({
+  ratio: z.number(),
+  n: z.number().int(),
+  unit: z.string(),
+})
+
+export const countSegmentSchema = z.object({
+  count: z.number().int(),
+  unit: z.string(),
+})
+
+export const summarySegmentSchema = z.union([
+  textSegmentSchema,
+  ratioSegmentSchema,
+  countSegmentSchema,
+])
+
+export const themeSummaryTextSchema = z.object({
+  lead: z.array(summarySegmentSchema),
+  body: z.array(summarySegmentSchema),
+  textOrigin: z.enum(["template", "curated"]),
+  methodologyVersion: z.string(),
+  generatedAt: z.string(),
+})
+
 export const themeDetailSchema = z.object({
   themeKey: z.number().int(),
   name: z.string(),
@@ -45,11 +72,14 @@ export const themeDetailSchema = z.object({
   periodStartYear: z.number().int().nullable(),
   periodEndYear: z.number().int().nullable(),
   lastDecisionDate: z.string().nullable(),
+  summary: themeSummaryTextSchema.nullable(),
 })
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
 export type ThemeList = z.infer<typeof themeListSchema>
 export type ThemeDetail = z.infer<typeof themeDetailSchema>
+export type SummarySegment = z.infer<typeof summarySegmentSchema>
+export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
 
 export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   const params = new URLSearchParams()

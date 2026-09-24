@@ -155,3 +155,72 @@ describe("link back to the search", () => {
     ).toHaveAttribute("href", "/")
   })
 })
+
+describe("article column", () => {
+  it("shows the lead and the body of the summary", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: {
+        ...themeDetail.summary,
+        lead: [{ text: "O entendimento está consolidado." }],
+        body: [{ text: "As decisões vêm de 3 tribunais." }],
+      },
+    })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-lead")).toHaveTextContent(
+      "O entendimento está consolidado."
+    )
+    expect(screen.getByTestId("summary-body")).toHaveTextContent(
+      "As decisões vêm de 3 tribunais."
+    )
+  })
+
+  it("keeps the text segments in the order the API returns", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: {
+        ...themeDetail.summary,
+        body: [{ text: "Primeiro, " }, { text: "depois." }],
+      },
+    })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-body")).toHaveTextContent(
+      "Primeiro, depois."
+    )
+  })
+
+  it("says the text was generated from the analytical base", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-origin")).toHaveTextContent(
+      "Texto gerado a partir da base analítica"
+    )
+  })
+
+  it("says the text was reviewed by the curation when it is curated", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      summary: { ...themeDetail.summary, textOrigin: "curated" },
+    })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("summary-origin")).toHaveTextContent(
+      "Texto revisado pela curadoria"
+    )
+  })
+
+  it("renders no article when the theme has no summary", async () => {
+    answerThemeDetail({ ...themeDetail, summary: null })
+
+    await renderTheme()
+
+    expect(screen.queryByRole("article")).not.toBeInTheDocument()
+  })
+})

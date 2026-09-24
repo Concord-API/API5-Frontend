@@ -120,6 +120,21 @@ const detailExample = {
   periodStartYear: 2021,
   periodEndYear: 2026,
   lastDecisionDate: "2026-08-30",
+  summary: {
+    lead: [
+      { text: "Em " },
+      { ratio: 0.9861, n: 144, unit: "decisões" },
+      { text: " julgadas, houve acolhimento da pretensão do autor." },
+    ],
+    body: [
+      { text: "Há " },
+      { count: 1, unit: "decisão" },
+      { text: " no recurso." },
+    ],
+    textOrigin: "template",
+    methodologyVersion: "1.0",
+    generatedAt: "2026-09-23",
+  },
 }
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
@@ -156,11 +171,22 @@ describe("fetchThemeDetail", () => {
       periodStartYear: null,
       periodEndYear: null,
       lastDecisionDate: null,
+      summary: null,
     })
 
     const detail = await fetchThemeDetail(412)
 
     expect(detail.lastDecisionDate).toBeNull()
+    expect(detail.summary).toBeNull()
+  })
+
+  it("breaks on the parse when the text origin is not template or curated", async () => {
+    respondWithDetail({
+      ...detailExample,
+      summary: { ...detailExample.summary, textOrigin: "llm" },
+    })
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
 
   it("breaks on the parse when a header field is missing", async () => {
