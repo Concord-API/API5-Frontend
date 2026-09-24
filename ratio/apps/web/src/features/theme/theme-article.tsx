@@ -27,7 +27,9 @@ function UnavailableNote({
 export function ThemeArticle({ summary, unavailable }: ThemeArticleProps) {
   return (
     <div className="mt-10 flex max-w-[690px] flex-col gap-6">
-      {summary !== null && (
+      {summary === null ? (
+        <UnavailableNote unavailable={unavailable} block="summary" />
+      ) : (
         <article className="flex flex-col gap-6">
           <p
             data-testid="summary-lead"
