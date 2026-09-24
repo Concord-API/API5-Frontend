@@ -299,3 +299,49 @@ describe("numbers in the summary text", () => {
     )
   })
 })
+
+describe("sourceless blocks", () => {
+  function noteOf(block: string) {
+    return screen
+      .getAllByRole("note")
+      .find((note) => note.getAttribute("data-block") === block)
+  }
+
+  it("explains the missing ruling quotation with the message from the API", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(noteOf("caseLawCitation")).toHaveTextContent(
+      "A citação de acórdão depende do inteiro teor da decisão, e os tribunais do escopo bloqueiam a coleta desse texto."
+    )
+  })
+
+  it("explains the missing cited decisions with the message from the API", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(noteOf("citedDecisions")).toHaveTextContent(
+      "As decisões citadas dependem do inteiro teor, que os tribunais do escopo não liberam para coleta."
+    )
+  })
+
+  it("renders no quotation, full-text button or citation marker", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(screen.queryByRole("blockquote")).not.toBeInTheDocument()
+    expect(screen.queryByText(/inteiro teor · pdf/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/\[\d+\]/)).not.toBeInTheDocument()
+  })
+
+  it("explains nothing when the API sends no unavailable block", async () => {
+    answerThemeDetail({ ...themeDetail, unavailable: [] })
+
+    await renderTheme()
+
+    expect(screen.queryByRole("note")).not.toBeInTheDocument()
+  })
+})
