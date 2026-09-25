@@ -34,7 +34,10 @@ function Theme() {
       <ThemeBackLink />
       <ThemeHeader theme={data} />
       <ThemeArticle summary={data.summary} unavailable={data.unavailable} />
-      <DoctrineBlock doctrine={data.doctrine} unavailable={data.unavailable} />
+      <DoctrineBlock
+        doctrine={data.relatedDoctrine}
+        unavailable={data.unavailable}
+      />
       <ProvenanceFooter provenance={data.provenance} />
       <ScopeStatement scope={data.scope} className="mt-2" />
     </ThemeFrame>

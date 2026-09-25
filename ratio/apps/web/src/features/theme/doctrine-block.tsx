@@ -1,16 +1,18 @@
 import { ExternalLink } from "lucide-react"
-import type { DoctrineEntry } from "@/api/doctrine"
+import type { DoctrineEntry, RelatedDoctrine } from "@/api/doctrine"
 import { findUnavailable, type UnavailableBlock } from "@/api/unavailable"
 import { EmptyState } from "@/components/empty-state"
 import { formatSimilarity } from "@/lib/format"
 
 type DoctrineBlockProps = {
-  doctrine: DoctrineEntry[]
+  doctrine: RelatedDoctrine
   unavailable: UnavailableBlock[]
 }
 
 function publicationOf(entry: DoctrineEntry) {
-  return [entry.journal, entry.year].filter((part) => part !== null).join(" · ")
+  return [entry.journal, entry.publicationYear]
+    .filter((part) => part !== null)
+    .join(" · ")
 }
 
 function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
@@ -38,9 +40,9 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
             {publication}
           </p>
         )}
-        {entry.articleUrl !== null && (
+        {entry.link !== null && (
           <a
-            href={entry.articleUrl}
+            href={entry.link}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 self-start font-mono text-[10px] font-semibold tracking-[0.12em] text-primary uppercase underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -56,7 +58,7 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
         className="flex shrink-0 flex-col items-end gap-0.5"
       >
         <span className="font-mono text-[14px] text-foreground">
-          {formatSimilarity(entry.similarity)}
+          {entry.similarity !== null && formatSimilarity(entry.similarity)}
         </span>
         <span className="font-mono text-[9px] tracking-[0.12em] text-muted-foreground uppercase">
           Similaridade
@@ -67,9 +69,10 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
 }
 
 export function DoctrineBlock({ doctrine, unavailable }: DoctrineBlockProps) {
+  const { entries } = doctrine
   const missing = findUnavailable(unavailable, "doctrine")
 
-  if (doctrine.length === 0 && missing === undefined) {
+  if (entries.length === 0 && missing === undefined) {
     return null
   }
 
@@ -84,15 +87,15 @@ export function DoctrineBlock({ doctrine, unavailable }: DoctrineBlockProps) {
       >
         Doutrina relacionada
       </h2>
-      {doctrine.length === 0 && missing !== undefined ? (
+      {entries.length === 0 && missing !== undefined ? (
         <div className="pt-4">
           <EmptyState item={missing} />
         </div>
       ) : (
         <ol>
-          {doctrine.map((entry) => (
+          {entries.map((entry) => (
             <DoctrineRow
-              key={`${entry.title}:${entry.articleUrl ?? ""}`}
+              key={`${entry.title}:${entry.link ?? ""}`}
               entry={entry}
             />
           ))}
