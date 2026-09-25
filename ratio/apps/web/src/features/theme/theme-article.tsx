@@ -66,6 +66,7 @@ export function ThemeArticle({
         partialTreatment={partialTreatment}
         provenance={provenance}
       />
+      <UnavailableNote unavailable={unavailable} block="amountAwarded" />
       <UnavailableNote unavailable={unavailable} block="caseLawCitation" />
       <UnavailableNote unavailable={unavailable} block="citedDecisions" />
     </div>
