@@ -1,9 +1,12 @@
 import { ExternalLink } from "lucide-react"
 import type { DoctrineEntry } from "@/api/doctrine"
+import { findUnavailable, type UnavailableBlock } from "@/api/unavailable"
+import { EmptyState } from "@/components/empty-state"
 import { formatSimilarity } from "@/lib/format"
 
 type DoctrineBlockProps = {
   doctrine: DoctrineEntry[]
+  unavailable: UnavailableBlock[]
 }
 
 function publicationOf(entry: DoctrineEntry) {
@@ -63,7 +66,13 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
   )
 }
 
-export function DoctrineBlock({ doctrine }: DoctrineBlockProps) {
+export function DoctrineBlock({ doctrine, unavailable }: DoctrineBlockProps) {
+  const missing = findUnavailable(unavailable, "doctrine")
+
+  if (doctrine.length === 0 && missing === undefined) {
+    return null
+  }
+
   return (
     <section
       aria-labelledby="doctrine-title"
@@ -75,14 +84,20 @@ export function DoctrineBlock({ doctrine }: DoctrineBlockProps) {
       >
         Doutrina relacionada
       </h2>
-      <ol>
-        {doctrine.map((entry) => (
-          <DoctrineRow
-            key={`${entry.title}:${entry.articleUrl ?? ""}`}
-            entry={entry}
-          />
-        ))}
-      </ol>
+      {doctrine.length === 0 && missing !== undefined ? (
+        <div className="pt-4">
+          <EmptyState item={missing} />
+        </div>
+      ) : (
+        <ol>
+          {doctrine.map((entry) => (
+            <DoctrineRow
+              key={`${entry.title}:${entry.articleUrl ?? ""}`}
+              entry={entry}
+            />
+          ))}
+        </ol>
+      )}
     </section>
   )
 }
