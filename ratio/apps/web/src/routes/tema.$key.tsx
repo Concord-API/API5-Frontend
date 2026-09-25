@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { themeDetailQueryOptions } from "@/api/themes"
 import { ProvenanceFooter } from "@/components/provenance-footer"
+import { ScopeStatement } from "@/components/scope-statement"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
@@ -33,6 +34,7 @@ function Theme() {
       <ThemeHeader theme={data} />
       <ThemeArticle summary={data.summary} unavailable={data.unavailable} />
       <ProvenanceFooter provenance={data.provenance} />
+      <ScopeStatement scope={data.scope} className="mt-2" />
     </ThemeFrame>
   )
 }
