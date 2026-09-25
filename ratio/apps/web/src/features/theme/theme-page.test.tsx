@@ -585,7 +585,112 @@ describe("related doctrine", () => {
 
     await renderTheme()
 
-    expect(doctrineBlock()).not.toHaveTextContent(/invocad|citad|citaç/i)
+    for (const entry of doctrineEntries()) {
+      expect(entry).not.toHaveTextContent(/invocad|citad|citaç/i)
+    }
+  })
+
+  it("declares that the link is by semantic similarity, with the threshold from the API", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent(
+      /^similaridade semântica ≥ 0,55 · modelo paraphrase-multilingual-MiniLM-L12-v2$/
+    )
+  })
+
+  it("prints the threshold the API sends, not a fixed one", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { ...themeDetail.relatedDoctrine, threshold: 0.6 },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent("similaridade semântica ≥ 0,60")
+  })
+
+  it("names each model once when the entries come from different models", async () => {
+    const [first, second, ...rest] = themeDetail.relatedDoctrine.entries
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: {
+        ...themeDetail.relatedDoctrine,
+        entries: [
+          first,
+          { ...second, embeddingModel: "multilingual-e5-base" },
+          ...rest.map((entry) => ({ ...entry, embeddingModel: null })),
+        ],
+      },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent(
+      /· modelos paraphrase-multilingual-MiniLM-L12-v2, multilingual-e5-base$/
+    )
+  })
+
+  it("leaves the model out when no entry names one", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: {
+        ...themeDetail.relatedDoctrine,
+        entries: themeDetail.relatedDoctrine.entries.map((entry) => ({
+          ...entry,
+          embeddingModel: null,
+        })),
+      },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent(/^similaridade semântica ≥ 0,55$/)
+  })
+
+  it("states that no article was cited by a court", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-statement")
+    ).toHaveTextContent(
+      "Artigos ligados ao tema pela proximidade entre o título do artigo e o assunto. Nenhum deles foi citado por tribunal."
+    )
+  })
+
+  it("declares nothing when the theme has no related doctrine", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { threshold: 0.55, entries: [] },
+      unavailable: [
+        {
+          block: "doctrine",
+          reason: "notApplicable",
+          message:
+            "Nenhum artigo de doutrina passou do limiar de similaridade com os assuntos deste tema.",
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).queryByTestId("doctrine-method")
+    ).not.toBeInTheDocument()
+    expect(
+      within(doctrineBlock()).queryByTestId("doctrine-statement")
+    ).not.toBeInTheDocument()
   })
 })
 
