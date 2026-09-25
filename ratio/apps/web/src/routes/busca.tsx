@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
 import { themesQueryOptions } from "@/api/themes"
 import { ProvenanceFooter } from "@/components/provenance-footer"
+import { ScopeStatement } from "@/components/scope-statement"
 import {
   ResultsError,
   ResultsFrame,
@@ -31,7 +32,8 @@ function Search() {
 
   return (
     <ResultsFrame>
-      <ResultsSummary term={q} total={data.total} />
+      <ResultsSummary term={q} total={data.total} scope={data.scope} />
+      <ScopeStatement scope={data.scope} className="-mt-4 mb-6" />
       {data.themes.length > 0 && (
         <ThemeList themes={data.themes} term={q} total={data.total} />
       )}
