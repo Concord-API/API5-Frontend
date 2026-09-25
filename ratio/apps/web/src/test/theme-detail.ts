@@ -53,6 +53,40 @@ export const themeDetail = {
       message: "O DataJud não publica o relator.",
     },
   ],
+  doctrine: [
+    {
+      title: "Dano moral e inscrição indevida em cadastros de inadimplentes",
+      authors: "Silva, Ana Paula; Souza, Carlos",
+      journal: "Revista de Direito do Consumidor",
+      year: 2021,
+      articleUrl: "https://doi.org/10.1590/rdc.2021.0412",
+      similarity: 0.7134,
+    },
+    {
+      title: "A negativação indevida e o dano moral presumido",
+      authors: null,
+      journal: "Revista Brasileira de Direito Civil",
+      year: 2023,
+      articleUrl: "https://rbdcivil.ibdcivil.org.br/rbdc/article/view/812",
+      similarity: 0.6821,
+    },
+    {
+      title: "Cadastros de proteção ao crédito e o dever de notificação prévia",
+      authors: "Pereira, João",
+      journal: "Revista da EMERJ",
+      year: 2019,
+      articleUrl: null,
+      similarity: 0.6317,
+    },
+    {
+      title: "Responsabilidade civil dos bancos de dados de consumidores",
+      authors: "Lima, Beatriz",
+      journal: null,
+      year: null,
+      articleUrl: "https://www.indexlaw.org/index.php/rdc/article/view/5530",
+      similarity: 0.5702,
+    },
+  ],
   provenance: {
     sources: [
       {

@@ -399,6 +399,174 @@ describe("sourceless blocks", () => {
   })
 })
 
+describe("related doctrine", () => {
+  function doctrineBlock() {
+    return screen.getByRole("region", { name: "Doutrina relacionada" })
+  }
+
+  function doctrineEntries() {
+    return within(doctrineBlock()).getAllByRole("listitem")
+  }
+
+  it("shows the related doctrine block on the theme page", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(doctrineBlock()).toBeInTheDocument()
+  })
+
+  it("keeps the entries in the order the API returns", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const titles = doctrineEntries().map(
+      (entry) => within(entry).getByTestId("doctrine-work").textContent
+    )
+    expect(titles).toEqual(themeDetail.doctrine.map((entry) => entry.title))
+  })
+
+  it("names the author and the work of each entry", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-reference")
+    ).toHaveTextContent(
+      "Silva, Ana Paula; Souza, Carlos — Dano moral e inscrição indevida em cadastros de inadimplentes"
+    )
+  })
+
+  it("names only the work when the entry has no author", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[1]).getByTestId("doctrine-reference")
+    ).toHaveTextContent(/^A negativação indevida e o dano moral presumido$/)
+  })
+
+  it("shows the journal and the year under the work", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-publication")
+    ).toHaveTextContent(/^Revista de Direito do Consumidor · 2021$/)
+  })
+
+  it("leaves the publication line out when the entry has no journal nor year", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[3]).queryByTestId("doctrine-publication")
+    ).not.toBeInTheDocument()
+  })
+
+  it("links the article to where it is published, in a new tab", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const link = within(doctrineEntries()[0]).getByRole("link", {
+      name: /abrir artigo/i,
+    })
+    expect(link).toHaveAttribute(
+      "href",
+      "https://doi.org/10.1590/rdc.2021.0412"
+    )
+    expect(link).toHaveAttribute("target", "_blank")
+    expect(link).toHaveAttribute("rel", "noopener noreferrer")
+  })
+
+  it("links each article to its own address", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const hrefs = within(doctrineBlock())
+      .getAllByRole("link", { name: /abrir artigo/i })
+      .map((link) => link.getAttribute("href"))
+    expect(hrefs).toEqual([
+      "https://doi.org/10.1590/rdc.2021.0412",
+      "https://rbdcivil.ibdcivil.org.br/rbdc/article/view/812",
+      "https://www.indexlaw.org/index.php/rdc/article/view/5530",
+    ])
+  })
+
+  it("keeps an entry without an article link as text only", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[2]).queryByRole("link")
+    ).not.toBeInTheDocument()
+    expect(doctrineEntries()[2]).toHaveTextContent(
+      "Cadastros de proteção ao crédito e o dever de notificação prévia"
+    )
+  })
+
+  it("shows the similarity score of each entry", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const scores = doctrineEntries().map(
+      (entry) => within(entry).getByTestId("doctrine-similarity").textContent
+    )
+    expect(scores).toEqual([
+      "0,71Similaridade",
+      "0,68Similaridade",
+      "0,63Similaridade",
+      "0,57Similaridade",
+    ])
+  })
+
+  it("explains the missing doctrine in its place with the message from the API", async () => {
+    const message =
+      "Nenhum artigo de doutrina passou do limiar de similaridade com os assuntos deste tema."
+    answerThemeDetail({
+      ...themeDetail,
+      doctrine: [],
+      unavailable: [{ block: "doctrine", reason: "notApplicable", message }],
+    })
+
+    await renderTheme()
+
+    const note = within(doctrineBlock()).getByRole("note")
+    expect(note).toHaveAttribute("data-block", "doctrine")
+    expect(note).toHaveTextContent(message)
+    expect(
+      within(doctrineBlock()).queryByRole("listitem")
+    ).not.toBeInTheDocument()
+  })
+
+  it("shows no doctrine block when there is no entry nor explanation", async () => {
+    answerThemeDetail({ ...themeDetail, doctrine: [] })
+
+    await renderTheme()
+
+    expect(
+      screen.queryByRole("region", { name: "Doutrina relacionada" })
+    ).not.toBeInTheDocument()
+  })
+
+  it("never presents an entry as invoked or cited by a court", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(doctrineBlock()).not.toHaveTextContent(/invocad|citad|citaç/i)
+  })
+})
+
 describe("provenance footer", () => {
   it("lists every source that fed the theme page", async () => {
     answerThemeDetail()
