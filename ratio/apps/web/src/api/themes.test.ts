@@ -73,9 +73,9 @@ function withoutScope(body: Record<string, unknown>) {
   return copy
 }
 
-function withoutDoctrine(body: Record<string, unknown>) {
+function withoutRelatedDoctrine(body: Record<string, unknown>) {
   const copy = { ...body }
-  delete copy.doctrine
+  delete copy.relatedDoctrine
   return copy
 }
 
@@ -229,21 +229,34 @@ const detailExample = {
       message: "O DataJud não publica o relator.",
     },
   ],
-  doctrine: [
-    {
-      title: "Dano moral e inscrição indevida em cadastros de inadimplentes",
-      authors: "Silva, Ana Paula; Souza, Carlos",
-      journal: "Revista de Direito do Consumidor",
-      year: 2021,
-      articleUrl: "https://doi.org/10.1590/rdc.2021.0412",
-      similarity: 0.7134,
-    },
-  ],
+  relatedDoctrine: {
+    threshold: 0.55,
+    entries: [
+      {
+        title: "Dano moral: aspectos históricos e de quantificação",
+        authors: "Maria Silva; João Souza",
+        journal: "Revista da EMERJ",
+        publicationYear: 2021,
+        doi: "10.1234/emerj.2021.001",
+        link: "https://doi.org/10.1234/emerj.2021.001",
+        source: "oai_emerj",
+        similarity: 0.854,
+        linkMethod: "embedding_cosine+lexical",
+        embeddingModel: "paraphrase-multilingual-MiniLM-L12-v2",
+      },
+    ],
+  },
   provenance,
   scope,
 }
 
-const doctrineEntry = detailExample.doctrine[0]
+const relatedDoctrine = detailExample.relatedDoctrine
+
+const doctrineEntry = relatedDoctrine.entries[0]
+
+function withEntries(entries: Record<string, unknown>[]) {
+  return { ...detailExample, relatedDoctrine: { ...relatedDoctrine, entries } }
+}
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
   let requested: URL | undefined
@@ -300,45 +313,55 @@ describe("fetchThemeDetail", () => {
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
 
-  it("breaks on the parse when the doctrine list is missing", async () => {
-    respondWithDetail(withoutDoctrine(detailExample))
+  it("breaks on the parse when the related doctrine is missing", async () => {
+    respondWithDetail(withoutRelatedDoctrine(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when the related doctrine has no threshold", async () => {
+    respondWithDetail({
+      ...detailExample,
+      relatedDoctrine: { entries: relatedDoctrine.entries },
+    })
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
 
   it("accepts a theme without related doctrine", async () => {
-    respondWithDetail({ ...detailExample, doctrine: [] })
+    respondWithDetail(withEntries([]))
 
     const detail = await fetchThemeDetail(412)
 
-    expect(detail.doctrine).toEqual([])
+    expect(detail.relatedDoctrine).toEqual({ threshold: 0.55, entries: [] })
   })
 
-  it("accepts a doctrine entry with only the title and the similarity", async () => {
+  it("accepts the doctrine fields the backend allows to be null", async () => {
     const entry = {
-      title: doctrineEntry.title,
+      ...doctrineEntry,
       authors: null,
       journal: null,
-      year: null,
-      articleUrl: null,
-      similarity: doctrineEntry.similarity,
+      publicationYear: null,
+      doi: null,
+      link: null,
+      similarity: null,
+      embeddingModel: null,
     }
-    respondWithDetail({ ...detailExample, doctrine: [entry] })
+    respondWithDetail(withEntries([entry]))
 
     const detail = await fetchThemeDetail(412)
 
-    expect(detail.doctrine).toEqual([entry])
+    expect(detail.relatedDoctrine.entries).toEqual([entry])
   })
 
   it.each([
     ["an empty title", { title: "" }],
-    ["an article link that is not a URL", { articleUrl: "doi 10.1590/rdc" }],
-    ["no similarity", { similarity: undefined }],
+    ["a link that is not a URL", { link: "doi 10.1234/emerj" }],
+    ["a link that is not http", { link: "javascript:alert(1)" }],
+    ["no source", { source: undefined }],
+    ["no link method", { linkMethod: undefined }],
   ])("breaks on the parse when a doctrine entry has %s", async (_, change) => {
-    respondWithDetail({
-      ...detailExample,
-      doctrine: [{ ...doctrineEntry, ...change }],
-    })
+    respondWithDetail(withEntries([{ ...doctrineEntry, ...change }]))
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
