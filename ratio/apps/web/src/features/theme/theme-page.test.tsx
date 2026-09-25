@@ -426,3 +426,28 @@ describe("provenance footer", () => {
     expect(screen.queryByTestId("provenance-footer")).not.toBeInTheDocument()
   })
 })
+
+describe("scope in the footer", () => {
+  it("states the scope at the foot of the theme page, without interaction", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(screen.getByTestId("scope-statement")).toHaveTextContent(
+      "Escopo: TJMG, TJRJ e TJSP · matéria cível"
+    )
+  })
+
+  it("states the scope even when the theme has no provenance", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      provenance: { sources: [], methodologyVersion: "1.0" },
+    })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("scope-statement")).toHaveTextContent(
+      "Escopo: TJMG, TJRJ e TJSP · matéria cível"
+    )
+  })
+})
