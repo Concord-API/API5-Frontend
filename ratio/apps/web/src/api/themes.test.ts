@@ -73,6 +73,12 @@ function withoutScope(body: Record<string, unknown>) {
   return copy
 }
 
+function withoutDoctrine(body: Record<string, unknown>) {
+  const copy = { ...body }
+  delete copy.doctrine
+  return copy
+}
+
 function respondWith(body: Record<string, unknown>) {
   let requested: URL | undefined
   server.use(
@@ -223,9 +229,21 @@ const detailExample = {
       message: "O DataJud não publica o relator.",
     },
   ],
+  doctrine: [
+    {
+      title: "Dano moral e inscrição indevida em cadastros de inadimplentes",
+      authors: "Silva, Ana Paula; Souza, Carlos",
+      journal: "Revista de Direito do Consumidor",
+      year: 2021,
+      articleUrl: "https://doi.org/10.1590/rdc.2021.0412",
+      similarity: 0.7134,
+    },
+  ],
   provenance,
   scope,
 }
+
+const doctrineEntry = detailExample.doctrine[0]
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
   let requested: URL | undefined
@@ -278,6 +296,49 @@ describe("fetchThemeDetail", () => {
 
   it("breaks on the parse when the scope is missing", async () => {
     respondWithDetail(withoutScope(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when the doctrine list is missing", async () => {
+    respondWithDetail(withoutDoctrine(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("accepts a theme without related doctrine", async () => {
+    respondWithDetail({ ...detailExample, doctrine: [] })
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.doctrine).toEqual([])
+  })
+
+  it("accepts a doctrine entry with only the title and the similarity", async () => {
+    const entry = {
+      title: doctrineEntry.title,
+      authors: null,
+      journal: null,
+      year: null,
+      articleUrl: null,
+      similarity: doctrineEntry.similarity,
+    }
+    respondWithDetail({ ...detailExample, doctrine: [entry] })
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.doctrine).toEqual([entry])
+  })
+
+  it.each([
+    ["an empty title", { title: "" }],
+    ["an article link that is not a URL", { articleUrl: "doi 10.1590/rdc" }],
+    ["no similarity", { similarity: undefined }],
+  ])("breaks on the parse when a doctrine entry has %s", async (_, change) => {
+    respondWithDetail({
+      ...detailExample,
+      doctrine: [{ ...doctrineEntry, ...change }],
+    })
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
