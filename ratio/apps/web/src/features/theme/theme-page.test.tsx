@@ -513,6 +513,22 @@ describe("related doctrine", () => {
     )
   })
 
+  it("shows the similarity score of each entry", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const scores = doctrineEntries().map(
+      (entry) => within(entry).getByTestId("doctrine-similarity").textContent
+    )
+    expect(scores).toEqual([
+      "0,71Similaridade",
+      "0,68Similaridade",
+      "0,63Similaridade",
+      "0,57Similaridade",
+    ])
+  })
+
   it("never presents an entry as invoked or cited by a court", async () => {
     answerThemeDetail()
 
