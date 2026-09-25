@@ -68,6 +68,22 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
   )
 }
 
+function methodOf({ threshold, entries }: RelatedDoctrine) {
+  const models = [
+    ...new Set(
+      entries
+        .map((entry) => entry.embeddingModel)
+        .filter((model) => model !== null)
+    ),
+  ]
+  const similarity = `similaridade semântica ≥ ${formatSimilarity(threshold)}`
+  if (models.length === 0) {
+    return similarity
+  }
+  const label = models.length === 1 ? "modelo" : "modelos"
+  return `${similarity} · ${label} ${models.join(", ")}`
+}
+
 export function DoctrineBlock({ doctrine, unavailable }: DoctrineBlockProps) {
   const { entries } = doctrine
   const missing = findUnavailable(unavailable, "doctrine")
@@ -81,25 +97,44 @@ export function DoctrineBlock({ doctrine, unavailable }: DoctrineBlockProps) {
       aria-labelledby="doctrine-title"
       className="mt-10 border border-[#DCD6C9] bg-card px-5 py-4"
     >
-      <h2
-        id="doctrine-title"
-        className="border-b border-foreground pb-2 font-sans text-[15px] font-bold text-foreground"
-      >
-        Doutrina relacionada
-      </h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-foreground pb-2">
+        <h2
+          id="doctrine-title"
+          className="font-sans text-[15px] font-bold text-foreground"
+        >
+          Doutrina relacionada
+        </h2>
+        {entries.length > 0 && (
+          <p
+            data-testid="doctrine-method"
+            className="font-mono text-[11px] text-muted-foreground"
+          >
+            {methodOf(doctrine)}
+          </p>
+        )}
+      </div>
       {entries.length === 0 && missing !== undefined ? (
         <div className="pt-4">
           <EmptyState item={missing} />
         </div>
       ) : (
-        <ol>
-          {entries.map((entry) => (
-            <DoctrineRow
-              key={`${entry.title}:${entry.link ?? ""}`}
-              entry={entry}
-            />
-          ))}
-        </ol>
+        <>
+          <p
+            data-testid="doctrine-statement"
+            className="pt-3 font-sans text-[13px] leading-relaxed text-muted-foreground italic"
+          >
+            Artigos ligados ao tema pela proximidade entre o título do artigo e
+            o assunto. Nenhum deles foi citado por tribunal.
+          </p>
+          <ol>
+            {entries.map((entry) => (
+              <DoctrineRow
+                key={`${entry.title}:${entry.link ?? ""}`}
+                entry={entry}
+              />
+            ))}
+          </ol>
+        </>
       )}
     </section>
   )
