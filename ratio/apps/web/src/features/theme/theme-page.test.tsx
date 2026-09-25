@@ -399,6 +399,85 @@ describe("sourceless blocks", () => {
   })
 })
 
+describe("related doctrine", () => {
+  function doctrineBlock() {
+    return screen.getByRole("region", { name: "Doutrina relacionada" })
+  }
+
+  function doctrineEntries() {
+    return within(doctrineBlock()).getAllByRole("listitem")
+  }
+
+  it("shows the related doctrine block on the theme page", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(doctrineBlock()).toBeInTheDocument()
+  })
+
+  it("keeps the entries in the order the API returns", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const titles = doctrineEntries().map(
+      (entry) => within(entry).getByTestId("doctrine-work").textContent
+    )
+    expect(titles).toEqual(themeDetail.doctrine.map((entry) => entry.title))
+  })
+
+  it("names the author and the work of each entry", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-reference")
+    ).toHaveTextContent(
+      "Silva, Ana Paula; Souza, Carlos — Dano moral e inscrição indevida em cadastros de inadimplentes"
+    )
+  })
+
+  it("names only the work when the entry has no author", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[1]).getByTestId("doctrine-reference")
+    ).toHaveTextContent(/^A negativação indevida e o dano moral presumido$/)
+  })
+
+  it("shows the journal and the year under the work", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-publication")
+    ).toHaveTextContent(/^Revista de Direito do Consumidor · 2021$/)
+  })
+
+  it("leaves the publication line out when the entry has no journal nor year", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[3]).queryByTestId("doctrine-publication")
+    ).not.toBeInTheDocument()
+  })
+
+  it("never presents an entry as invoked or cited by a court", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(doctrineBlock()).not.toHaveTextContent(/invocad|citad|citaç/i)
+  })
+})
+
 describe("provenance footer", () => {
   it("lists every source that fed the theme page", async () => {
     answerThemeDetail()
