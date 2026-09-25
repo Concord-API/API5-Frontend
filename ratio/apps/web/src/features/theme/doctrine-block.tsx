@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react"
 import type { DoctrineEntry } from "@/api/doctrine"
 
 type DoctrineBlockProps = {
@@ -31,6 +32,18 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
         >
           {publication}
         </p>
+      )}
+      {entry.articleUrl !== null && (
+        <a
+          href={entry.articleUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 self-start font-mono text-[10px] font-semibold tracking-[0.12em] text-primary uppercase underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          Abrir artigo
+          <span className="sr-only"> (abre em nova aba)</span>
+          <ExternalLink aria-hidden="true" className="size-3" />
+        </a>
       )}
     </li>
   )
