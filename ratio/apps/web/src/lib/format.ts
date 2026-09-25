@@ -13,6 +13,11 @@ const percentFormat = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
 })
 
+const similarityFormat = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
 export function formatNumber(value: number): string {
   return numberFormat.format(value)
 }
@@ -31,4 +36,8 @@ export function formatPercent(ratio: number): string {
 
 export function formatExtractionDate(value: string): string {
   return extractionDateFormat.format(new Date(value)).replaceAll("/", ".")
+}
+
+export function formatSimilarity(score: number): string {
+  return similarityFormat.format(score)
 }
