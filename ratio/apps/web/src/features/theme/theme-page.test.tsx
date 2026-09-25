@@ -424,7 +424,9 @@ describe("related doctrine", () => {
     const titles = doctrineEntries().map(
       (entry) => within(entry).getByTestId("doctrine-work").textContent
     )
-    expect(titles).toEqual(themeDetail.doctrine.map((entry) => entry.title))
+    expect(titles).toEqual(
+      themeDetail.relatedDoctrine.entries.map((entry) => entry.title)
+    )
   })
 
   it("names the author and the work of each entry", async () => {
@@ -534,7 +536,7 @@ describe("related doctrine", () => {
       "Nenhum artigo de doutrina passou do limiar de similaridade com os assuntos deste tema."
     answerThemeDetail({
       ...themeDetail,
-      doctrine: [],
+      relatedDoctrine: { threshold: 0.55, entries: [] },
       unavailable: [{ block: "doctrine", reason: "notApplicable", message }],
     })
 
@@ -549,7 +551,10 @@ describe("related doctrine", () => {
   })
 
   it("shows no doctrine block when there is no entry nor explanation", async () => {
-    answerThemeDetail({ ...themeDetail, doctrine: [] })
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { threshold: 0.55, entries: [] },
+    })
 
     await renderTheme()
 
