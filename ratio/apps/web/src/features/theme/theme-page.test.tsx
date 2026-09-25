@@ -469,6 +469,50 @@ describe("related doctrine", () => {
     ).not.toBeInTheDocument()
   })
 
+  it("links the article to where it is published, in a new tab", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const link = within(doctrineEntries()[0]).getByRole("link", {
+      name: /abrir artigo/i,
+    })
+    expect(link).toHaveAttribute(
+      "href",
+      "https://doi.org/10.1590/rdc.2021.0412"
+    )
+    expect(link).toHaveAttribute("target", "_blank")
+    expect(link).toHaveAttribute("rel", "noopener noreferrer")
+  })
+
+  it("links each article to its own address", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const hrefs = within(doctrineBlock())
+      .getAllByRole("link", { name: /abrir artigo/i })
+      .map((link) => link.getAttribute("href"))
+    expect(hrefs).toEqual([
+      "https://doi.org/10.1590/rdc.2021.0412",
+      "https://rbdcivil.ibdcivil.org.br/rbdc/article/view/812",
+      "https://www.indexlaw.org/index.php/rdc/article/view/5530",
+    ])
+  })
+
+  it("keeps an entry without an article link as text only", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[2]).queryByRole("link")
+    ).not.toBeInTheDocument()
+    expect(doctrineEntries()[2]).toHaveTextContent(
+      "Cadastros de proteção ao crédito e o dever de notificação prévia"
+    )
+  })
+
   it("never presents an entry as invoked or cited by a court", async () => {
     answerThemeDetail()
 
