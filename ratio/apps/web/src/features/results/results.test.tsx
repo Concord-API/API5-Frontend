@@ -145,6 +145,28 @@ describe("results states", () => {
   })
 })
 
+describe("results scope", () => {
+  it("states the scope under the results header, without interaction", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    expect(screen.getByTestId("scope-statement")).toHaveTextContent(
+      "Escopo: TJMG, TJRJ e TJSP · matéria cível"
+    )
+  })
+
+  it("states the scope on the most judged themes too", async () => {
+    answerThemes({ ...fullList, query: "" })
+
+    await renderResults("/busca")
+
+    expect(screen.getByTestId("scope-statement")).toHaveTextContent(
+      "Escopo: TJMG, TJRJ e TJSP · matéria cível"
+    )
+  })
+})
+
 describe("results provenance", () => {
   it("states the source and the extraction date under the results", async () => {
     answerThemes()
