@@ -529,6 +529,35 @@ describe("related doctrine", () => {
     ])
   })
 
+  it("explains the missing doctrine in its place with the message from the API", async () => {
+    const message =
+      "Nenhum artigo de doutrina passou do limiar de similaridade com os assuntos deste tema."
+    answerThemeDetail({
+      ...themeDetail,
+      doctrine: [],
+      unavailable: [{ block: "doctrine", reason: "notApplicable", message }],
+    })
+
+    await renderTheme()
+
+    const note = within(doctrineBlock()).getByRole("note")
+    expect(note).toHaveAttribute("data-block", "doctrine")
+    expect(note).toHaveTextContent(message)
+    expect(
+      within(doctrineBlock()).queryByRole("listitem")
+    ).not.toBeInTheDocument()
+  })
+
+  it("shows no doctrine block when there is no entry nor explanation", async () => {
+    answerThemeDetail({ ...themeDetail, doctrine: [] })
+
+    await renderTheme()
+
+    expect(
+      screen.queryByRole("region", { name: "Doutrina relacionada" })
+    ).not.toBeInTheDocument()
+  })
+
   it("never presents an entry as invoked or cited by a court", async () => {
     answerThemeDetail()
 
