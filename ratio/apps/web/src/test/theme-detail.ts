@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse } from "msw"
 import { server } from "./server"
+import { declaredScope } from "./themes"
 
 export const themeDetail = {
   themeKey: 412,
@@ -73,6 +74,7 @@ export const themeDetail = {
     ],
     methodologyVersion: "1.0",
   },
+  scope: declaredScope,
 }
 
 export const themeNotFoundProblem = {

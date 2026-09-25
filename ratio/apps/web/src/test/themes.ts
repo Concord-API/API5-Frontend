@@ -1,6 +1,21 @@
 import { delay, http, HttpResponse } from "msw"
+import type { Scope } from "../api/scope"
 import type { ThemeList } from "../api/themes"
 import { server } from "./server"
+
+export const declaredScope: Scope = {
+  courts: [
+    { code: "TJMG", name: "Tribunal de Justiça de Minas Gerais", state: "MG" },
+    {
+      code: "TJRJ",
+      name: "Tribunal de Justiça do Rio de Janeiro",
+      state: "RJ",
+    },
+    { code: "TJSP", name: "Tribunal de Justiça de São Paulo", state: "SP" },
+  ],
+  subject: "cível",
+  statement: "TJMG, TJRJ e TJSP",
+}
 
 export const fullList: ThemeList = {
   query: "inscricao indevida",
@@ -65,6 +80,7 @@ export const fullList: ThemeList = {
     ],
     methodologyVersion: "1.0",
   },
+  scope: declaredScope,
 }
 
 export const emptyList: ThemeList = {
@@ -72,6 +88,7 @@ export const emptyList: ThemeList = {
   total: 0,
   themes: [],
   provenance: fullList.provenance,
+  scope: declaredScope,
 }
 
 export const shortTermProblem = {

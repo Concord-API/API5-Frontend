@@ -38,13 +38,38 @@ const contractExample = {
     ],
     methodologyVersion: "1.0",
   },
+  scope: {
+    courts: [
+      {
+        code: "TJMG",
+        name: "Tribunal de Justiça de Minas Gerais",
+        state: "MG",
+      },
+      {
+        code: "TJRJ",
+        name: "Tribunal de Justiça do Rio de Janeiro",
+        state: "RJ",
+      },
+      { code: "TJSP", name: "Tribunal de Justiça de São Paulo", state: "SP" },
+    ],
+    subject: "cível",
+    statement: "TJMG, TJRJ e TJSP",
+  },
 }
 
 const provenance = contractExample.provenance
 
+const scope = contractExample.scope
+
 function withoutProvenance(body: Record<string, unknown>) {
   const copy = { ...body }
   delete copy.provenance
+  return copy
+}
+
+function withoutScope(body: Record<string, unknown>) {
+  const copy = { ...body }
+  delete copy.scope
   return copy
 }
 
@@ -114,12 +139,32 @@ describe("fetchThemes", () => {
     ).rejects.toBeInstanceOf(z.ZodError)
   })
 
+  it("breaks on the parse when the scope is missing", async () => {
+    respondWith(withoutScope(contractExample))
+
+    await expect(
+      fetchThemes({ q: "inscricao indevida" })
+    ).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("accepts a scope without a statement before the first load", async () => {
+    respondWith({
+      ...contractExample,
+      scope: { courts: [], subject: "cível", statement: null },
+    })
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.scope.statement).toBeNull()
+  })
+
   it("sends the term and the limit as query parameters", async () => {
     const requested = respondWith({
       query: "atraso de voo",
       total: 0,
       themes: [],
       provenance,
+      scope,
     })
 
     await fetchThemes({ q: "atraso de voo", limit: 5 })
@@ -135,6 +180,7 @@ describe("fetchThemes", () => {
       total: 0,
       themes: [],
       provenance,
+      scope,
     })
 
     await fetchThemes({ q: "" })
@@ -178,6 +224,7 @@ const detailExample = {
     },
   ],
   provenance,
+  scope,
 }
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
@@ -225,6 +272,12 @@ describe("fetchThemeDetail", () => {
 
   it("breaks on the parse when the provenance is missing", async () => {
     respondWithDetail(withoutProvenance(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when the scope is missing", async () => {
+    respondWithDetail(withoutScope(detailExample))
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })
