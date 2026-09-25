@@ -58,7 +58,7 @@ function DoctrineRow({ entry }: { entry: DoctrineEntry }) {
         className="flex shrink-0 flex-col items-end gap-0.5"
       >
         <span className="font-mono text-[14px] text-foreground">
-          {entry.similarity !== null && formatSimilarity(entry.similarity)}
+          {entry.similarity === null ? "—" : formatSimilarity(entry.similarity)}
         </span>
         <span className="font-mono text-[9px] tracking-[0.12em] text-muted-foreground uppercase">
           Similaridade
