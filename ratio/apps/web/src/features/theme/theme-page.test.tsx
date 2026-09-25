@@ -563,6 +563,23 @@ describe("related doctrine", () => {
     ).not.toBeInTheDocument()
   })
 
+  it("shows a dash when an entry has no similarity score", async () => {
+    const [first, ...rest] = themeDetail.relatedDoctrine.entries
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: {
+        ...themeDetail.relatedDoctrine,
+        entries: [{ ...first, similarity: null }, ...rest],
+      },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-similarity")
+    ).toHaveTextContent(/^—Similaridade$/)
+  })
+
   it("never presents an entry as invoked or cited by a court", async () => {
     answerThemeDetail()
 
