@@ -73,6 +73,12 @@ function withoutScope(body: Record<string, unknown>) {
   return copy
 }
 
+function withoutRelatedDoctrine(body: Record<string, unknown>) {
+  const copy = { ...body }
+  delete copy.relatedDoctrine
+  return copy
+}
+
 function respondWith(body: Record<string, unknown>) {
   let requested: URL | undefined
   server.use(
@@ -223,8 +229,33 @@ const detailExample = {
       message: "O DataJud não publica o relator.",
     },
   ],
+  relatedDoctrine: {
+    threshold: 0.55,
+    entries: [
+      {
+        title: "Dano moral: aspectos históricos e de quantificação",
+        authors: "Maria Silva; João Souza",
+        journal: "Revista da EMERJ",
+        publicationYear: 2021,
+        doi: "10.1234/emerj.2021.001",
+        link: "https://doi.org/10.1234/emerj.2021.001",
+        source: "oai_emerj",
+        similarity: 0.854,
+        linkMethod: "embedding_cosine+lexical",
+        embeddingModel: "paraphrase-multilingual-MiniLM-L12-v2",
+      },
+    ],
+  },
   provenance,
   scope,
+}
+
+const relatedDoctrine = detailExample.relatedDoctrine
+
+const doctrineEntry = relatedDoctrine.entries[0]
+
+function withEntries(entries: Record<string, unknown>[]) {
+  return { ...detailExample, relatedDoctrine: { ...relatedDoctrine, entries } }
 }
 
 function respondWithDetail(body: Record<string, unknown>, status = 200) {
@@ -278,6 +309,59 @@ describe("fetchThemeDetail", () => {
 
   it("breaks on the parse when the scope is missing", async () => {
     respondWithDetail(withoutScope(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when the related doctrine is missing", async () => {
+    respondWithDetail(withoutRelatedDoctrine(detailExample))
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("breaks on the parse when the related doctrine has no threshold", async () => {
+    respondWithDetail({
+      ...detailExample,
+      relatedDoctrine: { entries: relatedDoctrine.entries },
+    })
+
+    await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
+  })
+
+  it("accepts a theme without related doctrine", async () => {
+    respondWithDetail(withEntries([]))
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.relatedDoctrine).toEqual({ threshold: 0.55, entries: [] })
+  })
+
+  it("accepts the doctrine fields the backend allows to be null", async () => {
+    const entry = {
+      ...doctrineEntry,
+      authors: null,
+      journal: null,
+      publicationYear: null,
+      doi: null,
+      link: null,
+      similarity: null,
+      embeddingModel: null,
+    }
+    respondWithDetail(withEntries([entry]))
+
+    const detail = await fetchThemeDetail(412)
+
+    expect(detail.relatedDoctrine.entries).toEqual([entry])
+  })
+
+  it.each([
+    ["an empty title", { title: "" }],
+    ["a link that is not a URL", { link: "doi 10.1234/emerj" }],
+    ["a link that is not http", { link: "javascript:alert(1)" }],
+    ["no source", { source: undefined }],
+    ["no link method", { linkMethod: undefined }],
+  ])("breaks on the parse when a doctrine entry has %s", async (_, change) => {
+    respondWithDetail(withEntries([{ ...doctrineEntry, ...change }]))
 
     await expect(fetchThemeDetail(412)).rejects.toBeInstanceOf(z.ZodError)
   })

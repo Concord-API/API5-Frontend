@@ -1,6 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 import { z } from "zod"
 import { getJson } from "./client"
+import { relatedDoctrineSchema } from "./doctrine"
 import { provenanceSchema } from "./provenance"
 import { scopeSchema } from "./scope"
 import { unavailableBlockSchema } from "./unavailable"
@@ -79,6 +80,7 @@ export const themeDetailSchema = z.object({
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
   unavailable: z.array(unavailableBlockSchema),
+  relatedDoctrine: relatedDoctrineSchema,
   provenance: provenanceSchema,
   scope: scopeSchema,
 })

@@ -399,6 +399,301 @@ describe("sourceless blocks", () => {
   })
 })
 
+describe("related doctrine", () => {
+  function doctrineBlock() {
+    return screen.getByRole("region", { name: "Doutrina relacionada" })
+  }
+
+  function doctrineEntries() {
+    return within(doctrineBlock()).getAllByRole("listitem")
+  }
+
+  it("shows the related doctrine block on the theme page", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(doctrineBlock()).toBeInTheDocument()
+  })
+
+  it("keeps the entries in the order the API returns", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const titles = doctrineEntries().map(
+      (entry) => within(entry).getByTestId("doctrine-work").textContent
+    )
+    expect(titles).toEqual(
+      themeDetail.relatedDoctrine.entries.map((entry) => entry.title)
+    )
+  })
+
+  it("names the author and the work of each entry", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-reference")
+    ).toHaveTextContent(
+      "Silva, Ana Paula; Souza, Carlos — Dano moral e inscrição indevida em cadastros de inadimplentes"
+    )
+  })
+
+  it("names only the work when the entry has no author", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[1]).getByTestId("doctrine-reference")
+    ).toHaveTextContent(/^A negativação indevida e o dano moral presumido$/)
+  })
+
+  it("shows the journal and the year under the work", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-publication")
+    ).toHaveTextContent(/^Revista de Direito do Consumidor · 2021$/)
+  })
+
+  it("leaves the publication line out when the entry has no journal nor year", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[3]).queryByTestId("doctrine-publication")
+    ).not.toBeInTheDocument()
+  })
+
+  it("links the article to where it is published, in a new tab", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const link = within(doctrineEntries()[0]).getByRole("link", {
+      name: /abrir artigo/i,
+    })
+    expect(link).toHaveAttribute(
+      "href",
+      "https://doi.org/10.1590/rdc.2021.0412"
+    )
+    expect(link).toHaveAttribute("target", "_blank")
+    expect(link).toHaveAttribute("rel", "noopener noreferrer")
+  })
+
+  it("links each article to its own address", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const hrefs = within(doctrineBlock())
+      .getAllByRole("link", { name: /abrir artigo/i })
+      .map((link) => link.getAttribute("href"))
+    expect(hrefs).toEqual([
+      "https://doi.org/10.1590/rdc.2021.0412",
+      "https://rbdcivil.ibdcivil.org.br/rbdc/article/view/812",
+      "https://www.indexlaw.org/index.php/rdc/article/view/5530",
+    ])
+  })
+
+  it("keeps an entry without an article link as text only", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[2]).queryByRole("link")
+    ).not.toBeInTheDocument()
+    expect(doctrineEntries()[2]).toHaveTextContent(
+      "Cadastros de proteção ao crédito e o dever de notificação prévia"
+    )
+  })
+
+  it("shows the similarity score of each entry", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const scores = doctrineEntries().map(
+      (entry) => within(entry).getByTestId("doctrine-similarity").textContent
+    )
+    expect(scores).toEqual([
+      "0,71Similaridade",
+      "0,68Similaridade",
+      "0,63Similaridade",
+      "0,57Similaridade",
+    ])
+  })
+
+  it("explains the missing doctrine in its place with the message from the API", async () => {
+    const message =
+      "Nenhum artigo de doutrina passou do limiar de similaridade com os assuntos deste tema."
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { threshold: 0.55, entries: [] },
+      unavailable: [{ block: "doctrine", reason: "notApplicable", message }],
+    })
+
+    await renderTheme()
+
+    const note = within(doctrineBlock()).getByRole("note")
+    expect(note).toHaveAttribute("data-block", "doctrine")
+    expect(note).toHaveTextContent(message)
+    expect(
+      within(doctrineBlock()).queryByRole("listitem")
+    ).not.toBeInTheDocument()
+  })
+
+  it("shows no doctrine block when there is no entry nor explanation", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { threshold: 0.55, entries: [] },
+    })
+
+    await renderTheme()
+
+    expect(
+      screen.queryByRole("region", { name: "Doutrina relacionada" })
+    ).not.toBeInTheDocument()
+  })
+
+  it("shows a dash when an entry has no similarity score", async () => {
+    const [first, ...rest] = themeDetail.relatedDoctrine.entries
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: {
+        ...themeDetail.relatedDoctrine,
+        entries: [{ ...first, similarity: null }, ...rest],
+      },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineEntries()[0]).getByTestId("doctrine-similarity")
+    ).toHaveTextContent(/^—Similaridade$/)
+  })
+
+  it("never presents an entry as invoked or cited by a court", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    for (const entry of doctrineEntries()) {
+      expect(entry).not.toHaveTextContent(/invocad|citad|citaç/i)
+    }
+  })
+
+  it("declares that the link is by semantic similarity, with the threshold from the API", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent(
+      /^similaridade semântica ≥ 0,55 · modelo paraphrase-multilingual-MiniLM-L12-v2$/
+    )
+  })
+
+  it("prints the threshold the API sends, not a fixed one", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { ...themeDetail.relatedDoctrine, threshold: 0.6 },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent("similaridade semântica ≥ 0,60")
+  })
+
+  it("names each model once when the entries come from different models", async () => {
+    const [first, second, ...rest] = themeDetail.relatedDoctrine.entries
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: {
+        ...themeDetail.relatedDoctrine,
+        entries: [
+          first,
+          { ...second, embeddingModel: "multilingual-e5-base" },
+          ...rest.map((entry) => ({ ...entry, embeddingModel: null })),
+        ],
+      },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent(
+      /· modelos paraphrase-multilingual-MiniLM-L12-v2, multilingual-e5-base$/
+    )
+  })
+
+  it("leaves the model out when no entry names one", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: {
+        ...themeDetail.relatedDoctrine,
+        entries: themeDetail.relatedDoctrine.entries.map((entry) => ({
+          ...entry,
+          embeddingModel: null,
+        })),
+      },
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-method")
+    ).toHaveTextContent(/^similaridade semântica ≥ 0,55$/)
+  })
+
+  it("states that no article was cited by a court", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).getByTestId("doctrine-statement")
+    ).toHaveTextContent(
+      "Artigos ligados ao tema pela proximidade entre o título do artigo e o assunto. Nenhum deles foi citado por tribunal."
+    )
+  })
+
+  it("declares nothing when the theme has no related doctrine", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      relatedDoctrine: { threshold: 0.55, entries: [] },
+      unavailable: [
+        {
+          block: "doctrine",
+          reason: "notApplicable",
+          message:
+            "Nenhum artigo de doutrina passou do limiar de similaridade com os assuntos deste tema.",
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    expect(
+      within(doctrineBlock()).queryByTestId("doctrine-method")
+    ).not.toBeInTheDocument()
+    expect(
+      within(doctrineBlock()).queryByTestId("doctrine-statement")
+    ).not.toBeInTheDocument()
+  })
+})
+
 describe("provenance footer", () => {
   it("lists every source that fed the theme page", async () => {
     answerThemeDetail()
