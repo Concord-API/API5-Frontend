@@ -39,6 +39,7 @@ describe("sourceless blocks never render a placeholder value", () => {
     const rendered = notes()
     expect(rendered.map((note) => note.getAttribute("data-block"))).toEqual([
       "summary",
+      "amountAwarded",
       "caseLawCitation",
       "citedDecisions",
     ])
@@ -78,6 +79,7 @@ describe("sourceless blocks never render a placeholder value", () => {
     await renderTheme({
       ...themeDetail,
       summary: null,
+      outcomeBreakdown: [],
       unavailable: [notLoadedSummary],
     })
 
