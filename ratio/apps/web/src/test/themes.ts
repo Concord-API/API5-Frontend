@@ -1,6 +1,21 @@
 import { delay, http, HttpResponse } from "msw"
+import type { Scope } from "../api/scope"
 import type { ThemeList } from "../api/themes"
 import { server } from "./server"
+
+export const declaredScope: Scope = {
+  courts: [
+    { code: "TJMG", name: "Tribunal de Justiça de Minas Gerais", state: "MG" },
+    {
+      code: "TJRJ",
+      name: "Tribunal de Justiça do Rio de Janeiro",
+      state: "RJ",
+    },
+    { code: "TJSP", name: "Tribunal de Justiça de São Paulo", state: "SP" },
+  ],
+  subject: "cível",
+  statement: "TJMG, TJRJ e TJSP",
+}
 
 export const fullList: ThemeList = {
   query: "inscricao indevida",
@@ -52,12 +67,28 @@ export const fullList: ThemeList = {
       lastDecisionDate: null,
     },
   ],
+  provenance: {
+    sources: [
+      {
+        block: "cases",
+        source: "datajud",
+        name: "DataJud/CNJ",
+        sourceUrl: "https://www.cnj.jus.br/sistemas/datajud/",
+        extractedAt: "2026-08-28T13:00:00+00:00",
+        count: 12418,
+      },
+    ],
+    methodologyVersion: "1.0",
+  },
+  scope: declaredScope,
 }
 
 export const emptyList: ThemeList = {
   query: "contrato de arrendamento de satelite",
   total: 0,
   themes: [],
+  provenance: fullList.provenance,
+  scope: declaredScope,
 }
 
 export const shortTermProblem = {

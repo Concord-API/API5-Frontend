@@ -4,11 +4,12 @@ import { http, HttpResponse } from "msw"
 import { beforeEach, describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import { server } from "../../test/server"
+import { emptyList } from "../../test/themes"
 
 beforeEach(() => {
   server.use(
     http.get("/api/themes", () =>
-      HttpResponse.json({ query: "", total: 0, themes: [] })
+      HttpResponse.json({ ...emptyList, query: "" })
     )
   )
 })

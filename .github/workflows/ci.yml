@@ -70,3 +70,51 @@ jobs:
           path: ratio/apps/web/dist/
           if-no-files-found: error
           retention-days: 30
+
+  quality:
+    name: Frontend quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_ENABLED: ${{ secrets.SONAR_TOKEN != '' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main') }}
+      SONAR_WAIT_GATE: ${{ github.event_name == 'pull_request' }}
+    defaults:
+      run:
+        working-directory: ratio
+    steps:
+      - name: Skip when SonarQube Cloud is not configured
+        if: ${{ env.SONAR_TOKEN == '' }}
+        working-directory: .
+        run: echo "::warning::SONAR_TOKEN is not available, the quality analysis was skipped"
+      - name: Skip branches that the SonarQube Cloud plan does not analyze
+        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_ENABLED != 'true' }}
+        working-directory: .
+        run: echo "Only pull requests and main are analyzed; this push is covered by its pull request analysis"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        with:
+          node-version-file: ratio/.node-version
+          cache: npm
+          cache-dependency-path: ratio/package-lock.json
+      - name: Use the project npm version
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        run: npm install --global npm@11.12.1
+      - name: Install locked dependencies
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        run: npm ci
+      - name: Test with coverage
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        run: npm run test:ci
+      - name: Send the analysis and wait for the quality gate
+        if: ${{ env.SONAR_ENABLED == 'true' }}
+        uses: SonarSource/sonarqube-scan-action@ba9859eae8dd6bd29e412f25ddbbef3d032000f4 # v8.2.2
+        with:
+          projectBaseDir: ratio/apps/web
+          args: >
+            -Dsonar.qualitygate.wait=${{ env.SONAR_WAIT_GATE }}
+            -Dsonar.qualitygate.timeout=300

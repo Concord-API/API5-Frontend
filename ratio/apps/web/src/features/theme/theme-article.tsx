@@ -1,4 +1,5 @@
-import type { OutcomeFamily, Provenance, ThemeSummaryText } from "@/api/themes"
+import type { Provenance } from "@/api/provenance"
+import type { OutcomeFamily, ThemeSummaryText } from "@/api/themes"
 import { findUnavailable, type UnavailableBlock } from "@/api/unavailable"
 import { EmptyState } from "@/components/empty-state"
 import { OutcomeFigures } from "./outcome-figure"
@@ -13,7 +14,7 @@ type ThemeArticleProps = {
   summary: ThemeSummaryText | null
   outcomeBreakdown: OutcomeFamily[]
   partialTreatment: string
-  provenance: Provenance[]
+  provenance: Provenance
   unavailable: UnavailableBlock[]
 }
 
