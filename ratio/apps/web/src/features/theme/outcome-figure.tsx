@@ -1,8 +1,9 @@
-import type { OutcomeFamily, Provenance } from "@/api/themes"
+import type { Provenance } from "@/api/provenance"
+import type { OutcomeFamily } from "@/api/themes"
 import { Figure } from "@/components/figure"
 import {
   formatCount,
-  formatDate,
+  formatExtractionDate,
   formatNumber,
   formatPercent,
 } from "@/lib/format"
@@ -10,7 +11,7 @@ import {
 type OutcomeFiguresProps = {
   breakdown: OutcomeFamily[]
   partialTreatment: string
-  provenance: Provenance[]
+  provenance: Provenance
 }
 
 type OutcomeFigureProps = {
@@ -20,12 +21,12 @@ type OutcomeFigureProps = {
   source: string
 }
 
-function casesSource(provenance: Provenance[]) {
-  const cases = provenance.find((item) => item.block === "cases")
+function casesSource(provenance: Provenance) {
+  const cases = provenance.sources.find((item) => item.block === "cases")
   if (cases === undefined) {
     return ""
   }
-  return `${cases.source}, extração de ${formatDate(cases.extractedAt)}`
+  return `${cases.name}, extração de ${formatExtractionDate(cases.extractedAt)}`
 }
 
 function countLabel(count: number, ratio: number | null) {

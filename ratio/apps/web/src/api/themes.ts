@@ -1,6 +1,9 @@
 import { queryOptions } from "@tanstack/react-query"
 import { z } from "zod"
 import { getJson } from "./client"
+import { relatedDoctrineSchema } from "./doctrine"
+import { provenanceSchema } from "./provenance"
+import { scopeSchema } from "./scope"
 import { unavailableBlockSchema } from "./unavailable"
 
 export const strengthLevelSchema = z.enum([
@@ -32,6 +35,8 @@ export const themeListSchema = z.object({
   query: z.string(),
   total: z.number().int(),
   themes: z.array(themeSummarySchema),
+  provenance: provenanceSchema,
+  scope: scopeSchema,
 })
 
 export const textSegmentSchema = z.object({ text: z.string() })
@@ -73,13 +78,6 @@ export const outcomeFamilySchema = z.object({
   categories: z.array(outcomeCategorySchema),
 })
 
-export const provenanceSchema = z.object({
-  block: z.string(),
-  source: z.string(),
-  sourceUrl: z.string(),
-  extractedAt: z.string(),
-})
-
 export const themeDetailSchema = z.object({
   themeKey: z.number().int(),
   name: z.string(),
@@ -95,8 +93,10 @@ export const themeDetailSchema = z.object({
   summary: themeSummaryTextSchema.nullable(),
   outcomeBreakdown: z.array(outcomeFamilySchema),
   partialTreatment: z.string(),
-  provenance: z.array(provenanceSchema),
   unavailable: z.array(unavailableBlockSchema),
+  relatedDoctrine: relatedDoctrineSchema,
+  provenance: provenanceSchema,
+  scope: scopeSchema,
 })
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
@@ -105,7 +105,6 @@ export type ThemeDetail = z.infer<typeof themeDetailSchema>
 export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
 export type OutcomeFamily = z.infer<typeof outcomeFamilySchema>
-export type Provenance = z.infer<typeof provenanceSchema>
 
 export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   const params = new URLSearchParams()

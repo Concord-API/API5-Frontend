@@ -61,7 +61,37 @@ describe("results empty message", () => {
     )
 
     expect(heading).toHaveTextContent(
-      /^Nenhum tema encontrado para «contrato de arrendamento de satelite» no escopo TJSP, TJRJ e TJMG\.$/
+      /^Nenhum tema encontrado para «contrato de arrendamento de satelite» no escopo TJMG, TJRJ e TJSP\.$/
+    )
+  })
+
+  it("takes the scope of the message from the API, not from a fixed text", async () => {
+    answerThemes({
+      ...emptyList,
+      scope: { ...emptyList.scope, statement: "TJSP" },
+    })
+
+    const heading = await renderSummary(
+      "/busca?q=contrato%20de%20arrendamento%20de%20satelite"
+    )
+
+    expect(heading).toHaveTextContent(
+      /^Nenhum tema encontrado para «contrato de arrendamento de satelite» no escopo TJSP\.$/
+    )
+  })
+
+  it("leaves the scope out of the message when there is no statement", async () => {
+    answerThemes({
+      ...emptyList,
+      scope: { courts: [], subject: "cível", statement: null },
+    })
+
+    const heading = await renderSummary(
+      "/busca?q=contrato%20de%20arrendamento%20de%20satelite"
+    )
+
+    expect(heading).toHaveTextContent(
+      /^Nenhum tema encontrado para «contrato de arrendamento de satelite»\.$/
     )
   })
 
@@ -93,7 +123,7 @@ describe("results without a term", () => {
     const heading = await renderSummary("/busca")
 
     expect(heading).toHaveTextContent(
-      /^Nenhum tema disponível no escopo TJSP, TJRJ e TJMG\.$/
+      /^Nenhum tema disponível no escopo TJMG, TJRJ e TJSP\.$/
     )
     expect(screen.queryByRole("list", { name: "Temas" })).toBeNull()
   })

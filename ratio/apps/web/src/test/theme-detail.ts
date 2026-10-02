@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse } from "msw"
 import { server } from "./server"
+import { declaredScope } from "./themes"
 
 export const meritFamily = {
   polarityLabel: "acolhimento da pretensão do autor",
@@ -57,14 +58,6 @@ export const themeDetail = {
   outcomeBreakdown: [meritFamily],
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
-  provenance: [
-    {
-      block: "cases",
-      source: "DataJud/CNJ",
-      sourceUrl: "https://datajud-wiki.cnj.jus.br/api-publica/",
-      extractedAt: "2026-08-28",
-    },
-  ],
   unavailable: [
     {
       block: "caseLawCitation",
@@ -90,6 +83,82 @@ export const themeDetail = {
       message: "O DataJud não publica o relator.",
     },
   ],
+  relatedDoctrine: {
+    threshold: 0.55,
+    entries: [
+      {
+        title: "Dano moral e inscrição indevida em cadastros de inadimplentes",
+        authors: "Silva, Ana Paula; Souza, Carlos",
+        journal: "Revista de Direito do Consumidor",
+        publicationYear: 2021,
+        doi: "10.1590/rdc.2021.0412",
+        link: "https://doi.org/10.1590/rdc.2021.0412",
+        source: "doaj",
+        similarity: 0.7134,
+        linkMethod: "embedding_cosine+lexical",
+        embeddingModel: "paraphrase-multilingual-MiniLM-L12-v2",
+      },
+      {
+        title: "A negativação indevida e o dano moral presumido",
+        authors: null,
+        journal: "Revista Brasileira de Direito Civil",
+        publicationYear: 2023,
+        doi: null,
+        link: "https://rbdcivil.ibdcivil.org.br/rbdc/article/view/812",
+        source: "doaj",
+        similarity: 0.6821,
+        linkMethod: "embedding_cosine+lexical",
+        embeddingModel: "paraphrase-multilingual-MiniLM-L12-v2",
+      },
+      {
+        title:
+          "Cadastros de proteção ao crédito e o dever de notificação prévia",
+        authors: "Pereira, João",
+        journal: "Revista da EMERJ",
+        publicationYear: 2019,
+        doi: null,
+        link: null,
+        source: "oai_emerj",
+        similarity: 0.6317,
+        linkMethod: "embedding_cosine+lexical",
+        embeddingModel: "paraphrase-multilingual-MiniLM-L12-v2",
+      },
+      {
+        title: "Responsabilidade civil dos bancos de dados de consumidores",
+        authors: "Lima, Beatriz",
+        journal: null,
+        publicationYear: null,
+        doi: null,
+        link: "https://www.indexlaw.org/index.php/rdc/article/view/5530",
+        source: "oai_indexlaw",
+        similarity: 0.5702,
+        linkMethod: "embedding_cosine+lexical",
+        embeddingModel: "paraphrase-multilingual-MiniLM-L12-v2",
+      },
+    ],
+  },
+  provenance: {
+    sources: [
+      {
+        block: "cases",
+        source: "datajud",
+        name: "DataJud/CNJ",
+        sourceUrl: "https://www.cnj.jus.br/sistemas/datajud/",
+        extractedAt: "2026-08-28T13:00:00+00:00",
+        count: 203,
+      },
+      {
+        block: "doctrine",
+        source: "doaj",
+        name: "DOAJ",
+        sourceUrl: "https://doaj.org/",
+        extractedAt: "2026-09-02T11:00:00+00:00",
+        count: 4,
+      },
+    ],
+    methodologyVersion: "1.0",
+  },
+  scope: declaredScope,
 }
 
 export const themeNotFoundProblem = {
