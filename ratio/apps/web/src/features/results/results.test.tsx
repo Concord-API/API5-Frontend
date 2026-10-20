@@ -57,7 +57,9 @@ describe("results list", () => {
 
     const first = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(first).getByText("78")).toBeInTheDocument()
-    expect(within(first).getByText("144 julgados")).toBeInTheDocument()
+    expect(within(first).getByTestId("alignment-label")).toHaveTextContent(
+      "144 julgados"
+    )
     const second = itemOf(
       "Súmula 385 afasta a indenização quando há anotação preexistente"
     )
