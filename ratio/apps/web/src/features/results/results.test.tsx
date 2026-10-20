@@ -63,7 +63,9 @@ describe("results list", () => {
     const second = itemOf(
       "Súmula 385 afasta a indenização quando há anotação preexistente"
     )
-    expect(within(second).getByText("12.418 julgados")).toBeInTheDocument()
+    expect(within(second).getByTestId("alignment-label")).toHaveTextContent(
+      "12.418 julgados"
+    )
   })
 
   it("uses the singular for a single judged case", async () => {
@@ -72,7 +74,9 @@ describe("results list", () => {
     await renderResults()
 
     const item = itemOf("Quantum indenizatório por negativação indevida")
-    expect(within(item).getByText("1 julgado")).toBeInTheDocument()
+    expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
+      "1 julgado"
+    )
   })
 
   it("shows no case number", async () => {
