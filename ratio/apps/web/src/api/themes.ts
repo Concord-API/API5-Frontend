@@ -20,29 +20,6 @@ export const themeOutcomeSchema = z.object({
   polarityLabel: z.string().nullable(),
 })
 
-export const themeSummarySchema = z.object({
-  themeKey: z.number().int(),
-  name: z.string(),
-  subjectArea: z.string().nullable(),
-  judgedCount: z.number().int(),
-  strengthScore: z.number().int(),
-  level: strengthLevelSchema,
-  outcome: themeOutcomeSchema,
-  periodStartYear: z.number().int().nullable(),
-  periodEndYear: z.number().int().nullable(),
-  lastDecisionDate: z.string().nullable(),
-  courts: z.array(z.string()),
-  additionalCourtCount: z.number().int(),
-})
-
-export const themeListSchema = z.object({
-  query: z.string(),
-  total: z.number().int(),
-  themes: z.array(themeSummarySchema),
-  provenance: provenanceSchema,
-  scope: scopeSchema,
-})
-
 export const textSegmentSchema = z.object({ text: z.string() })
 
 export const ratioSegmentSchema = z.object({
@@ -61,6 +38,34 @@ export const summarySegmentSchema = z.union([
   ratioSegmentSchema,
   countSegmentSchema,
 ])
+
+export const themeResultSummarySchema = z.object({
+  lead: z.array(summarySegmentSchema),
+})
+
+export const themeSummarySchema = z.object({
+  themeKey: z.number().int(),
+  name: z.string(),
+  subjectArea: z.string().nullable(),
+  judgedCount: z.number().int(),
+  strengthScore: z.number().int(),
+  level: strengthLevelSchema,
+  outcome: themeOutcomeSchema,
+  periodStartYear: z.number().int().nullable(),
+  periodEndYear: z.number().int().nullable(),
+  lastDecisionDate: z.string().nullable(),
+  courts: z.array(z.string()),
+  additionalCourtCount: z.number().int(),
+  summary: themeResultSummarySchema.nullable(),
+})
+
+export const themeListSchema = z.object({
+  query: z.string(),
+  total: z.number().int(),
+  themes: z.array(themeSummarySchema),
+  provenance: provenanceSchema,
+  scope: scopeSchema,
+})
 
 export const themeSummaryTextSchema = z.object({
   lead: z.array(summarySegmentSchema),

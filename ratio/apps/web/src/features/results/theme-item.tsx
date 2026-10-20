@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router"
 import type { ThemeSummary } from "@/api/themes"
+import { SummarySegments } from "@/features/theme/summary-segments"
 import { formatDate, formatPeriod } from "@/lib/format"
 import { AlignmentBar } from "./alignment-bar"
 import { CourtChips } from "./court-chips"
+import { subjectAreaLabel } from "./subject-area"
 
 type ThemeItemProps = {
   theme: ThemeSummary
@@ -20,7 +22,7 @@ function themeFacts(theme: ThemeSummary): string[] {
 export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
   const facts = themeFacts(theme)
   return (
-    <li className="flex gap-9 border-b border-[#DCD6C9] py-8">
+    <li className="flex gap-9 border-b border-[#DCD6C9] py-8 transition-colors hover:bg-[#FBF6F5]">
       <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
         <span className="font-sans text-[28px] leading-none font-bold text-foreground">
           {theme.strengthScore}
@@ -33,7 +35,7 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
             data-testid="subject-area"
             className="self-start rounded-[2px] bg-foreground px-2 py-1 font-mono text-[10px] font-semibold tracking-[0.12em] text-background uppercase"
           >
-            {theme.subjectArea}
+            {subjectAreaLabel(theme.subjectArea)}
           </span>
         )}
         <h2 className="max-w-[680px] font-sans text-2xl leading-tight font-bold text-foreground">
@@ -46,6 +48,14 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
             {theme.name}
           </Link>
         </h2>
+        {theme.summary !== null && (
+          <p
+            data-testid="theme-summary"
+            className="line-clamp-2 max-w-[640px] text-[15px] leading-relaxed text-[#3A342C]"
+          >
+            <SummarySegments segments={theme.summary.lead} />
+          </p>
+        )}
         <AlignmentBar
           ratio={theme.outcome.upheldRatio}
           polarityLabel={theme.outcome.polarityLabel}

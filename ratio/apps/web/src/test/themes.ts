@@ -39,6 +39,13 @@ export const fullList: ThemeList = {
       lastDecisionDate: "2026-08-30",
       courts: ["TJMG", "TJSP", "TJRJ"],
       additionalCourtCount: 0,
+      summary: {
+        lead: [
+          { text: "Em " },
+          { ratio: 0.9861, n: 144, unit: "decisões" },
+          { text: ", o pedido de indenização foi acolhido." },
+        ],
+      },
     },
     {
       themeKey: 518,
@@ -58,6 +65,13 @@ export const fullList: ThemeList = {
       lastDecisionDate: "2026-08-19",
       courts: ["TJSP", "TJRJ", "TJMG"],
       additionalCourtCount: 2,
+      summary: {
+        lead: [
+          { text: "A anotação preexistente afastou a indenização em " },
+          { count: 9314, unit: "decisões" },
+          { text: "." },
+        ],
+      },
     },
     {
       themeKey: 733,
@@ -77,6 +91,7 @@ export const fullList: ThemeList = {
       lastDecisionDate: null,
       courts: ["TJSP"],
       additionalCourtCount: 0,
+      summary: null,
     },
   ],
   provenance: {
