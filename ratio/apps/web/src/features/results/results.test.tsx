@@ -103,6 +103,39 @@ describe("results list", () => {
     expect(within(courts).queryByTestId("additional-courts")).toBeNull()
   })
 
+  it("shows the period and the date of the last decision", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("theme-facts")).toHaveTextContent(
+      "2019 — 2026 · última decisão 30.08.2026"
+    )
+  })
+
+  it("writes a single year when the period starts and ends in it", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(item).getByTestId("theme-facts")).toHaveTextContent(
+      "2026 · última decisão 19.08.2026"
+    )
+  })
+
+  it("shows no period line when the period and the last decision are null", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Quantum indenizatório por negativação indevida")
+    expect(within(item).queryByTestId("theme-facts")).toBeNull()
+  })
+
   it("shows no case number", async () => {
     answerThemes()
 
