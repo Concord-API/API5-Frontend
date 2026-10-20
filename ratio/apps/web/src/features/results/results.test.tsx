@@ -50,6 +50,32 @@ describe("results list", () => {
     expect(within(item).queryByTestId("subject-area")).not.toBeInTheDocument()
   })
 
+  it("shows the short summary under the title with the numbers formatted", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const first = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(first).getByTestId("theme-summary")).toHaveTextContent(
+      "Em 98,6% das 144 decisões, o pedido de indenização foi acolhido."
+    )
+    const second = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(second).getByTestId("theme-summary")).toHaveTextContent(
+      "A anotação preexistente afastou a indenização em 9.314 decisões."
+    )
+  })
+
+  it("shows no summary when the theme has none", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Quantum indenizatório por negativação indevida")
+    expect(within(item).queryByTestId("theme-summary")).toBeNull()
+  })
+
   it("shows the strength score and the judged count of each theme", async () => {
     answerThemes()
 
