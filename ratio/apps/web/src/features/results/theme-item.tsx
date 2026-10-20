@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
+import type { MouseEvent } from "react"
 import type { ThemeSummary } from "@/api/themes"
 import { SummarySegments } from "@/features/theme/summary-segments"
 import { formatDate, formatPeriod } from "@/lib/format"
@@ -21,8 +22,27 @@ function themeFacts(theme: ThemeSummary): string[] {
 
 export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
   const facts = themeFacts(theme)
+  const navigate = useNavigate()
+
+  function openTheme(event: MouseEvent<HTMLLIElement>) {
+    if (event.target instanceof Element && event.target.closest("a")) {
+      return
+    }
+    if (window.getSelection()?.toString()) {
+      return
+    }
+    void navigate({
+      to: "/tema/$key",
+      params: { key: theme.themeKey },
+      state: { fromSearch },
+    })
+  }
+
   return (
-    <li className="flex gap-9 border-b border-[#DCD6C9] py-8 transition-colors hover:bg-[#FBF6F5]">
+    <li
+      onClick={openTheme}
+      className="flex cursor-pointer gap-9 border-b border-[#DCD6C9] py-8 transition-colors hover:bg-[#FBF6F5]"
+    >
       <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
         <span className="font-sans text-[28px] leading-none font-bold text-foreground">
           {theme.strengthScore}
