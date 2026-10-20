@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import type { ThemeSummary } from "@/api/themes"
 import { formatNumber } from "@/lib/format"
+import { AlignmentBar } from "./alignment-bar"
 
 type ThemeItemProps = {
   theme: ThemeSummary
@@ -42,6 +43,11 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
         <p className="font-mono text-[11px] text-muted-foreground">
           {judgedLabel(theme.judgedCount)}
         </p>
+        <AlignmentBar
+          ratio={theme.outcome.upheldRatio}
+          polarityLabel={theme.outcome.polarityLabel}
+          judgedCount={theme.judgedCount}
+        />
       </div>
     </li>
   )

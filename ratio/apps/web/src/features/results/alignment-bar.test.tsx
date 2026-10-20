@@ -12,8 +12,9 @@ describe("AlignmentBar", () => {
       />
     )
 
-    expect(screen.getByText("98,6% acolhimento da pretensão do autor")).toBeInTheDocument()
-    expect(screen.getByText("144 julgados")).toBeInTheDocument()
+    expect(screen.getByTestId("alignment-label")).toHaveTextContent(
+      "98,6% acolhimento da pretensão do autor · 144 julgados"
+    )
   })
 
   it("does not show a percentage when the API has no ratio", () => {
