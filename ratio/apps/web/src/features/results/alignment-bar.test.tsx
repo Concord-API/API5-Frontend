@@ -13,7 +13,7 @@ describe("AlignmentBar", () => {
     )
 
     expect(screen.getByTestId("alignment-label")).toHaveTextContent(
-      "98,6% acolhimento da pretensão do autor · 144 decisões"
+      "99% acolhimento da pretensão do autor · 144 decisões"
     )
   })
 

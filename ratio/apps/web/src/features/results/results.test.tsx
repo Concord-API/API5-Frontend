@@ -201,7 +201,7 @@ describe("results list", () => {
 
     const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
-      "50,0% acolhimento da pretensão do autor · 10 decisões"
+      "50% acolhimento da pretensão do autor · 10 decisões"
     )
   })
 
