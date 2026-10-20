@@ -21,4 +21,22 @@ describe("ScoreCircle", () => {
     })
     expect(within(circle).getByText("—")).toBeInTheDocument()
   })
+
+  it.each(["Consolidada", "Dominante"] as const)(
+    "emphasises the circle of a %s theme",
+    (level) => {
+      render(<ScoreCircle score={80} level={level} />)
+
+      expect(screen.getByRole("img")).toHaveAttribute("data-emphasis", "strong")
+    }
+  )
+
+  it.each(["Em formação", "Divergente", null] as const)(
+    "keeps the circle neutral for a %s theme",
+    (level) => {
+      render(<ScoreCircle score={63} level={level} />)
+
+      expect(screen.getByRole("img")).toHaveAttribute("data-emphasis", "none")
+    }
+  )
 })
