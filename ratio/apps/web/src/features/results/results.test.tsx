@@ -77,6 +77,32 @@ describe("results list", () => {
     expect(within(item).getByText("1 julgado")).toBeInTheDocument()
   })
 
+  it("shows the court chips and the exact additional count", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    const courts = within(item).getByRole("list", { name: "Tribunais" })
+    expect(
+      within(courts)
+        .getAllByRole("listitem")
+        .map((court) => court.textContent)
+    ).toEqual(["TJSP", "TJRJ", "TJMG", "+2"])
+  })
+
+  it("does not show the additional indicator when every court is visible", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    const courts = within(item).getByRole("list", { name: "Tribunais" })
+    expect(within(courts).queryByTestId("additional-courts")).toBeNull()
+  })
+
   it("shows no case number", async () => {
     answerThemes()
 

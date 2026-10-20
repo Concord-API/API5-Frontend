@@ -29,6 +29,8 @@ export const themeSummarySchema = z.object({
   level: strengthLevelSchema,
   outcome: themeOutcomeSchema,
   lastDecisionDate: z.string().nullable(),
+  courts: z.array(z.string()),
+  additionalCourtCount: z.number().int(),
 })
 
 export const themeListSchema = z.object({

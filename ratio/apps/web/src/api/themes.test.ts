@@ -23,6 +23,8 @@ const contractExample = {
         polarityLabel: "acolhimento da pretensão do autor",
       },
       lastDecisionDate: "2026-08-30",
+      courts: ["TJMG", "TJSP", "TJRJ"],
+      additionalCourtCount: 2,
     },
   ],
   provenance: {
@@ -97,6 +99,15 @@ describe("fetchThemes", () => {
     const list = await fetchThemes({ q: "inscricao indevida" })
 
     expect(list).toEqual(contractExample)
+  })
+
+  it("preserves the court acronyms and the exact additional count", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].courts).toEqual(["TJMG", "TJSP", "TJRJ"])
+    expect(list.themes[0].additionalCourtCount).toBe(2)
   })
 
   it("accepts the fields the contract allows to be null", async () => {

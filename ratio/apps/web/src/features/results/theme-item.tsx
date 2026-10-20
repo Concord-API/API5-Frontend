@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import type { ThemeSummary } from "@/api/themes"
 import { AlignmentBar } from "./alignment-bar"
+import { CourtChips } from "./court-chips"
 
 type ThemeItemProps = {
   theme: ThemeSummary
@@ -39,6 +40,10 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
           ratio={theme.outcome.upheldRatio}
           polarityLabel={theme.outcome.polarityLabel}
           judgedCount={theme.judgedCount}
+        />
+        <CourtChips
+          courts={theme.courts}
+          additionalCourtCount={theme.additionalCourtCount}
         />
       </div>
     </li>
