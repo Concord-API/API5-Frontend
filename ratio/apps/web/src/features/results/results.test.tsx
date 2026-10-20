@@ -156,6 +156,17 @@ describe("results list", () => {
     )
   })
 
+  it("puts the courts, the period and the percentage on the footer of the item, in that order", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("theme-footer")).toHaveTextContent(
+      /^TJMG\s*TJSP\s*TJRJ\s*2019 — 2026 · última decisão 30\.08\.2026\s*99% acolhimento da pretensão do autor · 144 decisões$/
+    )
+  })
+
   it("writes a single year when the period starts and ends in it", async () => {
     answerThemes()
 
