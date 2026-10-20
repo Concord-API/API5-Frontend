@@ -73,4 +73,36 @@ describe("ThemeItem", () => {
       "82% acolhimento da pretensão do autor · 12.418 decisões"
     )
   })
+
+  it("renders an item whose nullable fields are null", async () => {
+    await renderItem({
+      ...completeTheme,
+      subjectArea: null,
+      judgedCount: 1,
+      outcome: {
+        upheld: 1,
+        rejected: 0,
+        upheldRatio: null,
+        polarityLabel: "acolhimento da pretensão do autor",
+      },
+      periodStartYear: null,
+      periodEndYear: null,
+      lastDecisionDate: null,
+      courts: ["TJSP"],
+      additionalCourtCount: 0,
+      summary: null,
+    })
+
+    const link = screen.getByRole("link", { name: completeTheme.name })
+    expect(within(link).getByText("1 decisão")).toBeInTheDocument()
+    expect(
+      within(link).getByRole("list", { name: "Tribunais" })
+    ).toHaveTextContent("TJSP")
+    expect(within(link).queryByTestId("subject-area")).toBeNull()
+    expect(within(link).queryByTestId("theme-summary")).toBeNull()
+    expect(within(link).queryByTestId("theme-facts")).toBeNull()
+    expect(within(link).queryByTestId("alignment-bar")).toBeNull()
+    expect(within(link).queryByTestId("additional-courts")).toBeNull()
+    expect(within(link).queryByText(/%/)).toBeNull()
+  })
 })
