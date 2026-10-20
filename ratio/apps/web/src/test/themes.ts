@@ -35,6 +35,8 @@ export const fullList: ThemeList = {
         polarityLabel: "acolhimento da pretensão do autor",
       },
       lastDecisionDate: "2026-08-30",
+      courts: ["TJMG", "TJSP", "TJRJ"],
+      additionalCourtCount: 0,
     },
     {
       themeKey: 518,
@@ -50,6 +52,8 @@ export const fullList: ThemeList = {
         polarityLabel: "acolhimento da pretensão do autor",
       },
       lastDecisionDate: "2026-08-19",
+      courts: ["TJSP", "TJRJ", "TJMG"],
+      additionalCourtCount: 2,
     },
     {
       themeKey: 733,
@@ -65,6 +69,8 @@ export const fullList: ThemeList = {
         polarityLabel: null,
       },
       lastDecisionDate: null,
+      courts: ["TJSP"],
+      additionalCourtCount: 0,
     },
   ],
   provenance: {
