@@ -97,23 +97,25 @@ describe("results list", () => {
     const first = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(first).getByText("78")).toBeInTheDocument()
     expect(within(first).getByTestId("alignment-label")).toHaveTextContent(
-      "144 julgados"
+      "144 decisões"
     )
     const second = itemOf(
       "Súmula 385 afasta a indenização quando há anotação preexistente"
     )
     expect(within(second).getByTestId("alignment-label")).toHaveTextContent(
-      "12.418 julgados"
+      "12.418 decisões"
     )
   })
 
-  it("uses the singular for a single judged case", async () => {
+  it("shows the decision count instead of the percentage below the floor", async () => {
     answerThemes()
 
     await renderResults()
 
     const item = itemOf("Quantum indenizatório por negativação indevida")
-    expect(within(item).getByText("1 julgado")).toBeInTheDocument()
+    expect(within(item).getByText("1 decisão")).toBeInTheDocument()
+    expect(within(item).queryByText(/%/)).not.toBeInTheDocument()
+    expect(within(item).queryByTestId("alignment-bar")).not.toBeInTheDocument()
   })
 
   it("shows the court chips and the exact additional count", async () => {
@@ -198,7 +200,7 @@ describe("results list", () => {
 
     const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
-      "50,0% acolhimento da pretensão do autor · 10 julgados"
+      "50,0% acolhimento da pretensão do autor · 10 decisões"
     )
   })
 

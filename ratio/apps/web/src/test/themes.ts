@@ -84,7 +84,7 @@ export const fullList: ThemeList = {
         upheld: 1,
         rejected: 0,
         upheldRatio: null,
-        polarityLabel: null,
+        polarityLabel: "acolhimento da pretensão do autor",
       },
       periodStartYear: null,
       periodEndYear: null,
