@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import type { ThemeSummary } from "@/api/themes"
+import { formatDate, formatPeriod } from "@/lib/format"
 import { AlignmentBar } from "./alignment-bar"
 import { CourtChips } from "./court-chips"
 
@@ -8,7 +9,16 @@ type ThemeItemProps = {
   fromSearch: { q: string; total: number }
 }
 
+function themeFacts(theme: ThemeSummary): string[] {
+  const lastDecision = formatDate(theme.lastDecisionDate)
+  return [
+    formatPeriod(theme.periodStartYear, theme.periodEndYear),
+    lastDecision === null ? null : `última decisão ${lastDecision}`,
+  ].filter((part) => part !== null)
+}
+
 export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
+  const facts = themeFacts(theme)
   return (
     <li className="flex gap-9 border-b border-[#DCD6C9] py-8">
       <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
@@ -41,6 +51,14 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
           polarityLabel={theme.outcome.polarityLabel}
           judgedCount={theme.judgedCount}
         />
+        {facts.length > 0 && (
+          <p
+            data-testid="theme-facts"
+            className="font-mono text-[11px] text-muted-foreground"
+          >
+            {facts.join(" · ")}
+          </p>
+        )}
         <CourtChips
           courts={theme.courts}
           additionalCourtCount={theme.additionalCourtCount}

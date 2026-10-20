@@ -28,6 +28,8 @@ export const themeSummarySchema = z.object({
   strengthScore: z.number().int(),
   level: strengthLevelSchema,
   outcome: themeOutcomeSchema,
+  periodStartYear: z.number().int().nullable(),
+  periodEndYear: z.number().int().nullable(),
   lastDecisionDate: z.string().nullable(),
   courts: z.array(z.string()),
   additionalCourtCount: z.number().int(),
