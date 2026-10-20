@@ -105,4 +105,12 @@ describe("ThemeItem", () => {
     expect(within(link).queryByTestId("additional-courts")).toBeNull()
     expect(within(link).queryByText(/%/)).toBeNull()
   })
+
+  it("shows a dash in the circle when the theme has no strength score", async () => {
+    await renderItem({ ...completeTheme, strengthScore: null, level: null })
+
+    const link = screen.getByRole("link", { name: completeTheme.name })
+    expect(within(link).getByText("—")).toBeInTheDocument()
+    expect(within(link).getByText("/100")).toBeInTheDocument()
+  })
 })

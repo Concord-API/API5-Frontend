@@ -163,6 +163,20 @@ describe("fetchThemes", () => {
     expect(list.themes[0].summary).toBeNull()
   })
 
+  it("accepts a theme without strength score or level", async () => {
+    const theme = {
+      ...contractExample.themes[0],
+      strengthScore: null,
+      level: null,
+    }
+    respondWith({ ...contractExample, themes: [theme] })
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].strengthScore).toBeNull()
+    expect(list.themes[0].level).toBeNull()
+  })
+
   it("breaks on the parse when a field is missing", async () => {
     const theme: Record<string, unknown> = { ...contractExample.themes[0] }
     delete theme.strengthScore
