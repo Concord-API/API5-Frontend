@@ -136,6 +136,33 @@ describe("results list", () => {
     expect(within(item).queryByTestId("theme-facts")).toBeNull()
   })
 
+  it("shows the percentage and the judged count as the API sends them", async () => {
+    const [first, ...rest] = fullList.themes
+    answerThemes({
+      ...fullList,
+      themes: [
+        {
+          ...first,
+          judgedCount: 10,
+          outcome: {
+            ...first.outcome,
+            upheld: 1,
+            rejected: 3,
+            upheldRatio: 0.5,
+          },
+        },
+        ...rest,
+      ],
+    })
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
+      "50,0% acolhimento da pretensão do autor · 10 julgados"
+    )
+  })
+
   it("shows no case number", async () => {
     answerThemes()
 
