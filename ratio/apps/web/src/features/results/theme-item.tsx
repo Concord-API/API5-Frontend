@@ -35,7 +35,7 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
       >
         <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
           <span className="font-sans text-[28px] leading-none font-bold text-foreground">
-            {theme.strengthScore}
+            {theme.strengthScore ?? "—"}
           </span>
           <span className="font-mono text-[8px] text-muted-foreground">
             /100
