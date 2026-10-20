@@ -4,6 +4,7 @@ import { SummarySegments } from "@/features/theme/summary-segments"
 import { formatDate, formatPeriod } from "@/lib/format"
 import { AlignmentBar } from "./alignment-bar"
 import { CourtChips } from "./court-chips"
+import { subjectAreaLabel } from "./subject-area"
 
 type ThemeItemProps = {
   theme: ThemeSummary
@@ -34,7 +35,7 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
             data-testid="subject-area"
             className="self-start rounded-[2px] bg-foreground px-2 py-1 font-mono text-[10px] font-semibold tracking-[0.12em] text-background uppercase"
           >
-            {theme.subjectArea}
+            {subjectAreaLabel(theme.subjectArea)}
           </span>
         )}
         <h2 className="max-w-[680px] font-sans text-2xl leading-tight font-bold text-foreground">
