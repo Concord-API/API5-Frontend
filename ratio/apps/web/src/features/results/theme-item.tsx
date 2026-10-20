@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import type { ThemeSummary } from "@/api/themes"
+import { SummarySegments } from "@/features/theme/summary-segments"
 import { formatDate, formatPeriod } from "@/lib/format"
 import { AlignmentBar } from "./alignment-bar"
 import { CourtChips } from "./court-chips"
@@ -46,6 +47,14 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
             {theme.name}
           </Link>
         </h2>
+        {theme.summary !== null && (
+          <p
+            data-testid="theme-summary"
+            className="line-clamp-2 max-w-[640px] text-[15px] leading-relaxed text-[#3A342C]"
+          >
+            <SummarySegments segments={theme.summary.lead} />
+          </p>
+        )}
         <AlignmentBar
           ratio={theme.outcome.upheldRatio}
           polarityLabel={theme.outcome.polarityLabel}
