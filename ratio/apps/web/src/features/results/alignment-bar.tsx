@@ -20,8 +20,8 @@ export function AlignmentBar({
   }
 
   return (
-    <div className="flex items-center gap-3 font-mono text-[11px] text-muted-foreground">
-      <span className="h-[5px] min-w-20 flex-1 overflow-hidden rounded-full bg-[#EBE6DB]">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-muted-foreground">
+      <span className="h-[5px] w-[130px] shrink-0 overflow-hidden rounded-full bg-[#EBE6DB]">
         <span
           data-testid="alignment-bar"
           className="block h-full rounded-full bg-[#7B0D14]"

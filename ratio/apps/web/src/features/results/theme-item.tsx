@@ -64,23 +64,30 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
               <SummarySegments segments={theme.summary.lead} />
             </p>
           )}
-          <AlignmentBar
-            ratio={theme.outcome.upheldRatio}
-            polarityLabel={theme.outcome.polarityLabel}
-            judgedCount={theme.judgedCount}
-          />
-          {facts.length > 0 && (
-            <p
-              data-testid="theme-facts"
-              className="font-mono text-[11px] text-muted-foreground"
-            >
-              {facts.join(" · ")}
-            </p>
-          )}
-          <CourtChips
-            courts={theme.courts}
-            additionalCourtCount={theme.additionalCourtCount}
-          />
+          <div
+            data-testid="theme-footer"
+            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-[#E6E1D7] pt-3"
+          >
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <CourtChips
+                courts={theme.courts}
+                additionalCourtCount={theme.additionalCourtCount}
+              />
+              {facts.length > 0 && (
+                <span
+                  data-testid="theme-facts"
+                  className="font-mono text-[11px] text-muted-foreground"
+                >
+                  {facts.join(" · ")}
+                </span>
+              )}
+            </div>
+            <AlignmentBar
+              ratio={theme.outcome.upheldRatio}
+              polarityLabel={theme.outcome.polarityLabel}
+              judgedCount={theme.judgedCount}
+            />
+          </div>
         </div>
       </Link>
     </li>
