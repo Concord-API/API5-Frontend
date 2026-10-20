@@ -4,6 +4,7 @@ import {
   formatExtractionDate,
   formatNumber,
   formatPercent,
+  formatPeriod,
   formatSimilarity,
 } from "./format"
 
@@ -28,6 +29,25 @@ describe("formatDate", () => {
 
   it("returns null when there is no date", () => {
     expect(formatDate(null)).toBeNull()
+  })
+})
+
+describe("formatPeriod", () => {
+  it("joins the first and the last year with a dash", () => {
+    expect(formatPeriod(2019, 2026)).toBe("2019 — 2026")
+  })
+
+  it("writes a single year when the period starts and ends in it", () => {
+    expect(formatPeriod(2026, 2026)).toBe("2026")
+  })
+
+  it("returns null when either end of the period is missing", () => {
+    expect(formatPeriod(null, 2026)).toBeNull()
+    expect(formatPeriod(2019, null)).toBeNull()
+  })
+
+  it("does not separate the thousands of a year", () => {
+    expect(formatPeriod(1998, 2001)).not.toContain(".")
   })
 })
 
