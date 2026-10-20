@@ -103,6 +103,66 @@ describe("results list", () => {
     expect(within(courts).queryByTestId("additional-courts")).toBeNull()
   })
 
+  it("shows the period and the date of the last decision", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("theme-facts")).toHaveTextContent(
+      "2019 — 2026 · última decisão 30.08.2026"
+    )
+  })
+
+  it("writes a single year when the period starts and ends in it", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(item).getByTestId("theme-facts")).toHaveTextContent(
+      "2026 · última decisão 19.08.2026"
+    )
+  })
+
+  it("shows no period line when the period and the last decision are null", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Quantum indenizatório por negativação indevida")
+    expect(within(item).queryByTestId("theme-facts")).toBeNull()
+  })
+
+  it("shows the percentage and the judged count as the API sends them", async () => {
+    const [first, ...rest] = fullList.themes
+    answerThemes({
+      ...fullList,
+      themes: [
+        {
+          ...first,
+          judgedCount: 10,
+          outcome: {
+            ...first.outcome,
+            upheld: 1,
+            rejected: 3,
+            upheldRatio: 0.5,
+          },
+        },
+        ...rest,
+      ],
+    })
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
+      "50,0% acolhimento da pretensão do autor · 10 julgados"
+    )
+  })
+
   it("shows no case number", async () => {
     answerThemes()
 

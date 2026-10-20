@@ -22,6 +22,8 @@ const contractExample = {
         upheldRatio: 0.9861,
         polarityLabel: "acolhimento da pretensão do autor",
       },
+      periodStartYear: 2019,
+      periodEndYear: 2026,
       lastDecisionDate: "2026-08-30",
       courts: ["TJMG", "TJSP", "TJRJ"],
       additionalCourtCount: 2,
@@ -110,6 +112,15 @@ describe("fetchThemes", () => {
     expect(list.themes[0].additionalCourtCount).toBe(2)
   })
 
+  it("preserves the period of the theme", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].periodStartYear).toBe(2019)
+    expect(list.themes[0].periodEndYear).toBe(2026)
+  })
+
   it("accepts the fields the contract allows to be null", async () => {
     const theme = {
       ...contractExample.themes[0],
@@ -120,6 +131,8 @@ describe("fetchThemes", () => {
         upheldRatio: null,
         polarityLabel: null,
       },
+      periodStartYear: null,
+      periodEndYear: null,
       lastDecisionDate: null,
     }
     respondWith({ ...contractExample, themes: [theme] })
