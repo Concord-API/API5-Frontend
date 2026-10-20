@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
+import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
 import {
   answerNetworkError,
   answerNever,
@@ -27,8 +28,8 @@ describe("results list", () => {
     const { list } = await renderResults()
 
     const names = within(list)
-      .getAllByRole("link")
-      .map((link) => link.textContent)
+      .getAllByRole("heading", { level: 2 })
+      .map((heading) => heading.textContent)
     expect(names).toEqual(fullList.themes.map((theme) => theme.name))
   })
 
@@ -155,6 +156,17 @@ describe("results list", () => {
     )
   })
 
+  it("puts the courts, the period and the percentage on the footer of the item, in that order", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("theme-footer")).toHaveTextContent(
+      /^TJMG\s*TJSP\s*TJRJ\s*2019 — 2026 · última decisão 30\.08\.2026\s*99% acolhimento da pretensão do autor · 144 decisões$/
+    )
+  })
+
   it("writes a single year when the period starts and ends in it", async () => {
     answerThemes()
 
@@ -200,7 +212,7 @@ describe("results list", () => {
 
     const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
-      "50,0% acolhimento da pretensão do autor · 10 decisões"
+      "50% acolhimento da pretensão do autor · 10 decisões"
     )
   })
 
@@ -222,6 +234,35 @@ describe("results list", () => {
         name: "Inscrição indevida em cadastro de inadimplentes",
       })
     ).toHaveAttribute("href", "/tema/412")
+  })
+})
+
+describe("opening a theme from the result item", () => {
+  it("opens the theme detail when the item is clicked outside the title", async () => {
+    answerThemes()
+    answerThemeDetail()
+    const { router } = await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-summary"))
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: themeDetail.name })
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe("/tema/412")
+  })
+
+  it("keeps the way back to the results when the item opens the theme", async () => {
+    answerThemes()
+    answerThemeDetail()
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-facts"))
+
+    expect(
+      await screen.findByRole("link", { name: "Voltar aos 3 resultados" })
+    ).toHaveAttribute("href", "/busca?q=inscricao+indevida")
   })
 })
 

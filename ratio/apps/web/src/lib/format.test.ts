@@ -6,6 +6,7 @@ import {
   formatPercent,
   formatPeriod,
   formatSimilarity,
+  formatWholePercent,
 } from "./format"
 
 describe("formatNumber", () => {
@@ -62,6 +63,17 @@ describe("formatPercent", () => {
 
   it("writes a whole ratio as one hundred percent", () => {
     expect(formatPercent(1)).toBe("100,0%")
+  })
+})
+
+describe("formatWholePercent", () => {
+  it("rounds the ratio to a whole percentage", () => {
+    expect(formatWholePercent(0.9861)).toBe("99%")
+    expect(formatWholePercent(0.82)).toBe("82%")
+  })
+
+  it("writes a whole ratio as one hundred percent", () => {
+    expect(formatWholePercent(1)).toBe("100%")
   })
 })
 
