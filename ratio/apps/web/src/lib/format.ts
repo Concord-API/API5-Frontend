@@ -38,6 +38,16 @@ export function formatDate(value: string | null): string | null {
   return `${day}.${month}.${year}`
 }
 
+export function formatPeriod(
+  start: number | null,
+  end: number | null
+): string | null {
+  if (start === null || end === null) {
+    return null
+  }
+  return start === end ? String(start) : `${start} — ${end}`
+}
+
 export function formatPercent(ratio: number): string {
   return percentFormat.format(ratio).replace(/\s/g, "")
 }
