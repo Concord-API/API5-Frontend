@@ -13,6 +13,11 @@ const percentFormat = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
 })
 
+const wholePercentFormat = new Intl.NumberFormat("pt-BR", {
+  style: "percent",
+  maximumFractionDigits: 0,
+})
+
 const similarityFormat = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -38,8 +43,22 @@ export function formatDate(value: string | null): string | null {
   return `${day}.${month}.${year}`
 }
 
+export function formatPeriod(
+  start: number | null,
+  end: number | null
+): string | null {
+  if (start === null || end === null) {
+    return null
+  }
+  return start === end ? String(start) : `${start} — ${end}`
+}
+
 export function formatPercent(ratio: number): string {
   return percentFormat.format(ratio).replace(/\s/g, "")
+}
+
+export function formatWholePercent(ratio: number): string {
+  return wholePercentFormat.format(ratio).replace(/\s/g, "")
 }
 
 export function formatExtractionDate(value: string): string {

@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
+import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
 import {
   answerNetworkError,
   answerNever,
@@ -27,8 +28,8 @@ describe("results list", () => {
     const { list } = await renderResults()
 
     const names = within(list)
-      .getAllByRole("link")
-      .map((link) => link.textContent)
+      .getAllByRole("heading", { level: 2 })
+      .map((heading) => heading.textContent)
     expect(names).toEqual(fullList.themes.map((theme) => theme.name))
   })
 
@@ -41,6 +42,19 @@ describe("results list", () => {
     expect(within(item).getByText("CONSUMIDOR")).toBeInTheDocument()
   })
 
+  it("writes the area tag with its Portuguese accents", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(item).getByTestId("subject-area")).toHaveTextContent(
+      "BANCÁRIO"
+    )
+  })
+
   it("shows no area tag when the area is null", async () => {
     answerThemes()
 
@@ -50,6 +64,32 @@ describe("results list", () => {
     expect(within(item).queryByTestId("subject-area")).not.toBeInTheDocument()
   })
 
+  it("shows the short summary under the title with the numbers formatted", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const first = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(first).getByTestId("theme-summary")).toHaveTextContent(
+      "Em 98,6% das 144 decisões, o pedido de indenização foi acolhido."
+    )
+    const second = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(second).getByTestId("theme-summary")).toHaveTextContent(
+      "A anotação preexistente afastou a indenização em 9.314 decisões."
+    )
+  })
+
+  it("shows no summary when the theme has none", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Quantum indenizatório por negativação indevida")
+    expect(within(item).queryByTestId("theme-summary")).toBeNull()
+  })
+
   it("shows the strength score and the judged count of each theme", async () => {
     answerThemes()
 
@@ -57,20 +97,123 @@ describe("results list", () => {
 
     const first = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(first).getByText("78")).toBeInTheDocument()
-    expect(within(first).getByText("144 julgados")).toBeInTheDocument()
+    expect(within(first).getByTestId("alignment-label")).toHaveTextContent(
+      "144 decisões"
+    )
     const second = itemOf(
       "Súmula 385 afasta a indenização quando há anotação preexistente"
     )
-    expect(within(second).getByText("12.418 julgados")).toBeInTheDocument()
+    expect(within(second).getByTestId("alignment-label")).toHaveTextContent(
+      "12.418 decisões"
+    )
   })
 
-  it("uses the singular for a single judged case", async () => {
+  it("shows the decision count instead of the percentage below the floor", async () => {
     answerThemes()
 
     await renderResults()
 
     const item = itemOf("Quantum indenizatório por negativação indevida")
-    expect(within(item).getByText("1 julgado")).toBeInTheDocument()
+    expect(within(item).getByText("1 decisão")).toBeInTheDocument()
+    expect(within(item).queryByText(/%/)).not.toBeInTheDocument()
+    expect(within(item).queryByTestId("alignment-bar")).not.toBeInTheDocument()
+  })
+
+  it("shows the court chips and the exact additional count", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    const courts = within(item).getByRole("list", { name: "Tribunais" })
+    expect(
+      within(courts)
+        .getAllByRole("listitem")
+        .map((court) => court.textContent)
+    ).toEqual(["TJSP", "TJRJ", "TJMG", "+2"])
+  })
+
+  it("does not show the additional indicator when every court is visible", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    const courts = within(item).getByRole("list", { name: "Tribunais" })
+    expect(within(courts).queryByTestId("additional-courts")).toBeNull()
+  })
+
+  it("shows the period and the date of the last decision", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("theme-facts")).toHaveTextContent(
+      "2019 — 2026 · última decisão 30.08.2026"
+    )
+  })
+
+  it("puts the courts, the period and the percentage on the footer of the item, in that order", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("theme-footer")).toHaveTextContent(
+      /^TJMG\s*TJSP\s*TJRJ\s*2019 — 2026 · última decisão 30\.08\.2026\s*99% acolhimento da pretensão do autor · 144 decisões$/
+    )
+  })
+
+  it("writes a single year when the period starts and ends in it", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(item).getByTestId("theme-facts")).toHaveTextContent(
+      "2026 · última decisão 19.08.2026"
+    )
+  })
+
+  it("shows no period line when the period and the last decision are null", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf("Quantum indenizatório por negativação indevida")
+    expect(within(item).queryByTestId("theme-facts")).toBeNull()
+  })
+
+  it("shows the percentage and the judged count as the API sends them", async () => {
+    const [first, ...rest] = fullList.themes
+    answerThemes({
+      ...fullList,
+      themes: [
+        {
+          ...first,
+          judgedCount: 10,
+          outcome: {
+            ...first.outcome,
+            upheld: 1,
+            rejected: 3,
+            upheldRatio: 0.5,
+          },
+        },
+        ...rest,
+      ],
+    })
+
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
+      "50% acolhimento da pretensão do autor · 10 decisões"
+    )
   })
 
   it("shows no case number", async () => {
@@ -91,6 +234,35 @@ describe("results list", () => {
         name: "Inscrição indevida em cadastro de inadimplentes",
       })
     ).toHaveAttribute("href", "/tema/412")
+  })
+})
+
+describe("opening a theme from the result item", () => {
+  it("opens the theme detail when the item is clicked outside the title", async () => {
+    answerThemes()
+    answerThemeDetail()
+    const { router } = await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-summary"))
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: themeDetail.name })
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe("/tema/412")
+  })
+
+  it("keeps the way back to the results when the item opens the theme", async () => {
+    answerThemes()
+    answerThemeDetail()
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-facts"))
+
+    expect(
+      await screen.findByRole("link", { name: "Voltar aos 3 resultados" })
+    ).toHaveAttribute("href", "/busca?q=inscricao+indevida")
   })
 })
 

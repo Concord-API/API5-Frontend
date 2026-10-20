@@ -4,7 +4,9 @@ import {
   formatExtractionDate,
   formatNumber,
   formatPercent,
+  formatPeriod,
   formatSimilarity,
+  formatWholePercent,
 } from "./format"
 
 describe("formatNumber", () => {
@@ -31,6 +33,25 @@ describe("formatDate", () => {
   })
 })
 
+describe("formatPeriod", () => {
+  it("joins the first and the last year with a dash", () => {
+    expect(formatPeriod(2019, 2026)).toBe("2019 — 2026")
+  })
+
+  it("writes a single year when the period starts and ends in it", () => {
+    expect(formatPeriod(2026, 2026)).toBe("2026")
+  })
+
+  it("returns null when either end of the period is missing", () => {
+    expect(formatPeriod(null, 2026)).toBeNull()
+    expect(formatPeriod(2019, null)).toBeNull()
+  })
+
+  it("does not separate the thousands of a year", () => {
+    expect(formatPeriod(1998, 2001)).not.toContain(".")
+  })
+})
+
 describe("formatPercent", () => {
   it("writes the ratio as a percentage with one decimal and a comma", () => {
     expect(formatPercent(0.9861)).toBe("98,6%")
@@ -42,6 +63,17 @@ describe("formatPercent", () => {
 
   it("writes a whole ratio as one hundred percent", () => {
     expect(formatPercent(1)).toBe("100,0%")
+  })
+})
+
+describe("formatWholePercent", () => {
+  it("rounds the ratio to a whole percentage", () => {
+    expect(formatWholePercent(0.9861)).toBe("99%")
+    expect(formatWholePercent(0.82)).toBe("82%")
+  })
+
+  it("writes a whole ratio as one hundred percent", () => {
+    expect(formatWholePercent(1)).toBe("100%")
   })
 })
 

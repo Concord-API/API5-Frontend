@@ -22,7 +22,18 @@ const contractExample = {
         upheldRatio: 0.9861,
         polarityLabel: "acolhimento da pretensão do autor",
       },
+      periodStartYear: 2019,
+      periodEndYear: 2026,
       lastDecisionDate: "2026-08-30",
+      courts: ["TJMG", "TJSP", "TJRJ"],
+      additionalCourtCount: 2,
+      summary: {
+        lead: [
+          { text: "Em " },
+          { ratio: 0.9861, n: 144, unit: "decisões" },
+          { text: ", o pedido foi acolhido." },
+        ],
+      },
     },
   ],
   provenance: {
@@ -99,6 +110,36 @@ describe("fetchThemes", () => {
     expect(list).toEqual(contractExample)
   })
 
+  it("preserves the court acronyms and the exact additional count", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].courts).toEqual(["TJMG", "TJSP", "TJRJ"])
+    expect(list.themes[0].additionalCourtCount).toBe(2)
+  })
+
+  it("preserves the period of the theme", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].periodStartYear).toBe(2019)
+    expect(list.themes[0].periodEndYear).toBe(2026)
+  })
+
+  it("preserves the lead of the summary", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].summary?.lead).toEqual([
+      { text: "Em " },
+      { ratio: 0.9861, n: 144, unit: "decisões" },
+      { text: ", o pedido foi acolhido." },
+    ])
+  })
+
   it("accepts the fields the contract allows to be null", async () => {
     const theme = {
       ...contractExample.themes[0],
@@ -109,13 +150,31 @@ describe("fetchThemes", () => {
         upheldRatio: null,
         polarityLabel: null,
       },
+      periodStartYear: null,
+      periodEndYear: null,
       lastDecisionDate: null,
+      summary: null,
     }
     respondWith({ ...contractExample, themes: [theme] })
 
     const list = await fetchThemes({ q: "inscricao indevida" })
 
     expect(list.themes[0].outcome.upheldRatio).toBeNull()
+    expect(list.themes[0].summary).toBeNull()
+  })
+
+  it("accepts a theme without strength score or level", async () => {
+    const theme = {
+      ...contractExample.themes[0],
+      strengthScore: null,
+      level: null,
+    }
+    respondWith({ ...contractExample, themes: [theme] })
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.themes[0].strengthScore).toBeNull()
+    expect(list.themes[0].level).toBeNull()
   })
 
   it("breaks on the parse when a field is missing", async () => {
