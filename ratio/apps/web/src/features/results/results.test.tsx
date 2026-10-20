@@ -57,11 +57,15 @@ describe("results list", () => {
 
     const first = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(first).getByText("78")).toBeInTheDocument()
-    expect(within(first).getByText("144 julgados")).toBeInTheDocument()
+    expect(within(first).getByTestId("alignment-label")).toHaveTextContent(
+      "144 julgados"
+    )
     const second = itemOf(
       "Súmula 385 afasta a indenização quando há anotação preexistente"
     )
-    expect(within(second).getByText("12.418 julgados")).toBeInTheDocument()
+    expect(within(second).getByTestId("alignment-label")).toHaveTextContent(
+      "12.418 julgados"
+    )
   })
 
   it("uses the singular for a single judged case", async () => {
