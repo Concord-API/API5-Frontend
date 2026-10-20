@@ -1,4 +1,4 @@
-import { formatCount, formatPercent } from "@/lib/format"
+import { formatCount, formatWholePercent } from "@/lib/format"
 
 type AlignmentBarProps = {
   ratio: number | null
@@ -29,7 +29,7 @@ export function AlignmentBar({
         />
       </span>
       <span data-testid="alignment-label">
-        {formatPercent(ratio)} {polarityLabel} ·{" "}
+        {formatWholePercent(ratio)} {polarityLabel} ·{" "}
         {formatCount(judgedCount, "decisão", "decisões")}
       </span>
     </div>
