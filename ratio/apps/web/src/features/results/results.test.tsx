@@ -41,6 +41,19 @@ describe("results list", () => {
     expect(within(item).getByText("CONSUMIDOR")).toBeInTheDocument()
   })
 
+  it("writes the area tag with its Portuguese accents", async () => {
+    answerThemes()
+
+    await renderResults()
+
+    const item = itemOf(
+      "Súmula 385 afasta a indenização quando há anotação preexistente"
+    )
+    expect(within(item).getByTestId("subject-area")).toHaveTextContent(
+      "BANCÁRIO"
+    )
+  })
+
   it("shows no area tag when the area is null", async () => {
     answerThemes()
 
