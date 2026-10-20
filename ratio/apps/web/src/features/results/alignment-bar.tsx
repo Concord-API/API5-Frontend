@@ -29,7 +29,8 @@ export function AlignmentBar({
         />
       </span>
       <span data-testid="alignment-label">
-        {formatPercent(ratio)} {polarityLabel} · {formatCount(judgedCount, "julgado", "julgados")}
+        {formatPercent(ratio)} {polarityLabel} ·{" "}
+        {formatCount(judgedCount, "julgado", "julgados")}
       </span>
     </div>
   )

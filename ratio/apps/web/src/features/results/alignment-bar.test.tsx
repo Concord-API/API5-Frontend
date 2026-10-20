@@ -18,13 +18,7 @@ describe("AlignmentBar", () => {
   })
 
   it("does not show a percentage when the API has no ratio", () => {
-    render(
-      <AlignmentBar
-        ratio={null}
-        polarityLabel={null}
-        judgedCount={1}
-      />
-    )
+    render(<AlignmentBar ratio={null} polarityLabel={null} judgedCount={1} />)
 
     expect(screen.queryByText(/%/)).not.toBeInTheDocument()
     expect(screen.getByText("1 julgado")).toBeInTheDocument()

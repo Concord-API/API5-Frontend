@@ -1,15 +1,10 @@
 import { Link } from "@tanstack/react-router"
 import type { ThemeSummary } from "@/api/themes"
-import { formatNumber } from "@/lib/format"
 import { AlignmentBar } from "./alignment-bar"
 
 type ThemeItemProps = {
   theme: ThemeSummary
   fromSearch: { q: string; total: number }
-}
-
-function judgedLabel(count: number) {
-  return `${formatNumber(count)} ${count === 1 ? "julgado" : "julgados"}`
 }
 
 export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
@@ -40,9 +35,6 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
             {theme.name}
           </Link>
         </h2>
-        <p className="font-mono text-[11px] text-muted-foreground">
-          {judgedLabel(theme.judgedCount)}
-        </p>
         <AlignmentBar
           ratio={theme.outcome.upheldRatio}
           polarityLabel={theme.outcome.polarityLabel}
