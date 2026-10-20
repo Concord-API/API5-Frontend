@@ -74,9 +74,7 @@ describe("results list", () => {
     await renderResults()
 
     const item = itemOf("Quantum indenizatório por negativação indevida")
-    expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
-      "1 julgado"
-    )
+    expect(within(item).getByText("1 julgado")).toBeInTheDocument()
   })
 
   it("shows no case number", async () => {
