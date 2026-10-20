@@ -48,8 +48,11 @@ describe("ThemeItem", () => {
 
     const link = screen.getByRole("link", { name: completeTheme.name })
     expect(link).toHaveAttribute("href", "/tema/412")
-    expect(within(link).getByText("77")).toBeInTheDocument()
-    expect(within(link).getByText("/100")).toBeInTheDocument()
+    expect(
+      within(link).getByRole("img", {
+        name: "Força do entendimento: 77 de 100, Dominante",
+      })
+    ).toHaveTextContent("77/100")
     expect(within(link).getByTestId("subject-area")).toHaveTextContent(
       "CONSUMIDOR"
     )

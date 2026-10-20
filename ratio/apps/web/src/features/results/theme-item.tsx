@@ -5,6 +5,7 @@ import { SummarySegments } from "@/features/theme/summary-segments"
 import { formatDate, formatPeriod } from "@/lib/format"
 import { AlignmentBar } from "./alignment-bar"
 import { CourtChips } from "./court-chips"
+import { ScoreCircle } from "./score-circle"
 import { subjectAreaLabel } from "./subject-area"
 
 type ThemeItemProps = {
@@ -33,14 +34,7 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
         aria-labelledby={titleId}
         className="group flex gap-9 py-8 transition-colors hover:bg-[#FBF6F5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
-        <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
-          <span className="font-sans text-[28px] leading-none font-bold text-foreground">
-            {theme.strengthScore ?? "—"}
-          </span>
-          <span className="font-mono text-[8px] text-muted-foreground">
-            /100
-          </span>
-        </div>
+        <ScoreCircle score={theme.strengthScore} level={theme.level} />
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           {theme.subjectArea !== null && (
             <span
