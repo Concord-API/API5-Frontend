@@ -22,7 +22,7 @@ function themeFacts(theme: ThemeSummary): string[] {
 export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
   const facts = themeFacts(theme)
   return (
-    <li className="flex gap-9 border-b border-[#DCD6C9] py-8">
+    <li className="flex gap-9 border-b border-[#DCD6C9] py-8 transition-colors hover:bg-[#FBF6F5]">
       <div className="flex size-[70px] shrink-0 flex-col items-center justify-center rounded-full border border-[#C9C2B4]">
         <span className="font-sans text-[28px] leading-none font-bold text-foreground">
           {theme.strengthScore}
