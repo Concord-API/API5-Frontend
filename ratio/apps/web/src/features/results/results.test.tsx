@@ -1,7 +1,8 @@
 import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { renderRoute } from "../../test/render"
+import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
 import {
   answerNetworkError,
   answerNever,
@@ -222,6 +223,53 @@ describe("results list", () => {
         name: "Inscrição indevida em cadastro de inadimplentes",
       })
     ).toHaveAttribute("href", "/tema/412")
+  })
+})
+
+describe("opening a theme from the result item", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it("opens the theme detail when the item is clicked outside the title", async () => {
+    answerThemes()
+    answerThemeDetail()
+    const { router } = await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-summary"))
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: themeDetail.name })
+    ).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe("/tema/412")
+  })
+
+  it("keeps the way back to the results when the item opens the theme", async () => {
+    answerThemes()
+    answerThemeDetail()
+    await renderResults()
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-facts"))
+
+    expect(
+      await screen.findByRole("link", { name: "Voltar aos 3 resultados" })
+    ).toHaveAttribute("href", "/busca?q=inscricao+indevida")
+  })
+
+  it("does not open the theme when the click ends a text selection", async () => {
+    answerThemes()
+    answerThemeDetail()
+    const { router } = await renderResults()
+    vi.spyOn(window, "getSelection").mockReturnValue({
+      toString: () => "98,6% das 144 decisões",
+    } as Selection)
+
+    const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
+    await userEvent.click(within(item).getByTestId("theme-summary"))
+
+    expect(router.state.location.pathname).toBe("/busca")
   })
 })
 
