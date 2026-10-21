@@ -73,6 +73,7 @@ jobs:
 
   quality:
     name: Frontend quality
+    needs: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -107,9 +108,12 @@ jobs:
       - name: Install locked dependencies
         if: ${{ env.SONAR_ENABLED == 'true' }}
         run: npm ci
-      - name: Test with coverage
+      - name: Download the test results and coverage
         if: ${{ env.SONAR_ENABLED == 'true' }}
-        run: npm run test:ci
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: frontend-test-results-${{ github.sha }}
+          path: ratio/apps/web
       - name: Send the analysis and wait for the quality gate
         if: ${{ env.SONAR_ENABLED == 'true' }}
         uses: SonarSource/sonarqube-scan-action@ba9859eae8dd6bd29e412f25ddbbef3d032000f4 # v8.2.2
