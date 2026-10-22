@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { z } from "zod"
 import { server } from "../test/server"
 import { ApiError } from "./client"
-import { fetchThemeDetail, fetchThemes } from "./themes"
+import { fetchThemeDetail, fetchThemes, noFilters } from "./themes"
 
 const contractExample = {
   query: "inscricao indevida",
@@ -281,6 +281,34 @@ describe("fetchThemes", () => {
     const list = await fetchThemes({ q: "inscricao indevida" })
 
     expect(list.scope.statement).toBeNull()
+  })
+
+  it("sends every chosen filter as a query parameter", async () => {
+    const requested = respondWith(contractExample)
+
+    await fetchThemes({
+      q: "inscricao indevida",
+      filters: {
+        courts: ["TJSP", "TJRJ"],
+        period: "5y",
+        level: "second",
+        minStrength: 60,
+      },
+    })
+
+    const params = requested()?.searchParams
+    expect(params?.getAll("court")).toEqual(["TJSP", "TJRJ"])
+    expect(params?.get("period")).toBe("5y")
+    expect(params?.get("level")).toBe("second")
+    expect(params?.get("minStrength")).toBe("60")
+  })
+
+  it("sends no filter parameter when no filter is chosen", async () => {
+    const requested = respondWith(contractExample)
+
+    await fetchThemes({ q: "inscricao indevida", filters: noFilters })
+
+    expect([...(requested()?.searchParams.keys() ?? [])]).toEqual(["q"])
   })
 
   it("sends the term and the limit as query parameters", async () => {
