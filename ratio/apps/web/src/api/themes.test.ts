@@ -95,6 +95,8 @@ const provenance = contractExample.provenance
 
 const scope = contractExample.scope
 
+const filterOptions = contractExample.filterOptions
+
 function withoutProvenance(body: Record<string, unknown>) {
   const copy = { ...body }
   delete copy.provenance
@@ -288,6 +290,7 @@ describe("fetchThemes", () => {
       themes: [],
       provenance,
       scope,
+      filterOptions,
     })
 
     await fetchThemes({ q: "atraso de voo", limit: 5 })
@@ -304,6 +307,7 @@ describe("fetchThemes", () => {
       themes: [],
       provenance,
       scope,
+      filterOptions,
     })
 
     await fetchThemes({ q: "" })

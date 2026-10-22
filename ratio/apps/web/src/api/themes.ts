@@ -59,12 +59,29 @@ export const themeSummarySchema = z.object({
   summary: themeResultSummarySchema.nullable(),
 })
 
+export const courtCountSchema = z.object({
+  code: z.string(),
+  name: z.string(),
+  caseCount: z.number().int(),
+})
+
+export const levelOptionSchema = z.object({
+  code: z.string(),
+  label: z.string(),
+})
+
+export const filterOptionsSchema = z.object({
+  courts: z.array(courtCountSchema),
+  levels: z.array(levelOptionSchema),
+})
+
 export const themeListSchema = z.object({
   query: z.string(),
   total: z.number().int(),
   themes: z.array(themeSummarySchema),
   provenance: provenanceSchema,
   scope: scopeSchema,
+  filterOptions: filterOptionsSchema,
 })
 
 export const themeSummaryTextSchema = z.object({
@@ -110,6 +127,7 @@ export const themeDetailSchema = z.object({
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
 export type ThemeList = z.infer<typeof themeListSchema>
+export type FilterOptions = z.infer<typeof filterOptionsSchema>
 export type ThemeDetail = z.infer<typeof themeDetailSchema>
 export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
