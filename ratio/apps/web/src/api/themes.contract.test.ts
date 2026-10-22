@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest"
+import { fetchThemePanels } from "./panels"
 import { fetchThemeDetail, fetchThemes } from "./themes"
 
 describe("theme contract against the running API", () => {
@@ -20,5 +21,13 @@ describe("theme contract against the running API", () => {
     const detail = await fetchThemeDetail(list.themes[0].themeKey)
 
     expect(detail.themeKey).toBe(list.themes[0].themeKey)
+  })
+
+  it("accepts the panels of the first theme found", async () => {
+    const list = await fetchThemes({ q: "cobranca de divida" })
+
+    const panels = await fetchThemePanels(list.themes[0].themeKey)
+
+    expect(panels.themeKey).toBe(list.themes[0].themeKey)
   })
 })
