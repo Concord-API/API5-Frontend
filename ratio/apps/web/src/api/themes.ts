@@ -133,7 +133,31 @@ export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
 export type OutcomeFamily = z.infer<typeof outcomeFamilySchema>
 
-export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
+export type ThemePeriod = "5y" | "2y" | "all"
+
+export type ThemeFilters = {
+  courts: string[]
+  period: ThemePeriod
+  level: string | null
+  minStrength: number
+}
+
+export const noFilters: ThemeFilters = {
+  courts: [],
+  period: "all",
+  level: null,
+  minStrength: 0,
+}
+
+export function fetchThemes({
+  q,
+  limit,
+  filters = noFilters,
+}: {
+  q: string
+  limit?: number
+  filters?: ThemeFilters
+}) {
   const params = new URLSearchParams()
   if (q) {
     params.set("q", q)
@@ -141,14 +165,26 @@ export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   if (limit !== undefined) {
     params.set("limit", String(limit))
   }
+  for (const court of filters.courts) {
+    params.append("court", court)
+  }
+  if (filters.period !== "all") {
+    params.set("period", filters.period)
+  }
+  if (filters.level !== null) {
+    params.set("level", filters.level)
+  }
+  if (filters.minStrength > 0) {
+    params.set("minStrength", String(filters.minStrength))
+  }
   const search = params.toString()
   return getJson(`/api/themes${search ? `?${search}` : ""}`, themeListSchema)
 }
 
-export function themesQueryOptions(q: string) {
+export function themesQueryOptions(q: string, filters = noFilters) {
   return queryOptions({
-    queryKey: ["themes", q],
-    queryFn: () => fetchThemes({ q }),
+    queryKey: ["themes", q, filters],
+    queryFn: () => fetchThemes({ q, filters }),
   })
 }
 
