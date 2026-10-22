@@ -149,6 +149,15 @@ export const noFilters: ThemeFilters = {
   minStrength: 0,
 }
 
+export function activeFilterCount(filters: ThemeFilters) {
+  return (
+    filters.courts.length +
+    (filters.period === "all" ? 0 : 1) +
+    (filters.level === null ? 0 : 1) +
+    (filters.minStrength > 0 ? 1 : 0)
+  )
+}
+
 export function fetchThemes({
   q,
   limit,

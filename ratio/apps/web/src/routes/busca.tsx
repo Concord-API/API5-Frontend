@@ -1,9 +1,16 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
+import { useState, useTransition } from "react"
 import { z } from "zod"
-import { themesQueryOptions } from "@/api/themes"
+import {
+  activeFilterCount,
+  noFilters,
+  themesQueryOptions,
+  type ThemeFilters,
+} from "@/api/themes"
 import { ProvenanceFooter } from "@/components/provenance-footer"
 import { ScopeStatement } from "@/components/scope-statement"
+import { FilterPanel, FilterToggle } from "@/features/results/filter-bar"
 import {
   ResultsError,
   ResultsFrame,
@@ -28,12 +35,42 @@ export const Route = createFileRoute("/busca")({
 
 function Search() {
   const { q } = Route.useSearch()
-  const { data } = useSuspenseQuery(themesQueryOptions(q))
+
+  return <SearchResults key={q} q={q} />
+}
+
+function SearchResults({ q }: { q: string }) {
+  const [filters, setFilters] = useState<ThemeFilters>(noFilters)
+  const [open, setOpen] = useState(false)
+  const [, startTransition] = useTransition()
+  const { data } = useSuspenseQuery(themesQueryOptions(q, filters))
+
+  function apply(next: ThemeFilters) {
+    startTransition(() => setFilters(next))
+  }
 
   return (
     <ResultsFrame>
-      <ResultsSummary term={q} total={data.total} scope={data.scope} />
+      <ResultsSummary
+        term={q}
+        total={data.total}
+        scope={data.scope}
+        aside={
+          <FilterToggle
+            open={open}
+            active={activeFilterCount(filters)}
+            onToggle={() => setOpen((current) => !current)}
+          />
+        }
+      />
       <ScopeStatement scope={data.scope} className="-mt-4 mb-6" />
+      {open && (
+        <FilterPanel
+          options={data.filterOptions}
+          applied={filters}
+          onApply={apply}
+        />
+      )}
       {data.themes.length > 0 && (
         <ThemeList themes={data.themes} term={q} total={data.total} />
       )}
