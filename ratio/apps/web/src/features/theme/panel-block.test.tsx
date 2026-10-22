@@ -89,7 +89,9 @@ describe("panel block", () => {
     const block = await findBlock()
 
     const row = within(courtSection(block, "STJ")).getByTestId("panel-row")
-    expect(within(row).queryByTestId("panel-divergence")).not.toBeInTheDocument()
+    expect(
+      within(row).queryByTestId("panel-divergence")
+    ).not.toBeInTheDocument()
   })
 
   it("counts the appeals judged outside a listed panel", async () => {
@@ -168,7 +170,10 @@ describe("panel block", () => {
 
   it("keeps the order of the courts from the API", async () => {
     answerThemeDetail()
-    answerThemePanels({ ...themePanels, courts: [divergentCourt, alignedCourt] })
+    answerThemePanels({
+      ...themePanels,
+      courts: [divergentCourt, alignedCourt],
+    })
 
     await renderTheme()
     const block = await findBlock()
