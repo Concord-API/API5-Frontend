@@ -5,6 +5,7 @@ import { themeDetailQueryOptions } from "@/api/themes"
 import { ProvenanceFooter } from "@/components/provenance-footer"
 import { ScopeStatement } from "@/components/scope-statement"
 import { DoctrineBlock } from "@/features/theme/doctrine-block"
+import { PanelBlock } from "@/features/theme/panel-block"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
@@ -40,6 +41,7 @@ function Theme() {
         provenance={data.provenance}
         unavailable={data.unavailable}
       />
+      <PanelBlock themeKey={data.themeKey} />
       <DoctrineBlock
         doctrine={data.relatedDoctrine}
         unavailable={data.unavailable}
