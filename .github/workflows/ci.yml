@@ -2,7 +2,7 @@ name: Frontend CI
 
 on:
   pull_request:
-    branches: ['us*']
+    branches: [main, 'us*']
   push:
     branches: [main]
   workflow_dispatch:
@@ -79,7 +79,6 @@ jobs:
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_ENABLED: ${{ secrets.SONAR_TOKEN != '' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main') }}
-      SONAR_WAIT_GATE: ${{ github.event_name == 'pull_request' }}
     defaults:
       run:
         working-directory: ratio
@@ -120,5 +119,5 @@ jobs:
         with:
           projectBaseDir: ratio/apps/web
           args: >
-            -Dsonar.qualitygate.wait=${{ env.SONAR_WAIT_GATE }}
+            -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
