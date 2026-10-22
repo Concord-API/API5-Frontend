@@ -168,9 +168,77 @@ export const themeNotFoundProblem = {
   detail: "Tema não encontrado.",
 }
 
+export const divergentCourt = {
+  courtCode: "TJMG",
+  n: 20,
+  percentage: 0.55,
+  outsidePanels: 0,
+  panels: [
+    {
+      name: "1ª Câmara Cível",
+      n: 10,
+      percentage: 0.9,
+      distanceInPoints: 35,
+      divergent: true,
+    },
+    {
+      name: "2ª Câmara Cível",
+      n: 10,
+      percentage: 0.2,
+      distanceInPoints: -35,
+      divergent: true,
+    },
+  ],
+}
+
+export const alignedCourt = {
+  courtCode: "STJ",
+  n: 12,
+  percentage: 0.4167,
+  outsidePanels: 4,
+  panels: [
+    {
+      name: "Terceira Turma",
+      n: 8,
+      percentage: 0.5,
+      distanceInPoints: 8.3,
+      divergent: false,
+    },
+  ],
+}
+
+export const themePanels = {
+  themeKey: 412,
+  basis: "provimento do recurso (pretensão de quem recorreu)",
+  rule: { divergencePoints: 20, minJudgedForDivergence: 5 },
+  courts: [alignedCourt, divergentCourt],
+}
+
+export const noPanels = { ...themePanels, courts: [] }
+
+export function answerThemePanels(body: Record<string, unknown> = themePanels) {
+  const requests: URL[] = []
+  server.use(
+    http.get("/api/themes/:key/panels", ({ request }) => {
+      requests.push(new URL(request.url))
+      return HttpResponse.json(body)
+    })
+  )
+  return requests
+}
+
+export function answerThemePanelsError() {
+  server.use(
+    http.get("/api/themes/:key/panels", () =>
+      HttpResponse.json({ detail: "Falha" }, { status: 500 })
+    )
+  )
+}
+
 export function answerThemeDetail(body: Record<string, unknown> = themeDetail) {
   const requests: URL[] = []
   server.use(
+    http.get("/api/themes/:key/panels", () => HttpResponse.json(noPanels)),
     http.get("/api/themes/:key", ({ request }) => {
       requests.push(new URL(request.url))
       return HttpResponse.json(body)
