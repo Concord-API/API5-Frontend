@@ -23,7 +23,9 @@ describe("court alignment list", () => {
       />
     )
 
-    const list = screen.getByRole("region", { name: "Alinhamento por tribunal" })
+    const list = screen.getByRole("region", {
+      name: "Alinhamento por tribunal",
+    })
     const rows = within(list).getAllByTestId("court-alignment-row")
 
     expect(rows).toHaveLength(2)

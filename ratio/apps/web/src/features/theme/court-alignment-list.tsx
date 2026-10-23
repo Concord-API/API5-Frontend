@@ -5,9 +5,7 @@ type CourtAlignmentListProps = {
   alignments: CourtAlignment[]
 }
 
-export function CourtAlignmentList({
-  alignments,
-}: CourtAlignmentListProps) {
+export function CourtAlignmentList({ alignments }: CourtAlignmentListProps) {
   return (
     <section
       aria-labelledby="court-alignment-title"
