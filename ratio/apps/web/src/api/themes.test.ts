@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { z } from "zod"
 import { server } from "../test/server"
 import { ApiError } from "./client"
-import { fetchThemeDetail, fetchThemes } from "./themes"
+import { fetchThemeDetail, fetchThemes, noFilters } from "./themes"
 
 const contractExample = {
   query: "inscricao indevida",
@@ -66,11 +66,36 @@ const contractExample = {
     subject: "cível",
     statement: "TJMG, TJRJ e TJSP",
   },
+  filterOptions: {
+    courts: [
+      {
+        code: "TJSP",
+        name: "Tribunal de Justiça de São Paulo",
+        caseCount: 5412,
+      },
+      {
+        code: "TJMG",
+        name: "Tribunal de Justiça de Minas Gerais",
+        caseCount: 2108,
+      },
+      {
+        code: "TJRJ",
+        name: "Tribunal de Justiça do Rio de Janeiro",
+        caseCount: 0,
+      },
+    ],
+    levels: [
+      { code: "first", label: "Primeiro grau" },
+      { code: "second", label: "Segundo grau" },
+    ],
+  },
 }
 
 const provenance = contractExample.provenance
 
 const scope = contractExample.scope
+
+const filterOptions = contractExample.filterOptions
 
 function withoutProvenance(body: Record<string, unknown>) {
   const copy = { ...body }
@@ -81,6 +106,12 @@ function withoutProvenance(body: Record<string, unknown>) {
 function withoutScope(body: Record<string, unknown>) {
   const copy = { ...body }
   delete copy.scope
+  return copy
+}
+
+function withoutFilterOptions(body: Record<string, unknown>) {
+  const copy = { ...body }
+  delete copy.filterOptions
   return copy
 }
 
@@ -117,6 +148,35 @@ describe("fetchThemes", () => {
 
     expect(list.themes[0].courts).toEqual(["TJMG", "TJSP", "TJRJ"])
     expect(list.themes[0].additionalCourtCount).toBe(2)
+  })
+
+  it("preserves the case count of each court in the filter options", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.filterOptions.courts).toEqual(
+      contractExample.filterOptions.courts
+    )
+  })
+
+  it("preserves the level options the API offers", async () => {
+    respondWith(contractExample)
+
+    const list = await fetchThemes({ q: "inscricao indevida" })
+
+    expect(list.filterOptions.levels).toEqual([
+      { code: "first", label: "Primeiro grau" },
+      { code: "second", label: "Segundo grau" },
+    ])
+  })
+
+  it("breaks on the parse when the filter options are missing", async () => {
+    respondWith(withoutFilterOptions(contractExample))
+
+    await expect(
+      fetchThemes({ q: "inscricao indevida" })
+    ).rejects.toBeInstanceOf(z.ZodError)
   })
 
   it("preserves the period of the theme", async () => {
@@ -223,6 +283,34 @@ describe("fetchThemes", () => {
     expect(list.scope.statement).toBeNull()
   })
 
+  it("sends every chosen filter as a query parameter", async () => {
+    const requested = respondWith(contractExample)
+
+    await fetchThemes({
+      q: "inscricao indevida",
+      filters: {
+        courts: ["TJSP", "TJRJ"],
+        period: "5y",
+        level: "second",
+        minStrength: 60,
+      },
+    })
+
+    const params = requested()?.searchParams
+    expect(params?.getAll("court")).toEqual(["TJSP", "TJRJ"])
+    expect(params?.get("period")).toBe("5y")
+    expect(params?.get("level")).toBe("second")
+    expect(params?.get("minStrength")).toBe("60")
+  })
+
+  it("sends no filter parameter when no filter is chosen", async () => {
+    const requested = respondWith(contractExample)
+
+    await fetchThemes({ q: "inscricao indevida", filters: noFilters })
+
+    expect([...(requested()?.searchParams.keys() ?? [])]).toEqual(["q"])
+  })
+
   it("sends the term and the limit as query parameters", async () => {
     const requested = respondWith({
       query: "atraso de voo",
@@ -230,6 +318,7 @@ describe("fetchThemes", () => {
       themes: [],
       provenance,
       scope,
+      filterOptions,
     })
 
     await fetchThemes({ q: "atraso de voo", limit: 5 })
@@ -246,6 +335,7 @@ describe("fetchThemes", () => {
       themes: [],
       provenance,
       scope,
+      filterOptions,
     })
 
     await fetchThemes({ q: "" })
