@@ -62,12 +62,16 @@ export const themeDetail = {
       n: 100,
       percentage: 0.6944,
       polarityLabel: "acolhimento da pretensão do autor",
+      decisions: 1240,
+      lastDecisionDate: "2026-08-30",
     },
     {
       courtCode: "TJRJ",
       n: 44,
       percentage: 0.6591,
       polarityLabel: "acolhimento da pretensão do autor",
+      decisions: 530,
+      lastDecisionDate: "2026-06-11",
     },
   ],
   partialTreatment:

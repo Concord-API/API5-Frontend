@@ -1,6 +1,8 @@
 import { render, screen, within } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import type { CourtAlignment } from "@/api/themes"
+import { renderRoute } from "../../test/render"
+import { answerThemeDetail } from "../../test/theme-detail"
 import { CourtBehaviourTable } from "./court-behaviour-table"
 
 const tjsp: CourtAlignment = {
@@ -29,7 +31,9 @@ function renderTable(alignments: CourtAlignment[] = [tjsp, stj]) {
 function rowOf(table: HTMLElement, courtCode: string) {
   const row = within(table)
     .getAllByRole("row")
-    .find((item) => within(item).queryByRole("rowheader")?.textContent === courtCode)
+    .find(
+      (item) => within(item).queryByRole("rowheader")?.textContent === courtCode
+    )
   if (row === undefined) {
     throw new Error(`no row for ${courtCode}`)
   }
@@ -103,5 +107,18 @@ describe("court behaviour table", () => {
 
   it("renders nothing without courts", () => {
     expect(renderTable([])).toBeNull()
+  })
+
+  it("shows the table on the theme page", async () => {
+    answerThemeDetail()
+
+    await renderRoute("/tema/412")
+
+    const table = await screen.findByRole("table", {
+      name: "Comportamento de cada tribunal",
+    })
+    expect(
+      within(rowOf(table, "TJRJ")).getAllByRole("cell")[2]
+    ).toHaveTextContent("11.06.2026")
   })
 })
