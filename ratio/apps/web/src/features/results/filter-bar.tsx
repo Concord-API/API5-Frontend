@@ -1,5 +1,10 @@
 import { useState, type FormEvent } from "react"
-import type { FilterOptions, ThemeFilters, ThemePeriod } from "@/api/themes"
+import {
+  noFilters,
+  type FilterOptions,
+  type ThemeFilters,
+  type ThemePeriod,
+} from "@/api/themes"
 import { formatNumber } from "@/lib/format"
 
 const PANEL_ID = "filtros"
@@ -46,9 +51,15 @@ type FilterPanelProps = {
   options: FilterOptions
   applied: ThemeFilters
   onApply: (filters: ThemeFilters) => void
+  onClear: () => void
 }
 
-export function FilterPanel({ options, applied, onApply }: FilterPanelProps) {
+export function FilterPanel({
+  options,
+  applied,
+  onApply,
+  onClear,
+}: FilterPanelProps) {
   const [draft, setDraft] = useState(applied)
 
   function toggleCourt(code: string) {
@@ -70,6 +81,11 @@ export function FilterPanel({ options, applied, onApply }: FilterPanelProps) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     onApply(draft)
+  }
+
+  function clear() {
+    setDraft(noFilters)
+    onClear()
   }
 
   return (
@@ -181,12 +197,21 @@ export function FilterPanel({ options, applied, onApply }: FilterPanelProps) {
           <span>0</span>
           <span>100</span>
         </div>
-        <button
-          type="submit"
-          className={`mt-5 rounded-[3px] bg-primary px-4 py-2 font-mono text-[11px] font-semibold tracking-[0.14em] text-primary-foreground uppercase hover:bg-primary/90 ${focusClass}`}
-        >
-          Aplicar
-        </button>
+        <div className="mt-5 flex items-center gap-3.5">
+          <button
+            type="submit"
+            className={`rounded-[3px] bg-primary px-4 py-2 font-mono text-[11px] font-semibold tracking-[0.14em] text-primary-foreground uppercase hover:bg-primary/90 ${focusClass}`}
+          >
+            Aplicar
+          </button>
+          <button
+            type="button"
+            onClick={clear}
+            className={`font-sans text-sm text-primary hover:underline ${focusClass}`}
+          >
+            limpar filtros
+          </button>
+        </div>
       </fieldset>
     </form>
   )
