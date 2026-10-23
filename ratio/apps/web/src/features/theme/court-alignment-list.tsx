@@ -33,7 +33,7 @@ export function CourtAlignmentList({ alignments }: CourtAlignmentListProps) {
             </span>
             <span className="flex flex-col items-end gap-0.5 text-right">
               <span className="font-mono text-xs text-foreground">
-                {alignment.percentage === null
+                {alignment.n === 0 || alignment.percentage === null
                   ? "sem dado"
                   : formatPercent(alignment.percentage)}
                 {` · n ${formatNumber(alignment.n)}`}
