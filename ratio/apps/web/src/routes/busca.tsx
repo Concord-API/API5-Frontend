@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
-import { useState, useTransition } from "react"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useState } from "react"
 import { z } from "zod"
 import {
   activeFilterCount,
@@ -10,7 +10,10 @@ import {
 import { ProvenanceFooter } from "@/components/provenance-footer"
 import { ScopeStatement } from "@/components/scope-statement"
 import { FilterPanel, FilterToggle } from "@/features/results/filter-bar"
-import { filtersFromSearch } from "@/features/results/filter-search"
+import {
+  filtersFromSearch,
+  searchFromFilters,
+} from "@/features/results/filter-search"
 import {
   ResultsError,
   ResultsFrame,
@@ -58,25 +61,18 @@ function Search() {
     <SearchResults
       key={search.q}
       q={search.q}
-      initialFilters={filtersFromSearch(search)}
+      filters={filtersFromSearch(search)}
     />
   )
 }
 
-function SearchResults({
-  q,
-  initialFilters,
-}: {
-  q: string
-  initialFilters: ThemeFilters
-}) {
-  const [filters, setFilters] = useState(initialFilters)
+function SearchResults({ q, filters }: { q: string; filters: ThemeFilters }) {
   const [open, setOpen] = useState(false)
-  const [, startTransition] = useTransition()
+  const navigate = useNavigate()
   const { data } = useSuspenseQuery(themesQueryOptions(q, filters))
 
   function apply(next: ThemeFilters) {
-    startTransition(() => setFilters(next))
+    void navigate({ to: "/busca", search: { q, ...searchFromFilters(next) } })
   }
 
   return (
@@ -96,6 +92,7 @@ function SearchResults({
       <ScopeStatement scope={data.scope} className="-mt-4 mb-6" />
       {open && (
         <FilterPanel
+          key={JSON.stringify(filters)}
           options={data.filterOptions}
           applied={filters}
           onApply={apply}
