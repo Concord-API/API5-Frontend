@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw"
 import { describe, expect, it } from "vitest"
+import { themesQueryOptions } from "../api/themes"
 import { renderRoute } from "./render"
 import { server } from "./server"
 import { answerThemeDetail } from "./theme-detail"
@@ -25,7 +26,9 @@ describe("routes", () => {
     const { queryClient } = await renderRoute("/busca?q=atraso%20de%20voo")
 
     expect(requests.at(-1)?.searchParams.get("q")).toBe("atraso de voo")
-    expect(queryClient.getQueryData(["themes", "atraso de voo"])).toEqual({
+    expect(
+      queryClient.getQueryData(themesQueryOptions("atraso de voo").queryKey)
+    ).toEqual({
       ...emptyList,
       query: "atraso de voo",
     })
