@@ -121,4 +121,23 @@ describe("court behaviour table", () => {
       within(rowOf(table, "TJRJ")).getAllByRole("cell")[2]
     ).toHaveTextContent("11.06.2026")
   })
+
+  it("scrolls a wide table inside its own container", () => {
+    const table = renderTable()!
+
+    const container = table.parentElement!
+    expect(container).toHaveClass("overflow-x-auto")
+    expect(container).toHaveAttribute("tabindex", "0")
+    expect(container).toHaveAccessibleName(
+      "Comportamento de cada tribunal, role para o lado para ver todas as colunas"
+    )
+    expect(table).toHaveClass("min-w-[560px]")
+  })
+
+  it("keeps the block inside the page width", () => {
+    const table = renderTable()!
+
+    const block = table.closest("section")!
+    expect(block).toHaveClass("min-w-0", "max-w-full")
+  })
 })
