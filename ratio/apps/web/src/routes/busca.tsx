@@ -19,6 +19,7 @@ import {
   ResultsFrame,
   ResultsPending,
 } from "@/features/results/results-states"
+import { NarrowingEmpty } from "@/features/results/narrowing-empty"
 import { ResultsSummary } from "@/features/results/results-summary"
 import { ThemeList } from "@/features/results/theme-list"
 
@@ -100,6 +101,13 @@ function SearchResults({ q, filters }: { q: string; filters: ThemeFilters }) {
           options={data.filterOptions}
           applied={filters}
           onApply={apply}
+          onClear={clear}
+        />
+      )}
+      {data.themes.length === 0 && activeFilterCount(filters) > 0 && (
+        <NarrowingEmpty
+          filters={filters}
+          options={data.filterOptions}
           onClear={clear}
         />
       )}
