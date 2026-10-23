@@ -56,6 +56,20 @@ export const themeDetail = {
     generatedAt: "2026-09-23",
   },
   outcomeBreakdown: [meritFamily],
+  courtAlignments: [
+    {
+      courtCode: "TJSP",
+      n: 100,
+      percentage: 0.6944,
+      polarityLabel: "acolhimento da pretensão do autor",
+    },
+    {
+      courtCode: "TJRJ",
+      n: 44,
+      percentage: 0.6591,
+      polarityLabel: "acolhimento da pretensão do autor",
+    },
+  ],
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
   unavailable: [
