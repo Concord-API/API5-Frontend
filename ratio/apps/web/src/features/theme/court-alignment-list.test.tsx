@@ -35,9 +35,12 @@ describe("court alignment list", () => {
     expect(rows[0]).toHaveTextContent("acolhimento da pretensão do autor")
   })
 
-  it("renders no rows when there are no alignments", () => {
+  it("does not render when there are no alignments", () => {
     render(<CourtAlignmentList alignments={[]} />)
 
     expect(screen.queryByTestId("court-alignment-row")).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("region", { name: "Alinhamento por tribunal" })
+    ).not.toBeInTheDocument()
   })
 })

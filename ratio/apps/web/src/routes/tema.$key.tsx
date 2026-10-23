@@ -42,7 +42,7 @@ function Theme() {
         provenance={data.provenance}
         unavailable={data.unavailable}
       />
-      <CourtAlignmentList alignments={data.courtAlignments} />
+      <CourtAlignmentList alignments={data.courtAlignments ?? []} />
       <PanelBlock themeKey={data.themeKey} />
       <DoctrineBlock
         doctrine={data.relatedDoctrine}

@@ -108,7 +108,7 @@ export const themeDetailSchema = z.object({
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
   outcomeBreakdown: z.array(outcomeFamilySchema),
-  courtAlignments: z.array(courtAlignmentSchema),
+  courtAlignments: z.array(courtAlignmentSchema).optional(),
   partialTreatment: z.string(),
   unavailable: z.array(unavailableBlockSchema),
   relatedDoctrine: relatedDoctrineSchema,

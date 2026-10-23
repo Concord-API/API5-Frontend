@@ -6,6 +6,10 @@ type CourtAlignmentListProps = {
 }
 
 export function CourtAlignmentList({ alignments }: CourtAlignmentListProps) {
+  if (alignments.length === 0) {
+    return null
+  }
+
   return (
     <section
       aria-labelledby="court-alignment-title"
