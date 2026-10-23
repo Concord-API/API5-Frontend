@@ -80,6 +80,7 @@ describe("sourceless blocks never render a placeholder value", () => {
       ...themeDetail,
       summary: null,
       outcomeBreakdown: [],
+      courtAlignments: [],
       unavailable: [notLoadedSummary],
     })
 
