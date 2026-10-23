@@ -87,6 +87,13 @@ export const outcomeFamilySchema = z.object({
   categories: z.array(outcomeCategorySchema),
 })
 
+export const courtAlignmentSchema = z.object({
+  courtCode: z.string(),
+  n: z.number().int(),
+  percentage: z.number().nullable(),
+  polarityLabel: z.string(),
+})
+
 export const themeDetailSchema = z.object({
   themeKey: z.number().int(),
   name: z.string(),
@@ -101,6 +108,7 @@ export const themeDetailSchema = z.object({
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
   outcomeBreakdown: z.array(outcomeFamilySchema),
+  courtAlignments: z.array(courtAlignmentSchema),
   partialTreatment: z.string(),
   unavailable: z.array(unavailableBlockSchema),
   relatedDoctrine: relatedDoctrineSchema,
@@ -114,6 +122,7 @@ export type ThemeDetail = z.infer<typeof themeDetailSchema>
 export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
 export type OutcomeFamily = z.infer<typeof outcomeFamilySchema>
+export type CourtAlignment = z.infer<typeof courtAlignmentSchema>
 
 export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   const params = new URLSearchParams()

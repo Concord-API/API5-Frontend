@@ -82,6 +82,18 @@ describe("theme header", () => {
       "12.418 processos · 3 tribunais · 2021 — 2026 · última decisão 30.08.2026"
     )
   })
+
+  it("shows the alignment by court from the theme detail", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const list = screen.getByRole("region", {
+      name: "Alinhamento por tribunal",
+    })
+    expect(within(list).getAllByTestId("court-alignment-row")).toHaveLength(2)
+    expect(within(list).getByText("TJSP")).toBeInTheDocument()
+  })
 })
 
 describe("theme states", () => {
