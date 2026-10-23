@@ -138,6 +138,6 @@ describe("court behaviour table", () => {
     const table = renderTable()!
 
     const block = table.closest("section")!
-    expect(block).toHaveClass("min-w-0", "max-w-full")
+    expect(block).toHaveClass("min-w-0", "w-full", "max-w-[690px]")
   })
 })
