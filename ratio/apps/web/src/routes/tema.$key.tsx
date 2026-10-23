@@ -6,6 +6,7 @@ import { ProvenanceFooter } from "@/components/provenance-footer"
 import { ScopeStatement } from "@/components/scope-statement"
 import { DoctrineBlock } from "@/features/theme/doctrine-block"
 import { CourtAlignmentList } from "@/features/theme/court-alignment-list"
+import { CourtBehaviourTable } from "@/features/theme/court-behaviour-table"
 import { PanelBlock } from "@/features/theme/panel-block"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
@@ -43,6 +44,7 @@ function Theme() {
         unavailable={data.unavailable}
       />
       <CourtAlignmentList alignments={data.courtAlignments ?? []} />
+      <CourtBehaviourTable alignments={data.courtAlignments ?? []} />
       <PanelBlock themeKey={data.themeKey} />
       <DoctrineBlock
         doctrine={data.relatedDoctrine}

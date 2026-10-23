@@ -92,6 +92,8 @@ export const courtAlignmentSchema = z.object({
   n: z.number().int(),
   percentage: z.number().nullable(),
   polarityLabel: z.string(),
+  decisions: z.number().int().optional(),
+  lastDecisionDate: z.string().nullable().optional(),
 })
 
 export const themeDetailSchema = z.object({
