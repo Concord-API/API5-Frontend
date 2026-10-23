@@ -94,6 +94,31 @@ describe("theme header", () => {
     expect(within(list).getAllByTestId("court-alignment-row")).toHaveLength(2)
     expect(within(list).getByText("TJSP")).toBeInTheDocument()
   })
+
+  it("shows no data when a court has no judgments", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      courtAlignments: [
+        {
+          courtCode: "TJMG",
+          n: 0,
+          percentage: 0,
+          polarityLabel: "sem julgamento",
+        },
+      ],
+    })
+
+    await renderTheme()
+
+    const list = screen.getByRole("region", {
+      name: "Alinhamento por tribunal",
+    })
+    const row = within(list).getByTestId("court-alignment-row")
+
+    expect(row).toHaveTextContent("TJMG")
+    expect(row).toHaveTextContent("sem dado")
+    expect(row).not.toHaveTextContent("0%")
+  })
 })
 
 describe("theme states", () => {

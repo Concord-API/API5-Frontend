@@ -43,4 +43,25 @@ describe("court alignment list", () => {
       screen.queryByRole("region", { name: "Alinhamento por tribunal" })
     ).not.toBeInTheDocument()
   })
+
+  it("shows no data for a court without judgments", () => {
+    render(
+      <CourtAlignmentList
+        alignments={[
+          {
+            courtCode: "TJMG",
+            n: 0,
+            percentage: 0,
+            polarityLabel: "sem julgamento",
+          },
+        ]}
+      />
+    )
+
+    const row = screen.getByTestId("court-alignment-row")
+
+    expect(row).toHaveTextContent("TJMG")
+    expect(row).toHaveTextContent("sem dado")
+    expect(row).not.toHaveTextContent("0%")
+  })
 })
