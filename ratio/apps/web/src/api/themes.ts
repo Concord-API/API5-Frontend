@@ -59,12 +59,29 @@ export const themeSummarySchema = z.object({
   summary: themeResultSummarySchema.nullable(),
 })
 
+export const courtCountSchema = z.object({
+  code: z.string(),
+  name: z.string(),
+  caseCount: z.number().int(),
+})
+
+export const levelOptionSchema = z.object({
+  code: z.string(),
+  label: z.string(),
+})
+
+export const filterOptionsSchema = z.object({
+  courts: z.array(courtCountSchema),
+  levels: z.array(levelOptionSchema),
+})
+
 export const themeListSchema = z.object({
   query: z.string(),
   total: z.number().int(),
   themes: z.array(themeSummarySchema),
   provenance: provenanceSchema,
   scope: scopeSchema,
+  filterOptions: filterOptionsSchema,
 })
 
 export const themeSummaryTextSchema = z.object({
@@ -87,6 +104,15 @@ export const outcomeFamilySchema = z.object({
   categories: z.array(outcomeCategorySchema),
 })
 
+export const courtAlignmentSchema = z.object({
+  courtCode: z.string(),
+  n: z.number().int(),
+  percentage: z.number().nullable(),
+  polarityLabel: z.string(),
+  decisions: z.number().int().optional(),
+  lastDecisionDate: z.string().nullable().optional(),
+})
+
 export const themeDetailSchema = z.object({
   themeKey: z.number().int(),
   name: z.string(),
@@ -101,6 +127,7 @@ export const themeDetailSchema = z.object({
   lastDecisionDate: z.string().nullable(),
   summary: themeSummaryTextSchema.nullable(),
   outcomeBreakdown: z.array(outcomeFamilySchema),
+  courtAlignments: z.array(courtAlignmentSchema).optional(),
   partialTreatment: z.string(),
   unavailable: z.array(unavailableBlockSchema),
   relatedDoctrine: relatedDoctrineSchema,
@@ -110,12 +137,47 @@ export const themeDetailSchema = z.object({
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
 export type ThemeList = z.infer<typeof themeListSchema>
+export type FilterOptions = z.infer<typeof filterOptionsSchema>
 export type ThemeDetail = z.infer<typeof themeDetailSchema>
 export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
 export type OutcomeFamily = z.infer<typeof outcomeFamilySchema>
+export type CourtAlignment = z.infer<typeof courtAlignmentSchema>
 
-export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
+export type ThemePeriod = "5y" | "2y" | "all"
+
+export type ThemeFilters = {
+  courts: string[]
+  period: ThemePeriod
+  level: string | null
+  minStrength: number
+}
+
+export const noFilters: ThemeFilters = {
+  courts: [],
+  period: "all",
+  level: null,
+  minStrength: 0,
+}
+
+export function activeFilterCount(filters: ThemeFilters) {
+  return (
+    filters.courts.length +
+    (filters.period === "all" ? 0 : 1) +
+    (filters.level === null ? 0 : 1) +
+    (filters.minStrength > 0 ? 1 : 0)
+  )
+}
+
+export function fetchThemes({
+  q,
+  limit,
+  filters = noFilters,
+}: {
+  q: string
+  limit?: number
+  filters?: ThemeFilters
+}) {
   const params = new URLSearchParams()
   if (q) {
     params.set("q", q)
@@ -123,14 +185,26 @@ export function fetchThemes({ q, limit }: { q: string; limit?: number }) {
   if (limit !== undefined) {
     params.set("limit", String(limit))
   }
+  for (const court of filters.courts) {
+    params.append("court", court)
+  }
+  if (filters.period !== "all") {
+    params.set("period", filters.period)
+  }
+  if (filters.level !== null) {
+    params.set("level", filters.level)
+  }
+  if (filters.minStrength > 0) {
+    params.set("minStrength", String(filters.minStrength))
+  }
   const search = params.toString()
   return getJson(`/api/themes${search ? `?${search}` : ""}`, themeListSchema)
 }
 
-export function themesQueryOptions(q: string) {
+export function themesQueryOptions(q: string, filters = noFilters) {
   return queryOptions({
-    queryKey: ["themes", q],
-    queryFn: () => fetchThemes({ q }),
+    queryKey: ["themes", q, filters],
+    queryFn: () => fetchThemes({ q, filters }),
   })
 }
 
