@@ -75,6 +75,10 @@ function SearchResults({ q, filters }: { q: string; filters: ThemeFilters }) {
     void navigate({ to: "/busca", search: { q, ...searchFromFilters(next) } })
   }
 
+  function clear() {
+    void navigate({ to: "/busca", search: { q } })
+  }
+
   return (
     <ResultsFrame>
       <ResultsSummary
@@ -96,6 +100,7 @@ function SearchResults({ q, filters }: { q: string; filters: ThemeFilters }) {
           options={data.filterOptions}
           applied={filters}
           onApply={apply}
+          onClear={clear}
         />
       )}
       {data.themes.length > 0 && (
