@@ -49,36 +49,46 @@ export function CourtBehaviourTable({ alignments }: CourtBehaviourTableProps) {
   }
 
   return (
-    <section className="mt-10 max-w-[690px] border border-[#DCD6C9] bg-card px-5 py-4">
+    <section className="mt-10 w-full max-w-[690px] min-w-0 border border-[#DCD6C9] bg-card px-5 py-4">
       <h2
         id={titleId}
         className="border-b border-foreground pb-2 font-sans text-[15px] font-bold text-foreground"
       >
         Comportamento de cada tribunal
       </h2>
-      <table aria-labelledby={titleId} className="mt-2 w-full border-collapse">
-        <thead>
-          <tr>
-            <th scope="col" className={`${HEADER} text-left`}>
-              Tribunal
-            </th>
-            <th scope="col" className={`${HEADER} text-right`}>
-              Decisões
-            </th>
-            <th scope="col" className={`${HEADER} text-right`}>
-              Alinhamento
-            </th>
-            <th scope="col" className={`${HEADER} text-right`}>
-              Última decisão
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {alignments.map((alignment) => (
-            <BehaviourRow key={alignment.courtCode} alignment={alignment} />
-          ))}
-        </tbody>
-      </table>
+      <div
+        role="region"
+        tabIndex={0}
+        aria-label="Comportamento de cada tribunal, role para o lado para ver todas as colunas"
+        className="mt-2 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <table
+          aria-labelledby={titleId}
+          className="w-full min-w-[560px] border-collapse"
+        >
+          <thead>
+            <tr>
+              <th scope="col" className={`${HEADER} text-left`}>
+                Tribunal
+              </th>
+              <th scope="col" className={`${HEADER} text-right`}>
+                Decisões
+              </th>
+              <th scope="col" className={`${HEADER} text-right`}>
+                Alinhamento
+              </th>
+              <th scope="col" className={`${HEADER} text-right`}>
+                Última decisão
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {alignments.map((alignment) => (
+              <BehaviourRow key={alignment.courtCode} alignment={alignment} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }
