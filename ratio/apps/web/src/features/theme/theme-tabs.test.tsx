@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
+import { answerThemes, fullList } from "../../test/themes"
 
 async function renderTheme(path: string) {
   answerThemeDetail()
@@ -177,6 +178,111 @@ describe("changing the active tab", () => {
     )
     expect(
       screen.getByRole("link", { name: /Voltar aos 3 resultados/ })
+    ).toBeInTheDocument()
+  })
+})
+
+async function switchTo(
+  router: Awaited<ReturnType<typeof renderTheme>>["router"],
+  name: string,
+  aba: string
+) {
+  await userEvent.click(tab(name))
+  await waitFor(() => expect(router.state.location.search).toEqual({ aba }))
+}
+
+async function expectTab(
+  router: Awaited<ReturnType<typeof renderTheme>>["router"],
+  aba: string,
+  name: string
+) {
+  await waitFor(() => {
+    expect(router.state.location.pathname).toBe("/tema/412")
+    expect(router.state.location.search).toEqual({ aba })
+  })
+  await waitFor(() =>
+    expect(tab(name)).toHaveAttribute("aria-selected", "true")
+  )
+}
+
+describe("browser history between tabs", () => {
+  it("returns to the previous tab with the back button", async () => {
+    const { router } = await renderTheme("/tema/412")
+    await switchTo(router, "Base analítica", "base")
+
+    router.history.back()
+
+    await expectTab(router, "resumo", "Resumo")
+    resumoBlocks().forEach((block) => expect(block).toBeInTheDocument())
+    baseBlocks().forEach((block) => expect(block).not.toBeInTheDocument())
+  })
+
+  it("walks back through every tab visited without leaving the theme", async () => {
+    const { router } = await renderTheme("/tema/412")
+    await switchTo(router, "Base analítica", "base")
+    await switchTo(router, "Resumo", "resumo")
+
+    router.history.back()
+    await expectTab(router, "base", "Base analítica")
+
+    router.history.back()
+    await expectTab(router, "resumo", "Resumo")
+  })
+
+  it("returns to the tab left with the forward button", async () => {
+    const { router } = await renderTheme("/tema/412")
+    await switchTo(router, "Base analítica", "base")
+    router.history.back()
+    await expectTab(router, "resumo", "Resumo")
+
+    router.history.forward()
+
+    await expectTab(router, "base", "Base analítica")
+    baseBlocks().forEach((block) => expect(block).toBeInTheDocument())
+  })
+
+  it("keeps the way back to the results after going back a tab", async () => {
+    const { router } = await renderTheme("/tema/412")
+    await router.navigate({
+      to: "/tema/$key",
+      params: { key: 412 },
+      state: { fromSearch: { q: "inscrição indevida", total: 3 } },
+    })
+    await switchTo(router, "Base analítica", "base")
+
+    router.history.back()
+
+    await expectTab(router, "resumo", "Resumo")
+    expect(
+      screen.getByRole("link", { name: /Voltar aos 3 resultados/ })
+    ).toBeInTheDocument()
+  })
+})
+
+describe("browser history from the results to the tabs", () => {
+  it("leaves the theme only after going back past its first tab", async () => {
+    answerThemes()
+    answerThemeDetail()
+    const { router } = await renderRoute("/busca?q=inscricao%20indevida")
+    await screen.findByRole("list", { name: "Temas" })
+    const [first] = fullList.themes
+
+    await userEvent.click(screen.getByRole("link", { name: first.name }))
+    await screen.findByRole(
+      "heading",
+      { level: 1, name: themeDetail.name },
+      { timeout: 5000 }
+    )
+    await expectTab(router, "resumo", "Resumo")
+    await switchTo(router, "Base analítica", "base")
+
+    router.history.back()
+    await expectTab(router, "resumo", "Resumo")
+
+    router.history.back()
+    await waitFor(() => expect(router.state.location.pathname).toBe("/busca"))
+    expect(
+      await screen.findByRole("list", { name: "Temas" })
     ).toBeInTheDocument()
   })
 })
