@@ -6,6 +6,7 @@ import { ProvenanceFooter } from "@/components/provenance-footer"
 import { ScopeStatement } from "@/components/scope-statement"
 import { DoctrineBlock } from "@/features/theme/doctrine-block"
 import { CourtAlignmentList } from "@/features/theme/court-alignment-list"
+import { CaseSampleBlock } from "@/features/theme/case-sample-block"
 import { CourtBehaviourTable } from "@/features/theme/court-behaviour-table"
 import { PanelBlock } from "@/features/theme/panel-block"
 import { ThemeArticle } from "@/features/theme/theme-article"
@@ -53,6 +54,7 @@ function Theme() {
         doctrine={data.relatedDoctrine}
         unavailable={data.unavailable}
       />
+      <CaseSampleBlock themeKey={data.themeKey} />
       <ProvenanceFooter provenance={data.provenance} />
       <ScopeStatement scope={data.scope} className="mt-2" />
     </ThemeFrame>
