@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
+import { answerThemes, fullList } from "../../test/themes"
 
 async function renderTheme(path: string) {
   answerThemeDetail()
@@ -254,6 +255,34 @@ describe("browser history between tabs", () => {
     await expectTab(router, "resumo", "Resumo")
     expect(
       screen.getByRole("link", { name: /Voltar aos 3 resultados/ })
+    ).toBeInTheDocument()
+  })
+})
+
+describe("browser history from the results to the tabs", () => {
+  it("leaves the theme only after going back past its first tab", async () => {
+    answerThemes()
+    answerThemeDetail()
+    const { router } = await renderRoute("/busca?q=inscricao%20indevida")
+    await screen.findByRole("list", { name: "Temas" })
+    const [first] = fullList.themes
+
+    await userEvent.click(screen.getByRole("link", { name: first.name }))
+    await screen.findByRole(
+      "heading",
+      { level: 1, name: themeDetail.name },
+      { timeout: 5000 }
+    )
+    await expectTab(router, "resumo", "Resumo")
+    await switchTo(router, "Base analítica", "base")
+
+    router.history.back()
+    await expectTab(router, "resumo", "Resumo")
+
+    router.history.back()
+    await waitFor(() => expect(router.state.location.pathname).toBe("/busca"))
+    expect(
+      await screen.findByRole("list", { name: "Temas" })
     ).toBeInTheDocument()
   })
 })
