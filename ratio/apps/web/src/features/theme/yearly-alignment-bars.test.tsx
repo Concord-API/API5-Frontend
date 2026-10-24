@@ -43,4 +43,37 @@ describe("yearly alignment bars", () => {
       screen.queryByRole("region", { name: "Alinhamento por ano" })
     ).not.toBeInTheDocument()
   })
+
+  it("skips years without a computed result and highlights the latest year", () => {
+    render(
+      <YearlyAlignmentBars
+        alignments={[
+          {
+            year: 2022,
+            n: 80,
+            percentage: 0.62,
+            polarityLabel: "acolhimento da pretensão do autor",
+          },
+          {
+            year: 2023,
+            n: 0,
+            percentage: null,
+            polarityLabel: "sem resultado calculado",
+          },
+          {
+            year: 2024,
+            n: 120,
+            percentage: 0.84,
+            polarityLabel: "acolhimento da pretensão do autor",
+          },
+        ]}
+      />
+    )
+
+    const rows = screen.getAllByTestId("yearly-alignment-row")
+
+    expect(rows).toHaveLength(2)
+    expect(screen.queryByText("2023")).not.toBeInTheDocument()
+    expect(rows[1]).toHaveAttribute("data-latest", "true")
+  })
 })
