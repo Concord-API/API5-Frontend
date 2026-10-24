@@ -20,6 +20,7 @@ describe("yearly alignment bars", () => {
             polarityLabel: "acolhimento da pretensão do autor",
           },
         ]}
+        trend={null}
       />
     )
 
@@ -37,7 +38,7 @@ describe("yearly alignment bars", () => {
   })
 
   it("does not render when there are no yearly alignments", () => {
-    render(<YearlyAlignmentBars alignments={[]} />)
+    render(<YearlyAlignmentBars alignments={[]} trend={null} />)
 
     expect(
       screen.queryByRole("region", { name: "Alinhamento por ano" })
@@ -67,6 +68,7 @@ describe("yearly alignment bars", () => {
             polarityLabel: "acolhimento da pretensão do autor",
           },
         ]}
+        trend={null}
       />
     )
 
