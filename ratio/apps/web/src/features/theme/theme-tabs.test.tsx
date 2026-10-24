@@ -1,4 +1,5 @@
-import { screen, within } from "@testing-library/react"
+import { screen, waitFor, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import { answerThemeDetail, themeDetail } from "../../test/theme-detail"
@@ -117,6 +118,65 @@ describe("theme tabs", () => {
     const panel = screen.getByRole("tabpanel", { name: "Base analítica" })
     expect(
       within(panel).getByRole("region", { name: "Doutrina relacionada" })
+    ).toBeInTheDocument()
+  })
+})
+
+function tab(name: string) {
+  return screen.getByRole("tab", { name })
+}
+
+describe("changing the active tab", () => {
+  it("puts the base tab in the URL when it is clicked", async () => {
+    const { router } = await renderTheme("/tema/412")
+
+    await userEvent.click(tab("Base analítica"))
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ aba: "base" })
+    )
+    baseBlocks().forEach((block) => expect(block).toBeInTheDocument())
+    resumoBlocks().forEach((block) => expect(block).not.toBeInTheDocument())
+  })
+
+  it("puts the resumo tab in the URL when it is clicked from the base", async () => {
+    const { router } = await renderTheme("/tema/412?aba=base")
+
+    await userEvent.click(tab("Resumo"))
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ aba: "resumo" })
+    )
+    resumoBlocks().forEach((block) => expect(block).toBeInTheDocument())
+  })
+
+  it("puts the tab chosen with the keyboard in the URL", async () => {
+    const { router } = await renderTheme("/tema/412")
+
+    tab("Resumo").focus()
+    await userEvent.keyboard("{ArrowRight}{Enter}")
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ aba: "base" })
+    )
+    expect(tab("Base analítica")).toHaveAttribute("aria-selected", "true")
+  })
+
+  it("keeps the way back to the results after a tab change", async () => {
+    const { router } = await renderTheme("/tema/412")
+    await router.navigate({
+      to: "/tema/$key",
+      params: { key: 412 },
+      state: { fromSearch: { q: "inscrição indevida", total: 3 } },
+    })
+
+    await userEvent.click(tab("Base analítica"))
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({ aba: "base" })
+    )
+    expect(
+      screen.getByRole("link", { name: /Voltar aos 3 resultados/ })
     ).toBeInTheDocument()
   })
 })
