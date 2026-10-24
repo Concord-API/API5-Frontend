@@ -806,7 +806,7 @@ describe("related doctrine", () => {
   it("shows the related doctrine block on the theme page", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(doctrineBlock()).toBeInTheDocument()
   })
@@ -814,7 +814,7 @@ describe("related doctrine", () => {
   it("keeps the entries in the order the API returns", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     const titles = doctrineEntries().map(
       (entry) => within(entry).getByTestId("doctrine-work").textContent
@@ -827,7 +827,7 @@ describe("related doctrine", () => {
   it("names the author and the work of each entry", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineEntries()[0]).getByTestId("doctrine-reference")
@@ -839,7 +839,7 @@ describe("related doctrine", () => {
   it("names only the work when the entry has no author", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineEntries()[1]).getByTestId("doctrine-reference")
@@ -849,7 +849,7 @@ describe("related doctrine", () => {
   it("shows the journal and the year under the work", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineEntries()[0]).getByTestId("doctrine-publication")
@@ -859,7 +859,7 @@ describe("related doctrine", () => {
   it("leaves the publication line out when the entry has no journal nor year", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineEntries()[3]).queryByTestId("doctrine-publication")
@@ -869,7 +869,7 @@ describe("related doctrine", () => {
   it("links the article to where it is published, in a new tab", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     const link = within(doctrineEntries()[0]).getByRole("link", {
       name: /abrir artigo/i,
@@ -885,7 +885,7 @@ describe("related doctrine", () => {
   it("links each article to its own address", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     const hrefs = within(doctrineBlock())
       .getAllByRole("link", { name: /abrir artigo/i })
@@ -900,7 +900,7 @@ describe("related doctrine", () => {
   it("keeps an entry without an article link as text only", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineEntries()[2]).queryByRole("link")
@@ -913,7 +913,7 @@ describe("related doctrine", () => {
   it("shows the similarity score of each entry", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     const scores = doctrineEntries().map(
       (entry) => within(entry).getByTestId("doctrine-similarity").textContent
@@ -935,7 +935,7 @@ describe("related doctrine", () => {
       unavailable: [{ block: "doctrine", reason: "notApplicable", message }],
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     const note = within(doctrineBlock()).getByRole("note")
     expect(note).toHaveAttribute("data-block", "doctrine")
@@ -951,7 +951,7 @@ describe("related doctrine", () => {
       relatedDoctrine: { threshold: 0.55, entries: [] },
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       screen.queryByRole("region", { name: "Doutrina relacionada" })
@@ -968,7 +968,7 @@ describe("related doctrine", () => {
       },
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineEntries()[0]).getByTestId("doctrine-similarity")
@@ -978,7 +978,7 @@ describe("related doctrine", () => {
   it("never presents an entry as invoked or cited by a court", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     for (const entry of doctrineEntries()) {
       expect(entry).not.toHaveTextContent(/invocad|citad|citaç/i)
@@ -988,7 +988,7 @@ describe("related doctrine", () => {
   it("declares that the link is by semantic similarity, with the threshold from the API", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineBlock()).getByTestId("doctrine-method")
@@ -1003,7 +1003,7 @@ describe("related doctrine", () => {
       relatedDoctrine: { ...themeDetail.relatedDoctrine, threshold: 0.6 },
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineBlock()).getByTestId("doctrine-method")
@@ -1024,7 +1024,7 @@ describe("related doctrine", () => {
       },
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineBlock()).getByTestId("doctrine-method")
@@ -1045,7 +1045,7 @@ describe("related doctrine", () => {
       },
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineBlock()).getByTestId("doctrine-method")
@@ -1055,7 +1055,7 @@ describe("related doctrine", () => {
   it("states that no article was cited by a court", async () => {
     answerThemeDetail()
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineBlock()).getByTestId("doctrine-statement")
@@ -1078,7 +1078,7 @@ describe("related doctrine", () => {
       ],
     })
 
-    await renderTheme()
+    await renderTheme("/tema/412?aba=base")
 
     expect(
       within(doctrineBlock()).queryByTestId("doctrine-method")

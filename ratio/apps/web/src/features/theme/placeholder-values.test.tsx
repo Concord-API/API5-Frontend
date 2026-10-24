@@ -18,9 +18,12 @@ const notLoadedSummary = {
   message: "O texto deste tema ainda não foi gerado; ele sai na próxima carga.",
 }
 
-async function renderTheme(detail: Record<string, unknown> = themeDetail) {
+async function renderTheme(
+  detail: Record<string, unknown> = themeDetail,
+  path = "/tema/412"
+) {
   answerThemeDetail(detail)
-  await renderRoute("/tema/412")
+  await renderRoute(path)
   await screen.findByRole("heading", { level: 1 })
 }
 
@@ -66,14 +69,17 @@ describe("sourceless blocks never render a placeholder value", () => {
     })
   })
 
-  it("renders no value for the awarded amount or the reporting judge", async () => {
-    await renderTheme()
+  it.each(["/tema/412", "/tema/412?aba=base"])(
+    "renders no value for the awarded amount or the reporting judge on %s",
+    async (path) => {
+      await renderTheme(themeDetail, path)
 
-    const main = screen.getByRole("main")
-    expect(within(main).queryByText(/R\$\s*\d/)).not.toBeInTheDocument()
-    expect(within(main).queryByText(/relator:/i)).not.toBeInTheDocument()
-    expect(within(main).queryByText(/valor fixado:/i)).not.toBeInTheDocument()
-  })
+      const main = screen.getByRole("main")
+      expect(within(main).queryByText(/R\$\s*\d/)).not.toBeInTheDocument()
+      expect(within(main).queryByText(/relator:/i)).not.toBeInTheDocument()
+      expect(within(main).queryByText(/valor fixado:/i)).not.toBeInTheDocument()
+    }
+  )
 
   it("keeps a theme without a summary free of percentages and counts", async () => {
     await renderTheme({

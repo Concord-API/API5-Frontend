@@ -12,7 +12,7 @@ import {
 } from "../../test/theme-detail"
 
 async function renderTheme() {
-  await renderRoute("/tema/412")
+  await renderRoute("/tema/412?aba=base")
   await screen.findByRole("heading", { level: 1 })
 }
 
