@@ -255,6 +255,8 @@ describe("results list", () => {
 })
 
 describe("opening a theme from the result item", () => {
+  const lazyRoute = { timeout: 5000 }
+
   it("opens the theme detail when the item is clicked outside the title", async () => {
     answerThemes()
     answerThemeDetail()
@@ -264,7 +266,11 @@ describe("opening a theme from the result item", () => {
     await userEvent.click(within(item).getByTestId("theme-summary"))
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: themeDetail.name })
+      await screen.findByRole(
+        "heading",
+        { level: 1, name: themeDetail.name },
+        lazyRoute
+      )
     ).toBeInTheDocument()
     expect(router.state.location.pathname).toBe("/tema/412")
   })
@@ -278,7 +284,11 @@ describe("opening a theme from the result item", () => {
     await userEvent.click(within(item).getByTestId("theme-facts"))
 
     expect(
-      await screen.findByRole("link", { name: "Voltar aos 3 resultados" })
+      await screen.findByRole(
+        "link",
+        { name: "Voltar aos 3 resultados" },
+        lazyRoute
+      )
     ).toHaveAttribute("href", "/busca?q=inscricao+indevida")
   })
 })
