@@ -131,7 +131,7 @@ describe("court behaviour table", () => {
   it("shows the table on the theme page", async () => {
     answerThemeDetail()
 
-    await renderRoute("/tema/412")
+    await renderRoute("/tema/412?aba=base")
 
     const table = await screen.findByRole("table", {
       name: "Comportamento de cada tribunal",
