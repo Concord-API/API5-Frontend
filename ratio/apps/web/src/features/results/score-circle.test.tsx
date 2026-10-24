@@ -13,6 +13,28 @@ describe("ScoreCircle", () => {
     expect(within(circle).getByText("/100")).toBeInTheDocument()
   })
 
+  it("shows the grade next to the score", () => {
+    render(<ScoreCircle score={77} level="Dominante" />)
+
+    expect(screen.getByTestId("strength-grade")).toHaveTextContent("Dominante")
+  })
+
+  it("does not repeat the grade to screen readers", () => {
+    render(<ScoreCircle score={77} level="Dominante" />)
+
+    expect(screen.getByTestId("strength-grade")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    )
+  })
+
+  it("shows the score without a textual grade when the theme has none", () => {
+    render(<ScoreCircle score={62} level={null} />)
+
+    expect(screen.getByRole("img")).toHaveTextContent("62")
+    expect(screen.queryByTestId("strength-grade")).not.toBeInTheDocument()
+  })
+
   it("shows a dash when the theme has no score", () => {
     render(<ScoreCircle score={null} level={null} />)
 
