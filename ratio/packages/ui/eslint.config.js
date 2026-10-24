@@ -28,4 +28,13 @@ export default defineConfig([
       }],
     },
   },
+  {
+    files: ['src/components/tabs.tsx'],
+    rules: {
+      'react-refresh/only-export-components': ['error', {
+        allowConstantExport: true,
+        allowExportNames: ['tabsListVariants'],
+      }],
+    },
+  },
 ])
