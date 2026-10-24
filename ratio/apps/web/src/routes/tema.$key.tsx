@@ -18,7 +18,12 @@ import { YearlyAlignmentBars } from "@/features/theme/yearly-alignment-bars"
 
 const keySchema = z.coerce.number().int().positive()
 
+const searchSchema = z.object({
+  aba: z.enum(["resumo", "base"]).default("resumo").catch("resumo"),
+})
+
 export const Route = createFileRoute("/tema/$key")({
+  validateSearch: searchSchema,
   params: {
     parse: ({ key }) => ({ key: keySchema.parse(key) }),
     stringify: ({ key }) => ({ key: String(key) }),
