@@ -5,7 +5,7 @@ const TAB_LABEL: Record<ThemeTab, string> = {
   base: "Base analítica",
 }
 
-export function ThemeTabs({ active }: { active: ThemeTab }) {
+export function ThemeTabs({ active }: Readonly<{ active: ThemeTab }>) {
   return (
     <nav aria-label="Abas do tema" className="mt-8 border-b border-[#DCD6C9]">
       <ul className="flex gap-8">
