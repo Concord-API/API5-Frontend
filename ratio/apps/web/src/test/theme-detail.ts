@@ -255,9 +255,92 @@ export function answerThemePanelsError() {
   )
 }
 
+export const tjspCase = {
+  caseNumber: "1004832-11.2024.8.26.0100",
+  courtCode: "TJSP",
+  judgingBody: "22ª Câmara de Direito Privado",
+  caseClass: "Apelação Cível",
+  courtLevel: "Second",
+  decisionDate: "2026-08-21",
+  outcome: "Procedente",
+  source: "datajud",
+  sourceLink:
+    "https://esaj.tjsp.jus.br/cpopg/show.do?processo.numero=1004832-11.2024.8.26.0100",
+  sourceLinkType: "direto",
+  sealed: false,
+}
+
+export const tjmgCase = {
+  ...tjspCase,
+  caseNumber: "5009127-64.2023.8.13.0024",
+  courtCode: "TJMG",
+  judgingBody: "11ª Câmara Cível",
+  decisionDate: "2026-08-18",
+  outcome: "Improcedente",
+  sourceLink: "https://www.tjmg.jus.br/portal-tjmg/",
+  sourceLinkType: "portal",
+}
+
+export const sealedCase = {
+  caseNumber: null,
+  courtCode: null,
+  judgingBody: null,
+  caseClass: null,
+  courtLevel: null,
+  decisionDate: null,
+  outcome: null,
+  source: null,
+  sourceLink: null,
+  sourceLinkType: null,
+  sealed: true,
+}
+
+export const themeCases = {
+  themeKey: 412,
+  cases: [tjspCase, tjmgCase, sealedCase],
+  total: 145,
+  ordering:
+    "julgamento mais recente primeiro; empate pelo número do processo; processos em sigilo no fim",
+  shown: 3,
+  sampleLabel: "3 de 145 decisões",
+  unavailable: [
+    {
+      block: "reporterJudge",
+      reason: "sourceUnavailable",
+      message: "O DataJud não publica o relator.",
+    },
+    {
+      block: "amountAwarded",
+      reason: "sourceUnavailable",
+      message:
+        "O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão.",
+    },
+  ],
+}
+
+export const noCases = {
+  ...themeCases,
+  cases: [],
+  total: 0,
+  shown: 0,
+  sampleLabel: "0 de 0 decisões",
+}
+
+export function answerThemeCases(body: Record<string, unknown> = themeCases) {
+  const requests: URL[] = []
+  server.use(
+    http.get("/api/themes/:key/cases", ({ request }) => {
+      requests.push(new URL(request.url))
+      return HttpResponse.json(body)
+    })
+  )
+  return requests
+}
+
 export function answerThemeDetail(body: Record<string, unknown> = themeDetail) {
   const requests: URL[] = []
   server.use(
+    http.get("/api/themes/:key/cases", () => HttpResponse.json(noCases)),
     http.get("/api/themes/:key/panels", () => HttpResponse.json(noPanels)),
     http.get("/api/themes/:key", ({ request }) => {
       requests.push(new URL(request.url))
