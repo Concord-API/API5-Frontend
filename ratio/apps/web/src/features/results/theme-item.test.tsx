@@ -109,6 +109,21 @@ describe("ThemeItem", () => {
     expect(within(link).queryByText(/%/)).toBeNull()
   })
 
+  it("shows the score without a textual grade below the minimum", async () => {
+    await renderItem({ ...completeTheme, level: null })
+
+    const link = screen.getByRole("link", { name: completeTheme.name })
+    expect(
+      within(link).getByRole("img", {
+        name: "Força do entendimento: 77 de 100",
+      })
+    ).toHaveTextContent("77")
+    expect(within(link).queryByTestId("strength-grade")).toBeNull()
+    expect(link).not.toHaveTextContent(
+      /Consolidada|Dominante|Em formação|Divergente/
+    )
+  })
+
   it("shows a dash in the circle when the theme has no strength score", async () => {
     await renderItem({ ...completeTheme, strengthScore: null, level: null })
 
