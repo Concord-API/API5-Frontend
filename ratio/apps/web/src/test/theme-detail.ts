@@ -262,8 +262,9 @@ export const tjspCase = {
   decisionDate: "2026-08-21",
   outcome: "Procedente",
   source: "datajud",
-  sourceLink: "https://esaj.tjsp.jus.br/cpopg/open.do",
-  sourceLinkType: "portal",
+  sourceLink:
+    "https://esaj.tjsp.jus.br/cpopg/show.do?processo.numero=1004832-11.2024.8.26.0100",
+  sourceLinkType: "direto",
   sealed: false,
 }
 
@@ -275,6 +276,7 @@ export const tjmgCase = {
   decisionDate: "2026-08-18",
   outcome: "Improcedente",
   sourceLink: "https://www.tjmg.jus.br/portal-tjmg/",
+  sourceLinkType: "portal",
 }
 
 export const sealedCase = {

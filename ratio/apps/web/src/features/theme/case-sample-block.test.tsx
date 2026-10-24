@@ -5,6 +5,9 @@ import {
   answerThemeCases,
   answerThemeDetail,
   noCases,
+  themeCases,
+  tjmgCase,
+  tjspCase,
 } from "../../test/theme-detail"
 
 async function renderTheme() {
@@ -103,6 +106,64 @@ describe("auditable sample block", () => {
     expect(within(block).getByTestId("sample-ordering")).toHaveTextContent(
       "Ordem: julgamento mais recente primeiro; empate pelo número do processo; processos em sigilo no fim"
     )
+  })
+
+  it("links a case to its page at the court when the link opens the case", async () => {
+    answerThemeDetail()
+    answerThemeCases()
+
+    await renderTheme()
+    const [first] = bodyRows(await findBlock())
+
+    const link = within(first).getByRole("link", {
+      name: "Consultar no tribunal o processo 1004832-11.2024.8.26.0100",
+    })
+    expect(link).toHaveTextContent(/^consultar no tribunal$/)
+    expect(link).toHaveAttribute("href", tjspCase.sourceLink)
+    expect(link).toHaveAttribute("target", "_blank")
+    expect(link).toHaveAttribute("rel", "noopener noreferrer")
+    expect(within(first).queryByTestId("portal-hint")).toBeNull()
+  })
+
+  it("links a case to the court portal and asks to paste the formatted number", async () => {
+    answerThemeDetail()
+    answerThemeCases()
+
+    await renderTheme()
+    const [, second] = bodyRows(await findBlock())
+
+    expect(
+      within(second).getByRole("link", {
+        name: "Consultar no tribunal o processo 5009127-64.2023.8.13.0024",
+      })
+    ).toHaveAttribute("href", tjmgCase.sourceLink)
+    expect(within(second).getByTestId("portal-hint")).toHaveTextContent(
+      "cole o número no portal"
+    )
+    expect(second).toHaveTextContent("5009127-64.2023.8.13.0024")
+  })
+
+  it("shows the number without a link when the source has none", async () => {
+    answerThemeDetail()
+    answerThemeCases({
+      ...themeCases,
+      cases: [{ ...tjspCase, sourceLink: null, sourceLinkType: null }],
+    })
+
+    await renderTheme()
+    const [first] = bodyRows(await findBlock())
+
+    expect(first).toHaveTextContent("1004832-11.2024.8.26.0100")
+    expect(within(first).queryByRole("link")).toBeNull()
+  })
+
+  it("never calls the link a view of the decision", async () => {
+    answerThemeDetail()
+    answerThemeCases()
+
+    await renderTheme()
+
+    expect(await findBlock()).not.toHaveTextContent(/veja a decisão/i)
   })
 
   it("shows nothing when the theme has no cases", async () => {
