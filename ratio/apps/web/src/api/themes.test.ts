@@ -382,6 +382,25 @@ const detailExample = {
       ],
     },
   ],
+  yearlyAlignments: [
+    {
+      year: 2023,
+      n: 100,
+      percentage: 0.69,
+      polarityLabel: "acolhimento da pretensão do autor",
+    },
+    {
+      year: 2024,
+      n: 120,
+      percentage: 0.84,
+      polarityLabel: "acolhimento da pretensão do autor",
+    },
+  ],
+  yearlyTrend: {
+    fromPercentage: 0.69,
+    toPercentage: 0.84,
+    polarityLabel: "acolhimento da pretensão do autor",
+  },
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
   unavailable: [

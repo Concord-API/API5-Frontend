@@ -13,6 +13,7 @@ import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
 import { ThemeHeader } from "@/features/theme/theme-header"
 import { ThemeError, ThemePending } from "@/features/theme/theme-states"
+import { YearlyAlignmentBars } from "@/features/theme/yearly-alignment-bars"
 
 const keySchema = z.coerce.number().int().positive()
 
@@ -36,13 +37,21 @@ function Theme() {
     <ThemeFrame>
       <ThemeBackLink />
       <ThemeHeader theme={data} />
-      <ThemeArticle
-        summary={data.summary}
-        outcomeBreakdown={data.outcomeBreakdown}
-        partialTreatment={data.partialTreatment}
-        provenance={data.provenance}
-        unavailable={data.unavailable}
-      />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">
+        <ThemeArticle
+          summary={data.summary}
+          outcomeBreakdown={data.outcomeBreakdown}
+          partialTreatment={data.partialTreatment}
+          provenance={data.provenance}
+          unavailable={data.unavailable}
+        />
+        <aside>
+          <YearlyAlignmentBars
+            alignments={data.yearlyAlignments}
+            trend={data.yearlyTrend}
+          />
+        </aside>
+      </div>
       <CourtAlignmentList alignments={data.courtAlignments ?? []} />
       <CourtBehaviourTable
         alignments={data.courtAlignments ?? []}

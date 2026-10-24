@@ -113,6 +113,19 @@ export const courtAlignmentSchema = z.object({
   lastDecisionDate: z.string().nullable().optional(),
 })
 
+export const yearlyAlignmentSchema = z.object({
+  year: z.number().int(),
+  n: z.number().int(),
+  percentage: z.number().nullable(),
+  polarityLabel: z.string(),
+})
+
+export const yearlyTrendSchema = z.object({
+  fromPercentage: z.number(),
+  toPercentage: z.number(),
+  polarityLabel: z.string(),
+})
+
 export const themeDetailSchema = z.object({
   themeKey: z.number().int(),
   name: z.string(),
@@ -128,6 +141,8 @@ export const themeDetailSchema = z.object({
   summary: themeSummaryTextSchema.nullable(),
   outcomeBreakdown: z.array(outcomeFamilySchema),
   courtAlignments: z.array(courtAlignmentSchema).optional(),
+  yearlyAlignments: z.array(yearlyAlignmentSchema).optional().default([]),
+  yearlyTrend: yearlyTrendSchema.nullable().optional().default(null),
   partialTreatment: z.string(),
   unavailable: z.array(unavailableBlockSchema),
   relatedDoctrine: relatedDoctrineSchema,
@@ -143,6 +158,8 @@ export type SummarySegment = z.infer<typeof summarySegmentSchema>
 export type ThemeSummaryText = z.infer<typeof themeSummaryTextSchema>
 export type OutcomeFamily = z.infer<typeof outcomeFamilySchema>
 export type CourtAlignment = z.infer<typeof courtAlignmentSchema>
+export type YearlyAlignment = z.infer<typeof yearlyAlignmentSchema>
+export type YearlyTrend = z.infer<typeof yearlyTrendSchema>
 
 export type ThemePeriod = "5y" | "2y" | "all"
 

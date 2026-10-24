@@ -95,6 +95,41 @@ describe("theme header", () => {
     expect(within(list).getByText("TJSP")).toBeInTheDocument()
   })
 
+  it("shows the yearly alignment bars from the theme detail", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      yearlyAlignments: [
+        {
+          year: 2023,
+          n: 100,
+          percentage: 0.69,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
+        {
+          year: 2024,
+          n: 120,
+          percentage: 0.84,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
+      ],
+      yearlyTrend: {
+        fromPercentage: 0.69,
+        toPercentage: 0.84,
+        polarityLabel: "acolhimento da pretensão do autor",
+      },
+    })
+
+    await renderTheme()
+
+    const list = screen.getByRole("region", {
+      name: "Alinhamento por ano",
+    })
+    expect(within(list).getAllByTestId("yearly-alignment-row")).toHaveLength(2)
+    expect(
+      within(list).getByTestId("yearly-alignment-trend")
+    ).toHaveTextContent("69,0% → 84,0% na direção predominante")
+  })
+
   it("shows no data when a court has no judgments", async () => {
     answerThemeDetail({
       ...themeDetail,

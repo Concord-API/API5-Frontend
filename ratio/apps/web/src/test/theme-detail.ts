@@ -74,6 +74,8 @@ export const themeDetail = {
       lastDecisionDate: "2026-06-11",
     },
   ],
+  yearlyAlignments: [],
+  yearlyTrend: null,
   partialTreatment:
     "Na nota de força, a procedência em parte conta como acolhimento.",
   unavailable: [
