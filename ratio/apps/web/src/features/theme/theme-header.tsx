@@ -8,16 +8,26 @@ type ThemeHeaderProps = {
 export function ThemeHeader({ theme }: ThemeHeaderProps) {
   return (
     <header className="flex gap-10 border-b border-[#DCD6C9] pb-10">
-      <div
-        data-testid="strength-score"
-        className="flex size-[104px] shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-[#C9C2B4]"
-      >
-        <span className="font-sans text-[40px] leading-none font-bold text-foreground">
-          {theme.strengthScore ?? "—"}
-        </span>
-        <span className="max-w-[72px] text-center font-mono text-[8px] leading-tight tracking-[0.12em] text-muted-foreground uppercase">
-          Força do entendimento
-        </span>
+      <div className="flex w-[104px] shrink-0 flex-col items-center gap-2">
+        <div
+          data-testid="strength-score"
+          className="flex size-[104px] flex-col items-center justify-center gap-1 rounded-full border border-[#C9C2B4]"
+        >
+          <span className="font-sans text-[40px] leading-none font-bold text-foreground">
+            {theme.strengthScore ?? "—"}
+          </span>
+          <span className="max-w-[72px] text-center font-mono text-[8px] leading-tight tracking-[0.12em] text-muted-foreground uppercase">
+            Força do entendimento
+          </span>
+        </div>
+        {theme.level !== null && (
+          <span
+            data-testid="strength-grade"
+            className="text-center font-mono text-[10px] leading-tight font-semibold tracking-[0.12em] text-foreground uppercase"
+          >
+            {theme.level}
+          </span>
+        )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {theme.subjectArea !== null && (
