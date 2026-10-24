@@ -14,7 +14,7 @@ import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
 import { ThemeHeader } from "@/features/theme/theme-header"
 import { ThemeError, ThemePending } from "@/features/theme/theme-states"
-import { THEME_TABS } from "@/features/theme/theme-tab"
+import { THEME_TABS, type ThemeTab } from "@/features/theme/theme-tab"
 import { ThemeTabs } from "@/features/theme/theme-tabs"
 import { YearlyAlignmentBars } from "@/features/theme/yearly-alignment-bars"
 
@@ -40,7 +40,16 @@ export const Route = createFileRoute("/tema/$key")({
 function Theme() {
   const { key } = Route.useParams()
   const { aba } = Route.useSearch()
+  const navigate = Route.useNavigate()
   const { data } = useSuspenseQuery(themeDetailQueryOptions(key))
+
+  function changeTab(tab: ThemeTab) {
+    void navigate({
+      search: { aba: tab },
+      state: (previous) => previous,
+      resetScroll: false,
+    })
+  }
 
   return (
     <ThemeFrame>
@@ -48,6 +57,7 @@ function Theme() {
       <ThemeHeader theme={data} />
       <ThemeTabs
         active={aba}
+        onChange={changeTab}
         resumo={
           <>
             <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">

@@ -14,7 +14,7 @@ const TAB_LABEL: Record<ThemeTab, string> = {
 
 type ThemeTabsProps = {
   active: ThemeTab
-  onChange?: (tab: ThemeTab) => void
+  onChange: (tab: ThemeTab) => void
   resumo: ReactNode
   base: ReactNode
 }
@@ -30,7 +30,7 @@ export function ThemeTabs({
   return (
     <Tabs
       value={active}
-      onValueChange={(value: ThemeTab) => onChange?.(value)}
+      onValueChange={(value: ThemeTab) => onChange(value)}
       className="mt-8 gap-0"
     >
       <TabsList
