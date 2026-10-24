@@ -112,6 +112,11 @@ describe("theme header", () => {
           polarityLabel: "acolhimento da pretensão do autor",
         },
       ],
+        yearlyTrend: {
+          fromPercentage: 0.69,
+          toPercentage: 0.84,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
     })
 
     await renderTheme()
@@ -120,6 +125,9 @@ describe("theme header", () => {
       name: "Alinhamento por ano",
     })
     expect(within(list).getAllByTestId("yearly-alignment-row")).toHaveLength(2)
+      expect(within(list).getByTestId("yearly-alignment-trend")).toHaveTextContent(
+        "69,0% → 84,0% na direção predominante"
+      )
   })
 
   it("shows no data when a court has no judgments", async () => {
