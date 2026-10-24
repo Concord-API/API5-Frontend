@@ -1,11 +1,15 @@
-import type { YearlyAlignment } from "@/api/themes"
+import type { YearlyAlignment, YearlyTrend } from "@/api/themes"
 import { formatNumber, formatPercent } from "@/lib/format"
 
 type YearlyAlignmentBarsProps = {
   alignments: YearlyAlignment[]
+  trend: YearlyTrend | null
 }
 
-export function YearlyAlignmentBars({ alignments }: YearlyAlignmentBarsProps) {
+export function YearlyAlignmentBars({
+  alignments,
+  trend,
+}: YearlyAlignmentBarsProps) {
   const computedAlignments = alignments.filter(
     (alignment): alignment is YearlyAlignment & { percentage: number } =>
       alignment.percentage !== null
@@ -30,6 +34,15 @@ export function YearlyAlignmentBars({ alignments }: YearlyAlignmentBarsProps) {
       >
         Alinhamento por ano
       </h2>
+      {trend && computedAlignments.length > 1 ? (
+        <p
+          data-testid="yearly-alignment-trend"
+          className="pt-3 font-sans text-[13px] text-muted-foreground"
+        >
+          {formatPercent(trend.fromPercentage)} →{" "}
+          {formatPercent(trend.toPercentage)} na direção predominante
+        </p>
+      ) : null}
       <ul className="flex flex-col gap-3 pt-4">
         {computedAlignments.map((alignment) => (
           <li

@@ -20,6 +20,7 @@ describe("yearly alignment bars", () => {
             polarityLabel: "acolhimento da pretensão do autor",
           },
         ]}
+        trend={null}
       />
     )
 
@@ -37,7 +38,7 @@ describe("yearly alignment bars", () => {
   })
 
   it("does not render when there are no yearly alignments", () => {
-    render(<YearlyAlignmentBars alignments={[]} />)
+    render(<YearlyAlignmentBars alignments={[]} trend={null} />)
 
     expect(
       screen.queryByRole("region", { name: "Alinhamento por ano" })
@@ -67,6 +68,7 @@ describe("yearly alignment bars", () => {
             polarityLabel: "acolhimento da pretensão do autor",
           },
         ]}
+        trend={null}
       />
     )
 
@@ -75,5 +77,59 @@ describe("yearly alignment bars", () => {
     expect(rows).toHaveLength(2)
     expect(screen.queryByText("2023")).not.toBeInTheDocument()
     expect(rows[1]).toHaveAttribute("data-latest", "true")
+  })
+
+  it("renders the trend sentence from the aggregate", () => {
+    render(
+      <YearlyAlignmentBars
+        alignments={[
+          {
+            year: 2023,
+            n: 100,
+            percentage: 0.69,
+            polarityLabel: "acolhimento da pretensão do autor",
+          },
+          {
+            year: 2024,
+            n: 120,
+            percentage: 0.84,
+            polarityLabel: "acolhimento da pretensão do autor",
+          },
+        ]}
+        trend={{
+          fromPercentage: 0.69,
+          toPercentage: 0.84,
+          polarityLabel: "acolhimento da pretensão do autor",
+        }}
+      />
+    )
+
+    expect(screen.getByTestId("yearly-alignment-trend")).toHaveTextContent(
+      "69,0% → 84,0% na direção predominante"
+    )
+  })
+
+  it("hides the trend sentence when there is only one year", () => {
+    render(
+      <YearlyAlignmentBars
+        alignments={[
+          {
+            year: 2024,
+            n: 120,
+            percentage: 0.84,
+            polarityLabel: "acolhimento da pretensão do autor",
+          },
+        ]}
+        trend={{
+          fromPercentage: 0.69,
+          toPercentage: 0.84,
+          polarityLabel: "acolhimento da pretensão do autor",
+        }}
+      />
+    )
+
+    expect(
+      screen.queryByTestId("yearly-alignment-trend")
+    ).not.toBeInTheDocument()
   })
 })

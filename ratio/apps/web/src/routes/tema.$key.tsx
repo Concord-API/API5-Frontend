@@ -46,7 +46,10 @@ function Theme() {
           unavailable={data.unavailable}
         />
         <aside>
-          <YearlyAlignmentBars alignments={data.yearlyAlignments} />
+          <YearlyAlignmentBars
+            alignments={data.yearlyAlignments}
+            trend={data.yearlyTrend}
+          />
         </aside>
       </div>
       <CourtAlignmentList alignments={data.courtAlignments ?? []} />
