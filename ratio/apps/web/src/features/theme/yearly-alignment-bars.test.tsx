@@ -30,10 +30,10 @@ describe("yearly alignment bars", () => {
 
     expect(rows).toHaveLength(2)
     expect(rows[0]).toHaveTextContent("2023")
-    expect(rows[0]).toHaveTextContent("69%")
+    expect(rows[0]).toHaveTextContent("69,0%")
     expect(rows[0]).toHaveTextContent("n 100")
     expect(rows[1]).toHaveTextContent("2024")
-    expect(rows[1]).toHaveTextContent("84%")
+    expect(rows[1]).toHaveTextContent("84,0%")
   })
 
   it("does not render when there are no yearly alignments", () => {
