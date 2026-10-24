@@ -5,9 +5,7 @@ type YearlyAlignmentBarsProps = {
   alignments: YearlyAlignment[]
 }
 
-export function YearlyAlignmentBars({
-  alignments,
-}: YearlyAlignmentBarsProps) {
+export function YearlyAlignmentBars({ alignments }: YearlyAlignmentBarsProps) {
   if (alignments.length === 0) {
     return null
   }
