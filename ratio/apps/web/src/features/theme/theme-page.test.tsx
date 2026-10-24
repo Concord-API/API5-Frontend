@@ -47,6 +47,23 @@ describe("theme header", () => {
     expect(score).toHaveTextContent("Força do entendimento")
   })
 
+  it("shows the grade next to the score", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    expect(screen.getByTestId("strength-grade")).toHaveTextContent("Dominante")
+  })
+
+  it("shows the score without a textual grade below the minimum", async () => {
+    answerThemeDetail({ ...themeDetail, level: null })
+
+    await renderTheme()
+
+    expect(screen.getByTestId("strength-score")).toHaveTextContent("78")
+    expect(screen.queryByTestId("strength-grade")).not.toBeInTheDocument()
+  })
+
   it("shows a dash in place of the score when the theme has none", async () => {
     answerThemeDetail({ ...themeDetail, strengthScore: null, level: null })
 

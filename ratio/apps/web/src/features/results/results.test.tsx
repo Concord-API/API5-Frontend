@@ -189,6 +189,23 @@ describe("results list", () => {
     expect(within(item).queryByTestId("theme-facts")).toBeNull()
   })
 
+  it("shows a theme below the minimum without a grade among graded themes", async () => {
+    const [first, second, ...rest] = fullList.themes
+    answerThemes({
+      ...fullList,
+      themes: [{ ...first, level: null }, second, ...rest],
+    })
+
+    await renderResults()
+
+    const belowMinimum = itemOf(first.name)
+    expect(belowMinimum).toHaveTextContent(String(first.strengthScore))
+    expect(within(belowMinimum).queryByTestId("strength-grade")).toBeNull()
+    expect(
+      within(itemOf(second.name)).getByTestId("strength-grade")
+    ).toHaveTextContent(String(second.level))
+  })
+
   it("shows the percentage and the judged count as the API sends them", async () => {
     const [first, ...rest] = fullList.themes
     answerThemes({
