@@ -46,40 +46,43 @@ function Theme() {
     <ThemeFrame>
       <ThemeBackLink />
       <ThemeHeader theme={data} />
-      <ThemeTabs active={aba} />
-      {aba === "resumo" ? (
-        <>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">
-            <ThemeArticle
-              summary={data.summary}
-              outcomeBreakdown={data.outcomeBreakdown}
-              partialTreatment={data.partialTreatment}
-              provenance={data.provenance}
+      <ThemeTabs
+        active={aba}
+        resumo={
+          <>
+            <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">
+              <ThemeArticle
+                summary={data.summary}
+                outcomeBreakdown={data.outcomeBreakdown}
+                partialTreatment={data.partialTreatment}
+                provenance={data.provenance}
+                unavailable={data.unavailable}
+              />
+              <aside>
+                <YearlyAlignmentBars
+                  alignments={data.yearlyAlignments}
+                  trend={data.yearlyTrend}
+                />
+              </aside>
+            </div>
+            <CourtAlignmentList alignments={data.courtAlignments ?? []} />
+          </>
+        }
+        base={
+          <>
+            <CourtBehaviourTable
+              alignments={data.courtAlignments ?? []}
               unavailable={data.unavailable}
             />
-            <aside>
-              <YearlyAlignmentBars
-                alignments={data.yearlyAlignments}
-                trend={data.yearlyTrend}
-              />
-            </aside>
-          </div>
-          <CourtAlignmentList alignments={data.courtAlignments ?? []} />
-        </>
-      ) : (
-        <>
-          <CourtBehaviourTable
-            alignments={data.courtAlignments ?? []}
-            unavailable={data.unavailable}
-          />
-          <PanelBlock themeKey={data.themeKey} />
-          <DoctrineBlock
-            doctrine={data.relatedDoctrine}
-            unavailable={data.unavailable}
-          />
-          <CaseSampleBlock themeKey={data.themeKey} />
-        </>
-      )}
+            <PanelBlock themeKey={data.themeKey} />
+            <DoctrineBlock
+              doctrine={data.relatedDoctrine}
+              unavailable={data.unavailable}
+            />
+            <CaseSampleBlock themeKey={data.themeKey} />
+          </>
+        }
+      />
       <ProvenanceFooter provenance={data.provenance} />
       <ScopeStatement scope={data.scope} className="mt-2" />
     </ThemeFrame>
