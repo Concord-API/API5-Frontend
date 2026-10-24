@@ -36,8 +36,10 @@ describe("tab search param", () => {
   )
 })
 
-function tabBar() {
-  return screen.getByRole("navigation", { name: "Abas do tema" })
+function tabs() {
+  return within(
+    screen.getByRole("tablist", { name: "Abas do tema" })
+  ).getAllByRole("tab")
 }
 
 function resumoBlocks() {
@@ -90,24 +92,31 @@ describe("theme tabs", () => {
   it("names both tabs in the tab bar", async () => {
     await renderTheme("/tema/412")
 
-    expect(
-      within(tabBar())
-        .getAllByRole("listitem")
-        .map((item) => item.textContent)
-    ).toEqual(["Resumo", "Base analítica"])
+    expect(tabs().map((tab) => tab.textContent)).toEqual([
+      "Resumo",
+      "Base analítica",
+    ])
   })
 
   it.each([
     ["/tema/412", "Resumo"],
     ["/tema/412?aba=base", "Base analítica"],
     ["/tema/412?aba=xyz", "Resumo"],
-  ])("marks the active tab of %s", async (path, active) => {
+  ])("selects the active tab of %s", async (path, active) => {
     await renderTheme(path)
 
-    const current = within(tabBar())
-      .getAllByRole("listitem")
-      .map((item) => item.firstElementChild!)
-      .filter((tab) => tab.getAttribute("aria-current") === "page")
-    expect(current.map((tab) => tab.textContent)).toEqual([active])
+    const selected = tabs().filter(
+      (tab) => tab.getAttribute("aria-selected") === "true"
+    )
+    expect(selected.map((tab) => tab.textContent)).toEqual([active])
+  })
+
+  it("shows the active tab blocks inside its tab panel", async () => {
+    await renderTheme("/tema/412?aba=base")
+
+    const panel = screen.getByRole("tabpanel", { name: "Base analítica" })
+    expect(
+      within(panel).getByRole("region", { name: "Doutrina relacionada" })
+    ).toBeInTheDocument()
   })
 })
