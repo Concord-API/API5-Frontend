@@ -1,7 +1,26 @@
+import { useQuery } from "@tanstack/react-query"
+import type { ReactNode } from "react"
+import { themesQueryOptions } from "@/api/themes"
+
 type Limitation = {
   id: string
   title: string
-  body: string
+  body: ReactNode
+}
+
+function ScopeBody() {
+  const { data, isError } = useQuery(themesQueryOptions(""))
+
+  if (isError) {
+    return "Não foi possível carregar o escopo agora."
+  }
+  if (!data) {
+    return "Carregando o escopo dos dados…"
+  }
+  if (data.scope.statement === null) {
+    return "Ainda não há tribunais carregados nesta base."
+  }
+  return `Os dados cobrem a matéria ${data.scope.subject} do ${data.scope.statement}. Um percentual no Ratio vale para esses tribunais e não deve ser lido como tendência nacional.`
 }
 
 const MISSING_FROM_SOURCE: Limitation[] = [
@@ -44,7 +63,7 @@ const ABOUT_THE_DATA: Limitation[] = [
   {
     id: "scope",
     title: "Escopo",
-    body: "Os dados cobrem a matéria cível do TJSP, TJRJ e TJMG. Um percentual no Ratio vale para esses três tribunais e não deve ser lido como tendência nacional.",
+    body: <ScopeBody />,
   },
   {
     id: "updates",
