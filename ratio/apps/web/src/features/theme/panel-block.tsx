@@ -11,7 +11,7 @@ import { formatCount, formatNumber, formatPercent } from "@/lib/format"
 function divergenceText(panel: PanelAlignment) {
   const points = formatNumber(Math.round(Math.abs(panel.distanceInPoints)))
   const side = panel.distanceInPoints > 0 ? "acima" : "abaixo"
-  return `Diverge do tribunal: ${points} pontos ${side}`
+  return `${points} pontos ${side} do tribunal`
 }
 
 function PanelRow({ panel }: { panel: PanelAlignment }) {
@@ -21,26 +21,24 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
       data-divergent={panel.divergent}
       className={
         panel.divergent
-          ? "flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-l-2 border-primary py-2 pl-3"
-          : "flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-l-2 border-transparent py-2 pl-3"
+          ? "flex flex-wrap items-baseline justify-between gap-x-6 border-l-2 border-primary py-2 pl-3"
+          : "flex flex-wrap items-baseline justify-between gap-x-6 border-l-2 border-transparent py-2 pl-3"
       }
     >
       <span className="font-sans text-[15px] text-foreground">
         {panel.name}
       </span>
-      <span className="flex flex-col items-end gap-0.5">
-        <span
-          data-testid="panel-rate"
-          className="font-mono text-xs text-foreground"
-        >
-          {`${formatPercent(panel.percentage)} · n ${formatNumber(panel.n)}`}
-        </span>
+      <span
+        data-testid="panel-rate"
+        className="font-mono text-xs text-foreground"
+      >
+        {`${formatPercent(panel.percentage)} · n ${formatNumber(panel.n)}`}
         {panel.divergent && (
           <span
             data-testid="panel-divergence"
-            className="font-mono text-[11px] font-semibold text-primary"
+            className="font-semibold text-primary"
           >
-            {divergenceText(panel)}
+            {` · ${divergenceText(panel)}`}
           </span>
         )}
       </span>

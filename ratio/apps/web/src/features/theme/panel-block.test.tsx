@@ -74,10 +74,28 @@ describe("panel block", () => {
 
     const rows = within(courtSection(block, "TJMG")).getAllByTestId("panel-row")
     expect(within(rows[0]).getByTestId("panel-divergence")).toHaveTextContent(
-      "Diverge do tribunal: 35 pontos acima"
+      "35 pontos acima do tribunal"
     )
     expect(within(rows[1]).getByTestId("panel-divergence")).toHaveTextContent(
-      "Diverge do tribunal: 35 pontos abaixo"
+      "35 pontos abaixo do tribunal"
+    )
+  })
+
+  it("says the divergence on the same line as the panel rate", async () => {
+    answerThemeDetail()
+    answerThemePanels()
+
+    await renderTheme()
+    const block = await findBlock()
+
+    const row = within(courtSection(block, "TJMG")).getAllByTestId(
+      "panel-row"
+    )[0]
+    expect(within(row).getByTestId("panel-rate")).toContainElement(
+      within(row).getByTestId("panel-divergence")
+    )
+    expect(within(row).getByTestId("panel-rate")).toHaveTextContent(
+      "90,0% · n 10 · 35 pontos acima do tribunal"
     )
   })
 
