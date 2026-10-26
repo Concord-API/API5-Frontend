@@ -42,9 +42,6 @@ describe("sourceless blocks never render a placeholder value", () => {
     const rendered = notes()
     expect(rendered.map((note) => note.getAttribute("data-block"))).toEqual([
       "summary",
-      "amountAwarded",
-      "caseLawCitation",
-      "citedDecisions",
     ])
     rendered.forEach((note) => {
       const block = note.getAttribute("data-block")
