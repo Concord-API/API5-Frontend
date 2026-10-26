@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useId, useState } from "react"
+import { useId, useRef, useState } from "react"
 import {
   themePanelsQueryOptions,
   type CourtPanels,
@@ -12,10 +12,10 @@ import { formatCount, formatNumber, formatPercent } from "@/lib/format"
 const PANELS_PER_PAGE = 10
 
 const PAGE_BUTTON =
-  "inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-[3px] border border-[#C9C2B4] bg-card px-2.5 font-mono text-[11px] tracking-[0.14em] text-foreground uppercase hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default disabled:opacity-40 disabled:hover:border-[#C9C2B4]"
+  "inline-flex transition-colors duration-200 h-8 min-w-8 items-center justify-center gap-1.5 rounded-[3px] border border-[#C9C2B4] bg-card px-2.5 font-mono text-[11px] tracking-[0.14em] text-foreground uppercase hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default disabled:opacity-40 disabled:hover:border-[#C9C2B4]"
 
 const CURRENT_PAGE_BUTTON =
-  "inline-flex h-8 min-w-8 items-center justify-center rounded-[3px] border border-primary bg-primary px-2.5 font-mono text-[11px] font-semibold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+  "inline-flex transition-colors duration-200 h-8 min-w-8 items-center justify-center rounded-[3px] border border-primary bg-primary px-2.5 font-mono text-[11px] font-semibold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 
 function divergenceText(panel: PanelAlignment) {
   const points = formatNumber(Math.round(Math.abs(panel.distanceInPoints)))
@@ -58,6 +58,13 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
 function CourtBlock({ court }: { court: CourtPanels }) {
   const titleId = useId()
   const [page, setPage] = useState(0)
+  const [listHeight, setListHeight] = useState<number>()
+  const listRef = useRef<HTMLUListElement>(null)
+
+  function goTo(target: number) {
+    setListHeight(listRef.current?.offsetHeight)
+    setPage(target)
+  }
   const first = page * PANELS_PER_PAGE
   const shown = court.panels.slice(first, first + PANELS_PER_PAGE)
   const last = first + shown.length >= court.panels.length
@@ -79,7 +86,12 @@ function CourtBlock({ court }: { court: CourtPanels }) {
           {`Tribunal: ${formatPercent(court.percentage)} em ${formatCount(court.n, "recurso julgado", "recursos julgados")}`}
         </p>
       )}
-      <ul className="pt-2">
+      <ul
+        key={page}
+        ref={listRef}
+        style={{ minHeight: listHeight }}
+        className="pt-2 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-1"
+      >
         {shown.map((panel) => (
           <PanelRow key={panel.name} panel={panel} />
         ))}
@@ -93,7 +105,7 @@ function CourtBlock({ court }: { court: CourtPanels }) {
             <button
               type="button"
               disabled={page === 0}
-              onClick={() => setPage(page - 1)}
+              onClick={() => goTo(page - 1)}
               className={PAGE_BUTTON}
             >
               <span aria-hidden="true">‹</span>
@@ -105,7 +117,7 @@ function CourtBlock({ court }: { court: CourtPanels }) {
                 type="button"
                 aria-label={`Página ${index + 1}`}
                 aria-current={index === page ? "page" : undefined}
-                onClick={() => setPage(index)}
+                onClick={() => goTo(index)}
                 className={index === page ? CURRENT_PAGE_BUTTON : PAGE_BUTTON}
               >
                 {index + 1}
@@ -114,7 +126,7 @@ function CourtBlock({ court }: { court: CourtPanels }) {
             <button
               type="button"
               disabled={last}
-              onClick={() => setPage(page + 1)}
+              onClick={() => goTo(page + 1)}
               className={PAGE_BUTTON}
             >
               Próxima
