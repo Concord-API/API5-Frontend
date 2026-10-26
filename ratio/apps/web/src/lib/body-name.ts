@@ -14,5 +14,8 @@ function wordCase(word: string, index: number) {
 }
 
 export function bodyName(name: string) {
-  return name.split(" ").map(wordCase).join(" ")
+  return name
+    .split(" ")
+    .map((word, index) => wordCase(word, index))
+    .join(" ")
 }
