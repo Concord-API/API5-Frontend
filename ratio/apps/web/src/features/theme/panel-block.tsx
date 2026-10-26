@@ -37,19 +37,21 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
       <span className="font-sans text-[15px] text-foreground">
         {bodyName(panel.name)}
       </span>
-      <span
-        data-testid="panel-rate"
-        className="font-mono text-xs text-foreground"
-      >
-        {`${formatPercent(panel.percentage)} · n ${formatNumber(panel.n)}`}
+      <span className="flex items-baseline gap-3 font-mono text-xs">
         {panel.divergent && (
           <span
             data-testid="panel-divergence"
             className="font-semibold text-primary"
           >
-            {` · ${divergenceText(panel)}`}
+            {divergenceText(panel)}
           </span>
         )}
+        <span data-testid="panel-rate" className="text-foreground">
+          {`${formatPercent(panel.percentage)} `}
+          <span className="inline-block w-[8ch]">
+            {`· n ${formatNumber(panel.n)}`}
+          </span>
+        </span>
       </span>
     </li>
   )
