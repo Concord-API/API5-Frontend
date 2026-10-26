@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useId } from "react"
+import { useId, useState } from "react"
 import {
   themePanelsQueryOptions,
   type CourtPanels,
@@ -7,6 +7,8 @@ import {
   type ThemePanels,
 } from "@/api/panels"
 import { formatCount, formatNumber, formatPercent } from "@/lib/format"
+
+const PANELS_PER_PAGE = 10
 
 function divergenceText(panel: PanelAlignment) {
   const points = formatNumber(Math.round(Math.abs(panel.distanceInPoints)))
@@ -50,6 +52,9 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
 
 function CourtBlock({ court }: { court: CourtPanels }) {
   const titleId = useId()
+  const [page] = useState(0)
+  const first = page * PANELS_PER_PAGE
+  const shown = court.panels.slice(first, first + PANELS_PER_PAGE)
 
   return (
     <section aria-labelledby={titleId} className="pt-4">
@@ -68,10 +73,18 @@ function CourtBlock({ court }: { court: CourtPanels }) {
         </p>
       )}
       <ul className="pt-2">
-        {court.panels.map((panel) => (
+        {shown.map((panel) => (
           <PanelRow key={panel.name} panel={panel} />
         ))}
       </ul>
+      {court.panels.length > PANELS_PER_PAGE && (
+        <p
+          data-testid="panel-range"
+          className="pt-2 font-mono text-[11px] text-muted-foreground"
+        >
+          {`${first + 1}–${first + shown.length} de ${court.panels.length}`}
+        </p>
+      )}
       {court.outsidePanels > 0 && (
         <p
           data-testid="outside-panels"
