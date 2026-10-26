@@ -7,6 +7,7 @@ import {
   formatNumber,
   formatPercent,
 } from "@/lib/format"
+import { plainCategory, plainOutcome } from "@/lib/plain-outcome"
 
 type OutcomeFiguresProps = {
   breakdown: OutcomeFamily[]
@@ -36,6 +37,24 @@ function countLabel(count: number, ratio: number | null) {
   return `${formatNumber(count)} · ${formatPercent(ratio)}`
 }
 
+const INSTANCE_PLACE = {
+  state: "nos tribunais estaduais",
+  superior: "no STJ",
+} as const
+
+function titleOf(family: OutcomeFamily) {
+  const judged = family.judged
+  if (family.instance) {
+    const place = INSTANCE_PLACE[family.instance]
+    return judged === 1
+      ? `Desfecho de 1 recurso ${place}`
+      : `Desfecho dos ${formatNumber(judged)} recursos ${place}`
+  }
+  return judged === 1
+    ? "Desfecho de 1 decisão"
+    : `Desfecho das ${formatNumber(judged)} decisões`
+}
+
 function OutcomeFigure({
   number,
   family,
@@ -47,17 +66,9 @@ function OutcomeFigure({
   )
 
   return (
-    <Figure
-      number={number}
-      title={
-        family.judged === 1
-          ? "Desfecho de 1 decisão"
-          : `Desfecho das ${formatNumber(family.judged)} decisões`
-      }
-      source={source}
-    >
+    <Figure number={number} title={titleOf(family)} source={source}>
       <p className="mb-4 font-mono text-[11px] text-muted-foreground">
-        {family.polarityLabel}
+        {plainOutcome(family.polarityLabel)}
       </p>
       <ul className="flex flex-col gap-3">
         {family.categories.map((category) => (
@@ -68,7 +79,7 @@ function OutcomeFigure({
           >
             <div className="flex items-baseline justify-between gap-4">
               <span className="font-sans text-[15px] text-foreground">
-                {category.outcome}
+                {plainCategory(family.polarityLabel, category.outcome)}
               </span>
               <span className="shrink-0 font-mono text-xs text-foreground">
                 {countLabel(category.count, category.ratio)}
@@ -107,7 +118,7 @@ export function OutcomeFigures({
 
   return breakdown.map((family, index) => (
     <OutcomeFigure
-      key={family.polarityLabel}
+      key={`${family.polarityLabel}:${family.instance ?? ""}`}
       number={index + 1}
       family={family}
       partialTreatment={partialTreatment}

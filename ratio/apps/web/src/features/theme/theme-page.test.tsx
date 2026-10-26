@@ -5,6 +5,7 @@ import { renderRoute } from "../../test/render"
 import { answerThemes, fullList } from "../../test/themes"
 import {
   answerThemeDetail,
+  answerThemePrecedents,
   answerThemeNetworkError,
   answerThemeNever,
   answerThemeNotFound,
@@ -402,6 +403,39 @@ describe("numbers in the summary text", () => {
   })
 })
 
+describe("side column", () => {
+  it("starts the yearly alignment at the top, beside the STJ theses", async () => {
+    answerThemeDetail({
+      ...themeDetail,
+      yearlyAlignments: [
+        {
+          year: 2025,
+          n: 40,
+          percentage: 0.7,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
+        {
+          year: 2026,
+          n: 50,
+          percentage: 0.8,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
+      ],
+    })
+    answerThemePrecedents()
+
+    await renderTheme()
+
+    const theses = await screen.findByRole("region", {
+      name: "O que o STJ já decidiu sobre o assunto",
+    })
+    const yearly = screen.getByRole("region", { name: "Alinhamento por ano" })
+    const row = theses.closest("[data-testid='resumo-grid']")
+    expect(row).not.toBeNull()
+    expect(row).toContainElement(yearly)
+  })
+})
+
 describe("sourceless blocks", () => {
   function noteOf(block: string) {
     return screen
@@ -504,6 +538,29 @@ describe("sourceless blocks", () => {
     expect(router.state.location.hash).toBe("caseLawCitation")
   })
 
+  it("groups the missing data notes in one list after the outcome figures", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const list = screen.getByRole("region", { name: "O que a fonte não traz" })
+    expect(
+      within(list)
+        .getAllByRole("note")
+        .map((note) => note.getAttribute("data-block"))
+    ).toEqual(["amountAwarded", "caseLawCitation", "citedDecisions"])
+    expect(
+      within(list).getAllByRole("link", {
+        name: "Entenda por que este dado falta",
+      })
+    ).toHaveLength(3)
+    const lastFigure = screen.getAllByRole("figure").at(-1)!
+    expect(
+      lastFigure.compareDocumentPosition(list) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
   it("explains nothing when the API sends no unavailable block", async () => {
     answerThemeDetail({ ...themeDetail, unavailable: [] })
 
@@ -537,9 +594,7 @@ describe("outcome figure", () => {
 
     await renderTheme()
 
-    expect(outcomeFigure(1, "144")).toHaveTextContent(
-      "acolhimento da pretensão do autor"
-    )
+    expect(outcomeFigure(1, "144")).toHaveTextContent("o autor ganhou")
   })
 
   it("shows one bar per outcome with its count and percentage", async () => {
@@ -591,14 +646,10 @@ describe("outcome figure", () => {
 
     await renderTheme()
 
-    expect(outcomeFigure(1, "144")).toHaveTextContent(
-      "acolhimento da pretensão do autor"
-    )
-    expect(outcomeFigure(2, "30")).toHaveTextContent(
-      "acolhimento da pretensão de quem recorreu"
-    )
+    expect(outcomeFigure(1, "144")).toHaveTextContent("o autor ganhou")
+    expect(outcomeFigure(2, "30")).toHaveTextContent("o recurso foi aceito")
     expect(rowsOf(outcomeFigure(2, "30"))[2]).toHaveTextContent(
-      "Improcedente15 · 50,0%"
+      "Recurso negado15 · 50,0%"
     )
   })
 
@@ -710,9 +761,9 @@ describe("outcome figure below the percentage floor", () => {
     await renderTheme()
 
     const rows = within(figureNumber(1)).getAllByTestId("outcome-row")
-    expect(rows[0]).toHaveTextContent("Procedente1 decisão")
-    expect(rows[1]).toHaveTextContent("Parcialmente procedente0 decisões")
-    expect(rows[2]).toHaveTextContent("Improcedente0 decisões")
+    expect(rows[0]).toHaveTextContent("Recurso aceito1 decisão")
+    expect(rows[1]).toHaveTextContent("Recurso aceito em parte0 decisões")
+    expect(rows[2]).toHaveTextContent("Recurso negado0 decisões")
   })
 
   it("names a one-decision figure in the singular", async () => {
@@ -757,7 +808,7 @@ describe("outcome figure below the percentage floor", () => {
     expect(figure).not.toHaveTextContent("%")
     expect(within(figure).queryByTestId("outcome-bar")).not.toBeInTheDocument()
     expect(within(figure).getAllByTestId("outcome-row")[0]).toHaveTextContent(
-      "Procedente2 decisões"
+      "Recurso aceito2 decisões"
     )
   })
 

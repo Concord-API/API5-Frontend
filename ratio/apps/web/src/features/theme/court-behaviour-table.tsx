@@ -1,14 +1,11 @@
 import { useId } from "react"
 import type { CourtAlignment } from "@/api/themes"
-import { findUnavailable, type UnavailableBlock } from "@/api/unavailable"
 import { formatDate, formatNumber, formatPercent } from "@/lib/format"
+import { plainOutcome } from "@/lib/plain-outcome"
 
 type CourtBehaviourTableProps = {
   alignments: CourtAlignment[]
-  unavailable: UnavailableBlock[]
 }
-
-const AMOUNT_FALLBACK = "o valor depende do inteiro teor da decisão."
 
 const HEADER =
   "border-b border-foreground px-3 py-2 font-sans text-[13px] font-semibold tracking-[0.04em] text-foreground [font-variant-caps:all-small-caps]"
@@ -35,25 +32,18 @@ function BehaviourRow({ alignment }: { alignment: CourtAlignment }) {
             : formatPercent(alignment.percentage)}
         </span>
         <span className="block font-sans text-[12px] text-muted-foreground">
-          {alignment.polarityLabel}
+          {plainOutcome(alignment.polarityLabel)}
         </span>
       </td>
       <td className={NUMBER}>
         {formatDate(alignment.lastDecisionDate ?? null) ?? "—"}
       </td>
-      <td className="px-3 py-3 text-right font-mono text-[11px] text-muted-foreground italic">
-        sem fonte
-      </td>
     </tr>
   )
 }
 
-export function CourtBehaviourTable({
-  alignments,
-  unavailable,
-}: CourtBehaviourTableProps) {
+export function CourtBehaviourTable({ alignments }: CourtBehaviourTableProps) {
   const titleId = useId()
-  const amount = findUnavailable(unavailable, "amountAwarded")
 
   if (alignments.length === 0) {
     return null
@@ -91,9 +81,6 @@ export function CourtBehaviourTable({
               <th scope="col" className={`${HEADER} text-right`}>
                 Última decisão
               </th>
-              <th scope="col" className={`${HEADER} text-right`}>
-                Valor mediano
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -103,12 +90,6 @@ export function CourtBehaviourTable({
           </tbody>
         </table>
       </div>
-      <p
-        data-testid="amount-unsourced-note"
-        className="pt-3 font-sans text-[13px] leading-relaxed text-muted-foreground italic"
-      >
-        {`Valor mediano sem fonte: ${amount?.message ?? AMOUNT_FALLBACK}`}
-      </p>
     </section>
   )
 }

@@ -1,5 +1,6 @@
 import type { CourtAlignment } from "@/api/themes"
 import { formatNumber, formatPercent } from "@/lib/format"
+import { plainOutcome } from "@/lib/plain-outcome"
 
 type CourtAlignmentListProps = {
   alignments: CourtAlignment[]
@@ -39,7 +40,7 @@ export function CourtAlignmentList({ alignments }: CourtAlignmentListProps) {
                 {` · n ${formatNumber(alignment.n)}`}
               </span>
               <span className="font-sans text-[13px] text-muted-foreground">
-                {alignment.polarityLabel}
+                {plainOutcome(alignment.polarityLabel)}
               </span>
             </span>
           </li>

@@ -9,6 +9,7 @@ import { CourtAlignmentList } from "@/features/theme/court-alignment-list"
 import { CaseSampleBlock } from "@/features/theme/case-sample-block"
 import { CourtBehaviourTable } from "@/features/theme/court-behaviour-table"
 import { PanelBlock } from "@/features/theme/panel-block"
+import { PrecedentBlock } from "@/features/theme/precedent-block"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
@@ -60,15 +61,21 @@ function Theme() {
         onChange={changeTab}
         resumo={
           <>
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">
-              <ThemeArticle
-                summary={data.summary}
-                outcomeBreakdown={data.outcomeBreakdown}
-                partialTreatment={data.partialTreatment}
-                provenance={data.provenance}
-                unavailable={data.unavailable}
-              />
-              <aside>
+            <div
+              data-testid="resumo-grid"
+              className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start"
+            >
+              <div className="min-w-0">
+                <PrecedentBlock themeKey={data.themeKey} />
+                <ThemeArticle
+                  summary={data.summary}
+                  outcomeBreakdown={data.outcomeBreakdown}
+                  partialTreatment={data.partialTreatment}
+                  provenance={data.provenance}
+                  unavailable={data.unavailable}
+                />
+              </div>
+              <aside className="lg:sticky lg:top-6 lg:mt-10">
                 <YearlyAlignmentBars
                   alignments={data.yearlyAlignments}
                   trend={data.yearlyTrend}
@@ -80,10 +87,7 @@ function Theme() {
         }
         base={
           <>
-            <CourtBehaviourTable
-              alignments={data.courtAlignments ?? []}
-              unavailable={data.unavailable}
-            />
+            <CourtBehaviourTable alignments={data.courtAlignments ?? []} />
             <PanelBlock themeKey={data.themeKey} />
             <DoctrineBlock
               doctrine={data.relatedDoctrine}

@@ -1,7 +1,6 @@
 import { render, screen, within } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import type { CourtAlignment } from "@/api/themes"
-import type { UnavailableBlock } from "@/api/unavailable"
 import { renderRoute } from "../../test/render"
 import { answerThemeDetail } from "../../test/theme-detail"
 import { CourtBehaviourTable } from "./court-behaviour-table"
@@ -24,20 +23,8 @@ const stj: CourtAlignment = {
   lastDecisionDate: "2026-07-02",
 }
 
-const amountMissing: UnavailableBlock = {
-  block: "amountAwarded",
-  reason: "sourceUnavailable",
-  message:
-    "O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão.",
-}
-
-function renderTable(
-  alignments: CourtAlignment[] = [tjsp, stj],
-  unavailable: UnavailableBlock[] = [amountMissing]
-) {
-  render(
-    <CourtBehaviourTable alignments={alignments} unavailable={unavailable} />
-  )
+function renderTable(alignments: CourtAlignment[] = [tjsp, stj]) {
+  render(<CourtBehaviourTable alignments={alignments} />)
   return screen.queryByRole("table", { name: "Comportamento de cada tribunal" })
 }
 
@@ -61,13 +48,7 @@ describe("court behaviour table", () => {
       within(table)
         .getAllByRole("columnheader")
         .map((header) => header.textContent)
-    ).toEqual([
-      "Tribunal",
-      "Decisões",
-      "Alinhamento",
-      "Última decisão",
-      "Valor mediano",
-    ])
+    ).toEqual(["Tribunal", "Decisões", "Alinhamento", "Última decisão"])
   })
 
   it("shows the decisions, the alignment and the last decision of each court", () => {
@@ -76,7 +57,7 @@ describe("court behaviour table", () => {
     const cells = within(rowOf(table, "TJSP")).getAllByRole("cell")
     expect(cells[0]).toHaveTextContent("1.240")
     expect(cells[1]).toHaveTextContent("69,4%")
-    expect(cells[1]).toHaveTextContent("acolhimento da pretensão do autor")
+    expect(cells[1]).toHaveTextContent("o autor ganhou")
     expect(cells[2]).toHaveTextContent("30.08.2026")
   })
 
@@ -85,9 +66,7 @@ describe("court behaviour table", () => {
 
     const cells = within(rowOf(table, "STJ")).getAllByRole("cell")
     expect(cells[1]).toHaveTextContent("25,0%")
-    expect(cells[1]).toHaveTextContent(
-      "provimento do recurso (pretensão do recorrente)"
-    )
+    expect(cells[1]).toHaveTextContent("o recurso foi aceito")
   })
 
   it("shows no data instead of a percentage below the minimum", () => {
@@ -160,30 +139,13 @@ describe("court behaviour table", () => {
     expect(block).toHaveClass("min-w-0", "w-full", "max-w-[690px]")
   })
 
-  it("flags the amount of every court as unsourced, never with a value", () => {
+  it("leaves the amount out of the table, since the source never has it", () => {
     const table = renderTable()!
 
-    for (const court of ["TJSP", "STJ"]) {
-      const amount = within(rowOf(table, court)).getAllByRole("cell")[3]
-      expect(amount).toHaveTextContent("sem fonte")
-      expect(amount).not.toHaveTextContent(/\d/)
-      expect(amount).not.toHaveTextContent("R$")
-    }
-  })
-
-  it("explains why the amount has no source", () => {
-    renderTable()
-
-    expect(screen.getByTestId("amount-unsourced-note")).toHaveTextContent(
-      "Valor mediano sem fonte: O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão."
-    )
-  })
-
-  it("explains the missing amount even without the message from the API", () => {
-    renderTable([tjsp], [])
-
-    expect(screen.getByTestId("amount-unsourced-note")).toHaveTextContent(
-      "Valor mediano sem fonte: o valor depende do inteiro teor da decisão."
-    )
+    expect(within(table).queryByText("Valor mediano")).not.toBeInTheDocument()
+    expect(within(table).queryByText("sem fonte")).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId("amount-unsourced-note")
+    ).not.toBeInTheDocument()
   })
 })
