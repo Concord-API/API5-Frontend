@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { YearlyAlignmentBars } from "./yearly-alignment-bars"
 
 describe("yearly alignment bars", () => {
@@ -131,5 +131,53 @@ describe("yearly alignment bars", () => {
     expect(
       screen.queryByTestId("yearly-alignment-trend")
     ).not.toBeInTheDocument()
+  })
+
+  describe("a long series", () => {
+    const years = Array.from({ length: 21 }, (_, index) => ({
+      year: 2006 + index,
+      n: 10 + index,
+      percentage: 0.7,
+      polarityLabel:
+        "acolhimento da pretensão de quem propôs (autor não identificado)",
+    }))
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it("keeps the years inside a scrolling box of fixed height", () => {
+      render(<YearlyAlignmentBars alignments={years} trend={null} />)
+
+      const box = screen.getByRole("region", {
+        name: "Anos do alinhamento, role para ver todos",
+      })
+      expect(box).toHaveClass("max-h-[320px]", "overflow-y-auto")
+      expect(box).toHaveAttribute("tabindex", "0")
+      expect(within(box).getAllByTestId("yearly-alignment-row")).toHaveLength(
+        21
+      )
+    })
+
+    it("opens the box on the most recent years", () => {
+      vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(
+        900
+      )
+
+      render(<YearlyAlignmentBars alignments={years} trend={null} />)
+
+      const box = screen.getByRole("region", {
+        name: "Anos do alinhamento, role para ver todos",
+      })
+      expect(box.scrollTop).toBe(900)
+    })
+
+    it("says who won once when every year shares it", () => {
+      render(<YearlyAlignmentBars alignments={years} trend={null} />)
+
+      expect(screen.getAllByText("quem entrou com a ação ganhou")).toHaveLength(
+        1
+      )
+    })
   })
 })
