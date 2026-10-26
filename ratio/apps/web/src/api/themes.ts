@@ -100,6 +100,7 @@ export const outcomeCategorySchema = z.object({
 
 export const outcomeFamilySchema = z.object({
   polarityLabel: z.string(),
+  instance: z.enum(["state", "superior"]).nullable().optional(),
   judged: z.number().int(),
   categories: z.array(outcomeCategorySchema),
 })
