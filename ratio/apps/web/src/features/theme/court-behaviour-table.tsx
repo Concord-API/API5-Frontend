@@ -2,6 +2,7 @@ import { useId } from "react"
 import type { CourtAlignment } from "@/api/themes"
 import { findUnavailable, type UnavailableBlock } from "@/api/unavailable"
 import { formatDate, formatNumber, formatPercent } from "@/lib/format"
+import { plainOutcome } from "@/lib/plain-outcome"
 
 type CourtBehaviourTableProps = {
   alignments: CourtAlignment[]
@@ -35,7 +36,7 @@ function BehaviourRow({ alignment }: { alignment: CourtAlignment }) {
             : formatPercent(alignment.percentage)}
         </span>
         <span className="block font-sans text-[12px] text-muted-foreground">
-          {alignment.polarityLabel}
+          {plainOutcome(alignment.polarityLabel)}
         </span>
       </td>
       <td className={NUMBER}>
