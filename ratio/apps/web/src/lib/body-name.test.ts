@@ -18,6 +18,7 @@ describe("body name", () => {
     ["Câmara Do Meio Ambiente", "Câmara do Meio Ambiente"],
     ["DA SEÇÃO ÚNICA", "Da Seção Única"],
     ["TURMA RECURSAL II", "Turma Recursal II"],
+    ["CÂMARA CIVIL", "Câmara Civil"],
   ])("writes %s as %s", (name, expected) => {
     expect(bodyName(name)).toBe(expected)
   })
