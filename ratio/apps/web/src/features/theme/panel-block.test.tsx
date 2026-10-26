@@ -6,6 +6,7 @@ import {
   answerThemeDetail,
   answerThemePanels,
   answerThemePanelsError,
+  crowdedCourt,
   divergentCourt,
   noPanels,
   themePanels,
@@ -183,5 +184,42 @@ describe("panel block", () => {
       "TJMG",
       "STJ",
     ])
+  })
+  it("shows ten panels per page in a court with more than ten", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    const court = courtSection(block, "TJSP")
+    const rows = within(court).getAllByTestId("panel-row")
+    expect(rows).toHaveLength(10)
+    expect(rows[0]).toHaveTextContent("1ª Câmara de Direito Público")
+    expect(rows[9]).toHaveTextContent("10ª Câmara de Direito Público")
+    expect(within(court).getByTestId("panel-range")).toHaveTextContent(
+      "1–10 de 12"
+    )
+  })
+
+  it("shows no page control in a court with ten panels or fewer", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    const court = courtSection(block, "TJMG")
+    expect(within(court).getAllByTestId("panel-row")).toHaveLength(2)
+    expect(within(court).queryByTestId("panel-range")).not.toBeInTheDocument()
+    expect(
+      within(court).queryByRole("button", { name: "Próxima" })
+    ).not.toBeInTheDocument()
   })
 })

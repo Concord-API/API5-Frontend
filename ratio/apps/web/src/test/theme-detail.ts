@@ -227,6 +227,20 @@ export const alignedCourt = {
   ],
 }
 
+export const crowdedCourt = {
+  courtCode: "TJSP",
+  n: 120,
+  percentage: 0.5,
+  outsidePanels: 0,
+  panels: Array.from({ length: 12 }, (_, index) => ({
+    name: `${index + 1}ª Câmara de Direito Público`,
+    n: 10,
+    percentage: 0.5,
+    distanceInPoints: 0,
+    divergent: false,
+  })),
+}
+
 export const themePanels = {
   themeKey: 412,
   basis: "provimento do recurso (pretensão de quem recorreu)",
