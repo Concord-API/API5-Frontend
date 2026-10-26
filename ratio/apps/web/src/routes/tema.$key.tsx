@@ -61,16 +61,21 @@ function Theme() {
         onChange={changeTab}
         resumo={
           <>
-            <PrecedentBlock themeKey={data.themeKey} />
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">
-              <ThemeArticle
-                summary={data.summary}
-                outcomeBreakdown={data.outcomeBreakdown}
-                partialTreatment={data.partialTreatment}
-                provenance={data.provenance}
-                unavailable={data.unavailable}
-              />
-              <aside>
+            <div
+              data-testid="resumo-grid"
+              className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start"
+            >
+              <div className="min-w-0">
+                <PrecedentBlock themeKey={data.themeKey} />
+                <ThemeArticle
+                  summary={data.summary}
+                  outcomeBreakdown={data.outcomeBreakdown}
+                  partialTreatment={data.partialTreatment}
+                  provenance={data.provenance}
+                  unavailable={data.unavailable}
+                />
+              </div>
+              <aside className="lg:sticky lg:top-6 lg:mt-10">
                 <YearlyAlignmentBars
                   alignments={data.yearlyAlignments}
                   trend={data.yearlyTrend}

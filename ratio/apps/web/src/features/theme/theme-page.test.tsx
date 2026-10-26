@@ -405,7 +405,23 @@ describe("numbers in the summary text", () => {
 
 describe("side column", () => {
   it("starts the yearly alignment at the top, beside the STJ theses", async () => {
-    answerThemeDetail()
+    answerThemeDetail({
+      ...themeDetail,
+      yearlyAlignments: [
+        {
+          year: 2025,
+          n: 40,
+          percentage: 0.7,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
+        {
+          year: 2026,
+          n: 50,
+          percentage: 0.8,
+          polarityLabel: "acolhimento da pretensão do autor",
+        },
+      ],
+    })
     answerThemePrecedents()
 
     await renderTheme()
