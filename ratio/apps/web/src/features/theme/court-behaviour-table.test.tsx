@@ -66,7 +66,6 @@ describe("court behaviour table", () => {
       "Decisões",
       "Alinhamento",
       "Última decisão",
-      "Valor mediano",
     ])
   })
 
@@ -158,30 +157,11 @@ describe("court behaviour table", () => {
     expect(block).toHaveClass("min-w-0", "w-full", "max-w-[690px]")
   })
 
-  it("flags the amount of every court as unsourced, never with a value", () => {
+  it("leaves the amount out of the table, since the source never has it", () => {
     const table = renderTable()!
 
-    for (const court of ["TJSP", "STJ"]) {
-      const amount = within(rowOf(table, court)).getAllByRole("cell")[3]
-      expect(amount).toHaveTextContent("sem fonte")
-      expect(amount).not.toHaveTextContent(/\d/)
-      expect(amount).not.toHaveTextContent("R$")
-    }
-  })
-
-  it("explains why the amount has no source", () => {
-    renderTable()
-
-    expect(screen.getByTestId("amount-unsourced-note")).toHaveTextContent(
-      "Valor mediano sem fonte: O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão."
-    )
-  })
-
-  it("explains the missing amount even without the message from the API", () => {
-    renderTable([tjsp], [])
-
-    expect(screen.getByTestId("amount-unsourced-note")).toHaveTextContent(
-      "Valor mediano sem fonte: o valor depende do inteiro teor da decisão."
-    )
+    expect(within(table).queryByText("Valor mediano")).not.toBeInTheDocument()
+    expect(within(table).queryByText("sem fonte")).not.toBeInTheDocument()
+    expect(screen.queryByTestId("amount-unsourced-note")).not.toBeInTheDocument()
   })
 })

@@ -504,6 +504,29 @@ describe("sourceless blocks", () => {
     expect(router.state.location.hash).toBe("caseLawCitation")
   })
 
+  it("groups the missing data notes in one list after the outcome figures", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
+    const list = screen.getByRole("region", { name: "O que a fonte não traz" })
+    expect(
+      within(list)
+        .getAllByRole("note")
+        .map((note) => note.getAttribute("data-block"))
+    ).toEqual(["amountAwarded", "caseLawCitation", "citedDecisions"])
+    expect(
+      within(list).getAllByRole("link", {
+        name: "Entenda por que este dado falta",
+      })
+    ).toHaveLength(3)
+    const lastFigure = screen.getAllByRole("figure").at(-1)!
+    expect(
+      lastFigure.compareDocumentPosition(list) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+  })
+
   it("explains nothing when the API sends no unavailable block", async () => {
     answerThemeDetail({ ...themeDetail, unavailable: [] })
 
