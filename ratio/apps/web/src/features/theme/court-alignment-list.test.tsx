@@ -32,7 +32,7 @@ describe("court alignment list", () => {
     expect(rows[0]).toHaveTextContent("TJSP")
     expect(rows[0]).toHaveTextContent("69,4%")
     expect(rows[0]).toHaveTextContent("n 100")
-    expect(rows[0]).toHaveTextContent("acolhimento da pretensão do autor")
+    expect(rows[0]).toHaveTextContent("o autor ganhou")
   })
 
   it("does not render when there are no alignments", () => {

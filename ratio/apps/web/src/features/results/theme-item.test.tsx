@@ -73,7 +73,7 @@ describe("ThemeItem", () => {
     )
     expect(within(link).getByTestId("alignment-bar")).toBeInTheDocument()
     expect(within(link).getByTestId("alignment-label")).toHaveTextContent(
-      "82% acolhimento da pretensão do autor · 12.418 decisões"
+      "o autor ganhou em 82% · 12.418 decisões"
     )
   })
 

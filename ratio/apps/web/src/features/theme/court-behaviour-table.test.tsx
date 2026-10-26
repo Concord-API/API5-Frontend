@@ -76,7 +76,7 @@ describe("court behaviour table", () => {
     const cells = within(rowOf(table, "TJSP")).getAllByRole("cell")
     expect(cells[0]).toHaveTextContent("1.240")
     expect(cells[1]).toHaveTextContent("69,4%")
-    expect(cells[1]).toHaveTextContent("acolhimento da pretensão do autor")
+    expect(cells[1]).toHaveTextContent("o autor ganhou")
     expect(cells[2]).toHaveTextContent("30.08.2026")
   })
 
@@ -85,9 +85,7 @@ describe("court behaviour table", () => {
 
     const cells = within(rowOf(table, "STJ")).getAllByRole("cell")
     expect(cells[1]).toHaveTextContent("25,0%")
-    expect(cells[1]).toHaveTextContent(
-      "provimento do recurso (pretensão do recorrente)"
-    )
+    expect(cells[1]).toHaveTextContent("o recurso foi aceito")
   })
 
   it("shows no data instead of a percentage below the minimum", () => {

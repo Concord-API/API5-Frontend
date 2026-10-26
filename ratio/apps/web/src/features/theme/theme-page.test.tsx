@@ -537,9 +537,7 @@ describe("outcome figure", () => {
 
     await renderTheme()
 
-    expect(outcomeFigure(1, "144")).toHaveTextContent(
-      "acolhimento da pretensão do autor"
-    )
+    expect(outcomeFigure(1, "144")).toHaveTextContent("o autor ganhou")
   })
 
   it("shows one bar per outcome with its count and percentage", async () => {
@@ -591,14 +589,10 @@ describe("outcome figure", () => {
 
     await renderTheme()
 
-    expect(outcomeFigure(1, "144")).toHaveTextContent(
-      "acolhimento da pretensão do autor"
-    )
-    expect(outcomeFigure(2, "30")).toHaveTextContent(
-      "acolhimento da pretensão de quem recorreu"
-    )
+    expect(outcomeFigure(1, "144")).toHaveTextContent("o autor ganhou")
+    expect(outcomeFigure(2, "30")).toHaveTextContent("o recurso foi aceito")
     expect(rowsOf(outcomeFigure(2, "30"))[2]).toHaveTextContent(
-      "Improcedente15 · 50,0%"
+      "Recurso negado15 · 50,0%"
     )
   })
 

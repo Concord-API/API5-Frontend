@@ -163,7 +163,7 @@ describe("results list", () => {
 
     const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(item).getByTestId("theme-footer")).toHaveTextContent(
-      /^TJMG\s*TJSP\s*TJRJ\s*2019 — 2026 · última decisão 30\.08\.2026\s*99% acolhimento da pretensão do autor · 144 decisões$/
+      /^TJMG\s*TJSP\s*TJRJ\s*2019 — 2026 · última decisão 30\.08\.2026\s*o autor ganhou em 99% · 144 decisões$/
     )
   })
 
@@ -229,7 +229,7 @@ describe("results list", () => {
 
     const item = itemOf("Inscrição indevida em cadastro de inadimplentes")
     expect(within(item).getByTestId("alignment-label")).toHaveTextContent(
-      "50% acolhimento da pretensão do autor · 10 decisões"
+      "o autor ganhou em 50% · 10 decisões"
     )
   })
 
