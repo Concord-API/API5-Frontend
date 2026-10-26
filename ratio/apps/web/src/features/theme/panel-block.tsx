@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useId } from "react"
+import { useId, useState } from "react"
 import {
   themePanelsQueryOptions,
   type CourtPanels,
@@ -9,10 +9,15 @@ import {
 import { bodyName } from "@/lib/body-name"
 import { formatCount, formatNumber, formatPercent } from "@/lib/format"
 
+const PANELS_PER_PAGE = 10
+
+const PAGE_BUTTON =
+  "tracking-[0.12em] uppercase underline decoration-[#C9C2B4] underline-offset-2 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default disabled:no-underline disabled:opacity-40 disabled:hover:text-muted-foreground"
+
 function divergenceText(panel: PanelAlignment) {
   const points = formatNumber(Math.round(Math.abs(panel.distanceInPoints)))
   const side = panel.distanceInPoints > 0 ? "acima" : "abaixo"
-  return `Diverge do tribunal: ${points} pontos ${side}`
+  return `${points} pontos ${side} do tribunal`
 }
 
 function PanelRow({ panel }: { panel: PanelAlignment }) {
@@ -22,26 +27,24 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
       data-divergent={panel.divergent}
       className={
         panel.divergent
-          ? "flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-l-2 border-primary py-2 pl-3"
-          : "flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-l-2 border-transparent py-2 pl-3"
+          ? "flex flex-wrap items-baseline justify-between gap-x-6 border-l-2 border-primary py-2 pl-3"
+          : "flex flex-wrap items-baseline justify-between gap-x-6 border-l-2 border-transparent py-2 pl-3"
       }
     >
       <span className="font-sans text-[15px] text-foreground">
         {bodyName(panel.name)}
       </span>
-      <span className="flex flex-col items-end gap-0.5">
-        <span
-          data-testid="panel-rate"
-          className="font-mono text-xs text-foreground"
-        >
-          {`${formatPercent(panel.percentage)} · n ${formatNumber(panel.n)}`}
-        </span>
+      <span
+        data-testid="panel-rate"
+        className="font-mono text-xs text-foreground"
+      >
+        {`${formatPercent(panel.percentage)} · n ${formatNumber(panel.n)}`}
         {panel.divergent && (
           <span
             data-testid="panel-divergence"
-            className="font-mono text-[11px] font-semibold text-primary"
+            className="font-semibold text-primary"
           >
-            {divergenceText(panel)}
+            {` · ${divergenceText(panel)}`}
           </span>
         )}
       </span>
@@ -51,6 +54,10 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
 
 function CourtBlock({ court }: { court: CourtPanels }) {
   const titleId = useId()
+  const [page, setPage] = useState(0)
+  const first = page * PANELS_PER_PAGE
+  const shown = court.panels.slice(first, first + PANELS_PER_PAGE)
+  const last = first + shown.length >= court.panels.length
 
   return (
     <section aria-labelledby={titleId} className="pt-4">
@@ -69,10 +76,36 @@ function CourtBlock({ court }: { court: CourtPanels }) {
         </p>
       )}
       <ul className="pt-2">
-        {court.panels.map((panel) => (
+        {shown.map((panel) => (
           <PanelRow key={panel.name} panel={panel} />
         ))}
       </ul>
+      {court.panels.length > PANELS_PER_PAGE && (
+        <nav
+          aria-label={`Páginas das câmaras do ${court.courtCode}`}
+          className="flex items-center gap-4 pt-2 font-mono text-[11px] text-muted-foreground"
+        >
+          <button
+            type="button"
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+            className={PAGE_BUTTON}
+          >
+            Anterior
+          </button>
+          <span data-testid="panel-range">
+            {`${first + 1}–${first + shown.length} de ${court.panels.length}`}
+          </span>
+          <button
+            type="button"
+            disabled={last}
+            onClick={() => setPage(page + 1)}
+            className={PAGE_BUTTON}
+          >
+            Próxima
+          </button>
+        </nav>
+      )}
       {court.outsidePanels > 0 && (
         <p
           data-testid="outside-panels"

@@ -1,4 +1,5 @@
 import { screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import {
@@ -6,6 +7,7 @@ import {
   answerThemeDetail,
   answerThemePanels,
   answerThemePanelsError,
+  crowdedCourt,
   divergentCourt,
   noPanels,
   themePanels,
@@ -74,10 +76,28 @@ describe("panel block", () => {
 
     const rows = within(courtSection(block, "TJMG")).getAllByTestId("panel-row")
     expect(within(rows[0]).getByTestId("panel-divergence")).toHaveTextContent(
-      "Diverge do tribunal: 35 pontos acima"
+      "35 pontos acima do tribunal"
     )
     expect(within(rows[1]).getByTestId("panel-divergence")).toHaveTextContent(
-      "Diverge do tribunal: 35 pontos abaixo"
+      "35 pontos abaixo do tribunal"
+    )
+  })
+
+  it("says the divergence on the same line as the panel rate", async () => {
+    answerThemeDetail()
+    answerThemePanels()
+
+    await renderTheme()
+    const block = await findBlock()
+
+    const row = within(courtSection(block, "TJMG")).getAllByTestId(
+      "panel-row"
+    )[0]
+    expect(within(row).getByTestId("panel-rate")).toContainElement(
+      within(row).getByTestId("panel-divergence")
+    )
+    expect(within(row).getByTestId("panel-rate")).toHaveTextContent(
+      "90,0% · n 10 · 35 pontos acima do tribunal"
     )
   })
 
@@ -184,6 +204,99 @@ describe("panel block", () => {
       "STJ",
     ])
   })
+  it("shows ten panels per page in a court with more than ten", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    const court = courtSection(block, "TJSP")
+    const rows = within(court).getAllByTestId("panel-row")
+    expect(rows).toHaveLength(10)
+    expect(rows[0]).toHaveTextContent("1ª Câmara de Direito Público")
+    expect(rows[9]).toHaveTextContent("10ª Câmara de Direito Público")
+    expect(within(court).getByTestId("panel-range")).toHaveTextContent(
+      "1–10 de 12"
+    )
+  })
+
+  it("shows no page control in a court with ten panels or fewer", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    const court = courtSection(block, "TJMG")
+    expect(within(court).getAllByTestId("panel-row")).toHaveLength(2)
+    expect(within(court).queryByTestId("panel-range")).not.toBeInTheDocument()
+    expect(
+      within(court).queryByRole("button", { name: "Próxima" })
+    ).not.toBeInTheDocument()
+  })
+  it("moves to the next panels of the court and back", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+    const user = userEvent.setup()
+
+    await renderTheme()
+    const block = await findBlock()
+    const court = courtSection(block, "TJSP")
+
+    expect(
+      within(court).getByRole("button", { name: "Anterior" })
+    ).toBeDisabled()
+    await user.click(within(court).getByRole("button", { name: "Próxima" }))
+
+    const rows = within(court).getAllByTestId("panel-row")
+    expect(rows.map((row) => row.textContent)).toEqual([
+      expect.stringContaining("11ª Câmara de Direito Público"),
+      expect.stringContaining("12ª Câmara de Direito Público"),
+    ])
+    expect(within(court).getByTestId("panel-range")).toHaveTextContent(
+      "11–12 de 12"
+    )
+    expect(
+      within(court).getByRole("button", { name: "Próxima" })
+    ).toBeDisabled()
+
+    await user.click(within(court).getByRole("button", { name: "Anterior" }))
+
+    expect(within(court).getAllByTestId("panel-row")).toHaveLength(10)
+  })
+
+  it("pages one court without moving the others", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, { ...crowdedCourt, courtCode: "TJRJ" }],
+    })
+    const user = userEvent.setup()
+
+    await renderTheme()
+    const block = await findBlock()
+
+    await user.click(
+      within(courtSection(block, "TJSP")).getByRole("button", {
+        name: "Próxima",
+      })
+    )
+
+    expect(
+      within(courtSection(block, "TJRJ")).getByTestId("panel-range")
+    ).toHaveTextContent("1–10 de 12")
+  })
+
   it("shows the panel names in title case", async () => {
     answerThemeDetail()
     answerThemePanels({

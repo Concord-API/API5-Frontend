@@ -443,42 +443,25 @@ describe("sourceless blocks", () => {
       .find((note) => note.getAttribute("data-block") === block)
   }
 
-  it("explains the missing ruling quotation with the message from the API", async () => {
+  it("shows no list of what the source lacks", async () => {
     answerThemeDetail()
 
     await renderTheme()
 
-    expect(noteOf("caseLawCitation")).toHaveTextContent(
-      "A citação de acórdão depende do inteiro teor da decisão, e os tribunais do escopo bloqueiam a coleta desse texto."
-    )
-  })
-
-  it("explains the missing cited decisions with the message from the API", async () => {
-    answerThemeDetail()
-
-    await renderTheme()
-
-    expect(noteOf("citedDecisions")).toHaveTextContent(
-      "As decisões citadas dependem do inteiro teor, que os tribunais do escopo não liberam para coleta."
-    )
-  })
-
-  it("replaces the amount figure with the unavailable message after the outcome figures", async () => {
-    answerThemeDetail()
-
-    await renderTheme()
-
-    const outcomeFigure = screen.getByRole("figure", {
-      name: /^FIG\. 1 — Desfecho/,
-    })
-    const amountNote = noteOf("amountAwarded")
-    expect(amountNote).toHaveTextContent(
-      "O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão."
-    )
     expect(
-      outcomeFigure.compareDocumentPosition(amountNote!) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
+      screen.queryByRole("region", { name: "O que a fonte não traz" })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("link", { name: "Entenda por que este dado falta" })
+    ).not.toBeInTheDocument()
+    expect(screen.queryByRole("note")).not.toBeInTheDocument()
+  })
+
+  it("draws no amount figure", async () => {
+    answerThemeDetail()
+
+    await renderTheme()
+
     expect(
       screen.queryByRole("figure", { name: /valor fixado/i })
     ).not.toBeInTheDocument()
@@ -515,50 +498,6 @@ describe("sourceless blocks", () => {
       "O texto deste tema ainda não foi gerado; ele sai na próxima carga."
     )
     expect(screen.queryByRole("article")).not.toBeInTheDocument()
-  })
-
-  it("leads from a sourceless block to the explanation of the limitations page", async () => {
-    answerThemeDetail()
-    const user = userEvent.setup()
-    const { router } = await renderTheme()
-
-    const note = noteOf("caseLawCitation")
-    const link = within(note?.parentElement as HTMLElement).getByRole("link", {
-      name: "Entenda por que este dado falta",
-    })
-    await user.click(link)
-
-    expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: "Limitações dos dados",
-      })
-    ).toBeInTheDocument()
-    expect(router.state.location.pathname).toBe("/limitacoes")
-    expect(router.state.location.hash).toBe("caseLawCitation")
-  })
-
-  it("groups the missing data notes in one list after the outcome figures", async () => {
-    answerThemeDetail()
-
-    await renderTheme()
-
-    const list = screen.getByRole("region", { name: "O que a fonte não traz" })
-    expect(
-      within(list)
-        .getAllByRole("note")
-        .map((note) => note.getAttribute("data-block"))
-    ).toEqual(["amountAwarded", "caseLawCitation", "citedDecisions"])
-    expect(
-      within(list).getAllByRole("link", {
-        name: "Entenda por que este dado falta",
-      })
-    ).toHaveLength(3)
-    const lastFigure = screen.getAllByRole("figure").at(-1)!
-    expect(
-      lastFigure.compareDocumentPosition(list) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
   })
 
   it("explains nothing when the API sends no unavailable block", async () => {
