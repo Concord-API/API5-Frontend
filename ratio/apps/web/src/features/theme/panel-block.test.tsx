@@ -83,7 +83,7 @@ describe("panel block", () => {
     )
   })
 
-  it("says the divergence on the same line as the panel rate", async () => {
+  it("says the divergence before the panel rate, on the same line", async () => {
     answerThemeDetail()
     answerThemePanels()
 
@@ -93,12 +93,15 @@ describe("panel block", () => {
     const row = within(courtSection(block, "TJMG")).getAllByTestId(
       "panel-row"
     )[0]
-    expect(within(row).getByTestId("panel-rate")).toContainElement(
-      within(row).getByTestId("panel-divergence")
-    )
-    expect(within(row).getByTestId("panel-rate")).toHaveTextContent(
-      "90,0% · n 10 · 35 pontos acima do tribunal"
-    )
+    const divergence = within(row).getByTestId("panel-divergence")
+    const rate = within(row).getByTestId("panel-rate")
+    expect(rate).not.toContainElement(divergence)
+    expect(rate).toHaveTextContent(/^90,0% · n 10$/)
+    expect(divergence.parentElement).toBe(rate.parentElement)
+    expect(
+      divergence.compareDocumentPosition(rate) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
   })
 
   it("says nothing about divergence for a panel close to its court", async () => {
@@ -320,5 +323,47 @@ describe("panel block", () => {
     expect(within(block).getByTestId("panel-row")).toHaveTextContent(
       "4ª Câmara de Direito Público"
     )
+  })
+  it("shows a button for each panel page with the current one marked", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+    const pages = within(courtSection(block, "TJSP")).getByRole("navigation", {
+      name: "Páginas das câmaras do TJSP",
+    })
+
+    expect(
+      within(pages).getByRole("button", { name: "Página 1" })
+    ).toHaveAttribute("aria-current", "page")
+    expect(
+      within(pages).getByRole("button", { name: "Página 2" })
+    ).not.toHaveAttribute("aria-current")
+    expect(within(pages).getByTestId("panel-range")).toHaveTextContent(
+      "Câmaras 1–10 de 12"
+    )
+  })
+  it("goes straight to the page of the button", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+    const user = userEvent.setup()
+
+    await renderTheme()
+    const block = await findBlock()
+    const court = courtSection(block, "TJSP")
+
+    await user.click(within(court).getByRole("button", { name: "Página 2" }))
+
+    expect(within(court).getAllByTestId("panel-row")).toHaveLength(2)
+    expect(
+      within(court).getByRole("button", { name: "Página 2" })
+    ).toHaveAttribute("aria-current", "page")
   })
 })
