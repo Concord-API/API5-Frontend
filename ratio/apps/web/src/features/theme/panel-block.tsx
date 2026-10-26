@@ -103,7 +103,7 @@ function PanelSection({ panels }: { panels: ThemePanels }) {
         data-testid="panel-rule"
         className="pt-3 font-sans text-[13px] leading-relaxed text-muted-foreground italic"
       >
-        {`Taxa de ${panels.basis} em cada câmara, comparada com a do próprio tribunal. A câmara é sinalizada quando fica a ${divergencePoints} pontos ou mais do tribunal, a partir de ${minJudgedForDivergence} julgados; câmara com um único julgado não aparece.`}
+        {`Percentual de recursos aceitos em cada câmara, comparado com o do próprio tribunal. A câmara é sinalizada quando fica a ${divergencePoints} pontos ou mais do tribunal, a partir de ${minJudgedForDivergence} julgados; câmara com um único julgado não aparece.`}
       </p>
       {panels.courts.map((court) => (
         <CourtBlock key={court.courtCode} court={court} />

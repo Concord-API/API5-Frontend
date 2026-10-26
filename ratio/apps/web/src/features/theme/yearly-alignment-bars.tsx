@@ -1,5 +1,6 @@
 import type { YearlyAlignment, YearlyTrend } from "@/api/themes"
 import { formatNumber, formatPercent } from "@/lib/format"
+import { plainOutcome } from "@/lib/plain-outcome"
 
 type YearlyAlignmentBarsProps = {
   alignments: YearlyAlignment[]
@@ -75,7 +76,7 @@ export function YearlyAlignmentBars({
               />
             </div>
             <span className="font-sans text-[13px] text-muted-foreground">
-              {alignment.polarityLabel}
+              {plainOutcome(alignment.polarityLabel)}
             </span>
           </li>
         ))}

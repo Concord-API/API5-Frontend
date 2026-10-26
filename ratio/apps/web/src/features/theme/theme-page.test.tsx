@@ -537,9 +537,7 @@ describe("outcome figure", () => {
 
     await renderTheme()
 
-    expect(outcomeFigure(1, "144")).toHaveTextContent(
-      "acolhimento da pretensão do autor"
-    )
+    expect(outcomeFigure(1, "144")).toHaveTextContent("o autor ganhou")
   })
 
   it("shows one bar per outcome with its count and percentage", async () => {
@@ -591,14 +589,10 @@ describe("outcome figure", () => {
 
     await renderTheme()
 
-    expect(outcomeFigure(1, "144")).toHaveTextContent(
-      "acolhimento da pretensão do autor"
-    )
-    expect(outcomeFigure(2, "30")).toHaveTextContent(
-      "acolhimento da pretensão de quem recorreu"
-    )
+    expect(outcomeFigure(1, "144")).toHaveTextContent("o autor ganhou")
+    expect(outcomeFigure(2, "30")).toHaveTextContent("o recurso foi aceito")
     expect(rowsOf(outcomeFigure(2, "30"))[2]).toHaveTextContent(
-      "Improcedente15 · 50,0%"
+      "Recurso negado15 · 50,0%"
     )
   })
 
@@ -710,9 +704,9 @@ describe("outcome figure below the percentage floor", () => {
     await renderTheme()
 
     const rows = within(figureNumber(1)).getAllByTestId("outcome-row")
-    expect(rows[0]).toHaveTextContent("Procedente1 decisão")
-    expect(rows[1]).toHaveTextContent("Parcialmente procedente0 decisões")
-    expect(rows[2]).toHaveTextContent("Improcedente0 decisões")
+    expect(rows[0]).toHaveTextContent("Recurso aceito1 decisão")
+    expect(rows[1]).toHaveTextContent("Recurso aceito em parte0 decisões")
+    expect(rows[2]).toHaveTextContent("Recurso negado0 decisões")
   })
 
   it("names a one-decision figure in the singular", async () => {
@@ -757,7 +751,7 @@ describe("outcome figure below the percentage floor", () => {
     expect(figure).not.toHaveTextContent("%")
     expect(within(figure).queryByTestId("outcome-bar")).not.toBeInTheDocument()
     expect(within(figure).getAllByTestId("outcome-row")[0]).toHaveTextContent(
-      "Procedente2 decisões"
+      "Recurso aceito2 decisões"
     )
   })
 

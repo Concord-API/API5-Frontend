@@ -117,7 +117,7 @@ describe("panel block", () => {
     const block = await findBlock()
 
     expect(within(block).getByTestId("panel-rule")).toHaveTextContent(
-      "provimento do recurso (pretensão de quem recorreu)"
+      "recursos aceitos"
     )
     expect(within(block).getByTestId("panel-rule")).toHaveTextContent(
       "20 pontos ou mais"

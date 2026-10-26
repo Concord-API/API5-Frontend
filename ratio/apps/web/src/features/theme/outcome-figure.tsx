@@ -7,6 +7,7 @@ import {
   formatNumber,
   formatPercent,
 } from "@/lib/format"
+import { plainCategory, plainOutcome } from "@/lib/plain-outcome"
 
 type OutcomeFiguresProps = {
   breakdown: OutcomeFamily[]
@@ -57,7 +58,7 @@ function OutcomeFigure({
       source={source}
     >
       <p className="mb-4 font-mono text-[11px] text-muted-foreground">
-        {family.polarityLabel}
+        {plainOutcome(family.polarityLabel)}
       </p>
       <ul className="flex flex-col gap-3">
         {family.categories.map((category) => (
@@ -68,7 +69,7 @@ function OutcomeFigure({
           >
             <div className="flex items-baseline justify-between gap-4">
               <span className="font-sans text-[15px] text-foreground">
-                {category.outcome}
+                {plainCategory(family.polarityLabel, category.outcome)}
               </span>
               <span className="shrink-0 font-mono text-xs text-foreground">
                 {countLabel(category.count, category.ratio)}
