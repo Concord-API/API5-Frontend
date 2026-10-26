@@ -321,4 +321,46 @@ describe("panel block", () => {
       "4ª Câmara de Direito Público"
     )
   })
+  it("shows a button for each panel page with the current one marked", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+    const pages = within(courtSection(block, "TJSP")).getByRole("navigation", {
+      name: "Páginas das câmaras do TJSP",
+    })
+
+    expect(
+      within(pages).getByRole("button", { name: "Página 1" })
+    ).toHaveAttribute("aria-current", "page")
+    expect(
+      within(pages).getByRole("button", { name: "Página 2" })
+    ).not.toHaveAttribute("aria-current")
+    expect(within(pages).getByTestId("panel-range")).toHaveTextContent(
+      "Câmaras 1–10 de 12"
+    )
+  })
+  it("goes straight to the page of the button", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+    const user = userEvent.setup()
+
+    await renderTheme()
+    const block = await findBlock()
+    const court = courtSection(block, "TJSP")
+
+    await user.click(within(court).getByRole("button", { name: "Página 2" }))
+
+    expect(within(court).getAllByTestId("panel-row")).toHaveLength(2)
+    expect(
+      within(court).getByRole("button", { name: "Página 2" })
+    ).toHaveAttribute("aria-current", "page")
+  })
 })
