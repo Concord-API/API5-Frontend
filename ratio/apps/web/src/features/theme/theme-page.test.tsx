@@ -5,6 +5,7 @@ import { renderRoute } from "../../test/render"
 import { answerThemes, fullList } from "../../test/themes"
 import {
   answerThemeDetail,
+  answerThemePrecedents,
   answerThemeNetworkError,
   answerThemeNever,
   answerThemeNotFound,
@@ -399,6 +400,23 @@ describe("numbers in the summary text", () => {
     expect(screen.getByTestId("summary-body")).toHaveTextContent(
       "62,0% das 12.418 decisões"
     )
+  })
+})
+
+describe("side column", () => {
+  it("starts the yearly alignment at the top, beside the STJ theses", async () => {
+    answerThemeDetail()
+    answerThemePrecedents()
+
+    await renderTheme()
+
+    const theses = await screen.findByRole("region", {
+      name: "O que o STJ já decidiu sobre o assunto",
+    })
+    const yearly = screen.getByRole("region", { name: "Alinhamento por ano" })
+    const row = theses.closest("[data-testid='resumo-grid']")
+    expect(row).not.toBeNull()
+    expect(row).toContainElement(yearly)
   })
 })
 
