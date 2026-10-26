@@ -154,11 +154,15 @@ describe("yearly alignment bars", () => {
       })
       expect(box).toHaveClass("max-h-[320px]", "overflow-y-auto")
       expect(box).toHaveAttribute("tabindex", "0")
-      expect(within(box).getAllByTestId("yearly-alignment-row")).toHaveLength(21)
+      expect(within(box).getAllByTestId("yearly-alignment-row")).toHaveLength(
+        21
+      )
     })
 
     it("opens the box on the most recent years", () => {
-      vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(900)
+      vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(
+        900
+      )
 
       render(<YearlyAlignmentBars alignments={years} trend={null} />)
 
@@ -171,7 +175,9 @@ describe("yearly alignment bars", () => {
     it("says who won once when every year shares it", () => {
       render(<YearlyAlignmentBars alignments={years} trend={null} />)
 
-      expect(screen.getAllByText("quem entrou com a ação ganhou")).toHaveLength(1)
+      expect(screen.getAllByText("quem entrou com a ação ganhou")).toHaveLength(
+        1
+      )
     })
   })
 })

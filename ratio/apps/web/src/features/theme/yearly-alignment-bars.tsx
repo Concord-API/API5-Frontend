@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import type { YearlyAlignment, YearlyTrend } from "@/api/themes"
 import { formatNumber, formatPercent } from "@/lib/format"
 import { plainOutcome } from "@/lib/plain-outcome"
@@ -11,14 +12,26 @@ export function YearlyAlignmentBars({
   alignments,
   trend,
 }: YearlyAlignmentBarsProps) {
+  const box = useRef<HTMLDivElement>(null)
   const computedAlignments = alignments.filter(
     (alignment): alignment is YearlyAlignment & { percentage: number } =>
       alignment.percentage !== null
   )
 
+  useEffect(() => {
+    if (box.current) {
+      box.current.scrollTop = box.current.scrollHeight
+    }
+  }, [alignments])
+
   if (computedAlignments.length === 0) {
     return null
   }
+
+  const labels = new Set(
+    computedAlignments.map((alignment) => plainOutcome(alignment.polarityLabel))
+  )
+  const sharedLabel = labels.size === 1 ? [...labels][0] : null
 
   const latestYear = Math.max(
     ...computedAlignments.map((alignment) => alignment.year)
@@ -44,43 +57,58 @@ export function YearlyAlignmentBars({
           {formatPercent(trend.toPercentage)} na direção predominante
         </p>
       ) : null}
-      <ul className="flex flex-col gap-3 pt-4">
-        {computedAlignments.map((alignment) => (
-          <li
-            key={alignment.year}
-            data-testid="yearly-alignment-row"
-            data-latest={alignment.year === latestYear ? "true" : undefined}
-            className={`flex flex-col gap-1 ${
-              alignment.year === latestYear
-                ? "border-l-4 border-[#7B0D14] pl-3"
-                : ""
-            }`}
-          >
-            <div className="flex items-baseline justify-between gap-3">
-              <span
-                className={`font-mono text-xs text-foreground ${
-                  alignment.year === latestYear ? "font-bold" : ""
-                }`}
-              >
-                {alignment.year}
-              </span>
-              <span className="font-mono text-xs text-foreground">
-                {formatPercent(alignment.percentage)}
-                {` · n ${formatNumber(alignment.n)}`}
-              </span>
-            </div>
-            <div className="h-2 bg-[#E4CFCF]" aria-hidden="true">
-              <div
-                className="h-full bg-[#7B0D14]"
-                style={{ width: `${alignment.percentage * 100}%` }}
-              />
-            </div>
-            <span className="font-sans text-[13px] text-muted-foreground">
-              {plainOutcome(alignment.polarityLabel)}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {sharedLabel !== null && (
+        <p className="pt-2 font-sans text-[13px] text-muted-foreground">
+          {sharedLabel}
+        </p>
+      )}
+      <div
+        ref={box}
+        role="region"
+        tabIndex={0}
+        aria-label="Anos do alinhamento, role para ver todos"
+        className="mt-3 max-h-[320px] overflow-y-auto pr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        <ul className="flex flex-col gap-3">
+          {computedAlignments.map((alignment) => (
+            <li
+              key={alignment.year}
+              data-testid="yearly-alignment-row"
+              data-latest={alignment.year === latestYear ? "true" : undefined}
+              className={`flex flex-col gap-1 ${
+                alignment.year === latestYear
+                  ? "border-l-4 border-[#7B0D14] pl-3"
+                  : ""
+              }`}
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <span
+                  className={`font-mono text-xs text-foreground ${
+                    alignment.year === latestYear ? "font-bold" : ""
+                  }`}
+                >
+                  {alignment.year}
+                </span>
+                <span className="font-mono text-xs text-foreground">
+                  {formatPercent(alignment.percentage)}
+                  {` · n ${formatNumber(alignment.n)}`}
+                </span>
+              </div>
+              <div className="h-2 bg-[#E4CFCF]" aria-hidden="true">
+                <div
+                  className="h-full bg-[#7B0D14]"
+                  style={{ width: `${alignment.percentage * 100}%` }}
+                />
+              </div>
+              {sharedLabel === null && (
+                <span className="font-sans text-[13px] text-muted-foreground">
+                  {plainOutcome(alignment.polarityLabel)}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   )
 }
