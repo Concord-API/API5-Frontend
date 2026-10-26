@@ -9,6 +9,7 @@ import { CourtAlignmentList } from "@/features/theme/court-alignment-list"
 import { CaseSampleBlock } from "@/features/theme/case-sample-block"
 import { CourtBehaviourTable } from "@/features/theme/court-behaviour-table"
 import { PanelBlock } from "@/features/theme/panel-block"
+import { PrecedentBlock } from "@/features/theme/precedent-block"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
@@ -60,6 +61,7 @@ function Theme() {
         onChange={changeTab}
         resumo={
           <>
+            <PrecedentBlock themeKey={data.themeKey} />
             <div className="grid gap-10 lg:grid-cols-[minmax(0,690px)_250px] lg:items-start">
               <ThemeArticle
                 summary={data.summary}

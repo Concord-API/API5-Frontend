@@ -337,11 +337,71 @@ export function answerThemeCases(body: Record<string, unknown> = themeCases) {
   return requests
 }
 
+const temaLink = (number: number) =>
+  `https://processo.stj.jus.br/repetitivos/temas_repetitivos/pesquisa.jsp?novaConsulta=true&tipo_pesquisa=T&cod_tema_inicial=${number}&cod_tema_final=${number}`
+
+export const precedentSource = {
+  name: "STJ, Precedentes qualificados",
+  url: "https://dadosabertos.web.stj.jus.br/dataset/precedentes-qualificados",
+  extractedAt: "2026-10-20T10:00:00+00:00",
+}
+
+export function thesis(
+  number: number,
+  overrides: Record<string, unknown> = {}
+) {
+  return {
+    kind: "Tema",
+    number,
+    thesis: `Tese firmada no Tema ${number}.`,
+    question: `Questão do Tema ${number}.`,
+    status: "Trânsito em Julgado",
+    judgedAt: "2016-12-14",
+    judgingBody: "Segunda Seção",
+    link: temaLink(number),
+    ...overrides,
+  }
+}
+
+export const themePrecedents = {
+  themeKey: 412,
+  source: precedentSource,
+  precedents: [
+    thesis(952, {
+      thesis:
+        "O reajuste de mensalidade de plano de saúde fundado na mudança de faixa etária é válido.",
+    }),
+    thesis(1016, { judgedAt: "2022-03-23", status: "Acórdão Publicado" }),
+  ],
+}
+
+export const noPrecedents = {
+  themeKey: 412,
+  source: { ...precedentSource, extractedAt: null },
+  precedents: [],
+}
+
+export function answerThemePrecedents(
+  body: Record<string, unknown> = themePrecedents
+) {
+  const requests: URL[] = []
+  server.use(
+    http.get("/api/themes/:key/precedents", ({ request }) => {
+      requests.push(new URL(request.url))
+      return HttpResponse.json(body)
+    })
+  )
+  return requests
+}
+
 export function answerThemeDetail(body: Record<string, unknown> = themeDetail) {
   const requests: URL[] = []
   server.use(
     http.get("/api/themes/:key/cases", () => HttpResponse.json(noCases)),
     http.get("/api/themes/:key/panels", () => HttpResponse.json(noPanels)),
+    http.get("/api/themes/:key/precedents", () =>
+      HttpResponse.json(noPrecedents)
+    ),
     http.get("/api/themes/:key", ({ request }) => {
       requests.push(new URL(request.url))
       return HttpResponse.json(body)
