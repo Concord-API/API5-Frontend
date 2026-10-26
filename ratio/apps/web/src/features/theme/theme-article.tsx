@@ -2,7 +2,6 @@ import type { Provenance } from "@/api/provenance"
 import type { OutcomeFamily, ThemeSummaryText } from "@/api/themes"
 import { findUnavailable, type UnavailableBlock } from "@/api/unavailable"
 import { EmptyState } from "@/components/empty-state"
-import { MissingDataList } from "./missing-data-list"
 import { OutcomeFigures } from "./outcome-figure"
 import { SummarySegments } from "./summary-segments"
 
@@ -67,10 +66,6 @@ export function ThemeArticle({
         breakdown={outcomeBreakdown}
         partialTreatment={partialTreatment}
         provenance={provenance}
-      />
-      <MissingDataList
-        unavailable={unavailable}
-        blocks={["amountAwarded", "caseLawCitation", "citedDecisions"]}
       />
     </div>
   )
