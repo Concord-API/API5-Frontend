@@ -82,10 +82,7 @@ function Theme() {
         }
         base={
           <>
-            <CourtBehaviourTable
-              alignments={data.courtAlignments ?? []}
-              unavailable={data.unavailable}
-            />
+            <CourtBehaviourTable alignments={data.courtAlignments ?? []} />
             <PanelBlock themeKey={data.themeKey} />
             <DoctrineBlock
               doctrine={data.relatedDoctrine}

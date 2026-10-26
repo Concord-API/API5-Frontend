@@ -1,7 +1,6 @@
 import { render, screen, within } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import type { CourtAlignment } from "@/api/themes"
-import type { UnavailableBlock } from "@/api/unavailable"
 import { renderRoute } from "../../test/render"
 import { answerThemeDetail } from "../../test/theme-detail"
 import { CourtBehaviourTable } from "./court-behaviour-table"
@@ -24,20 +23,8 @@ const stj: CourtAlignment = {
   lastDecisionDate: "2026-07-02",
 }
 
-const amountMissing: UnavailableBlock = {
-  block: "amountAwarded",
-  reason: "sourceUnavailable",
-  message:
-    "O valor fixado não é campo estruturado no DataJud; ele só existe no inteiro teor da decisão.",
-}
-
-function renderTable(
-  alignments: CourtAlignment[] = [tjsp, stj],
-  unavailable: UnavailableBlock[] = [amountMissing]
-) {
-  render(
-    <CourtBehaviourTable alignments={alignments} unavailable={unavailable} />
-  )
+function renderTable(alignments: CourtAlignment[] = [tjsp, stj]) {
+  render(<CourtBehaviourTable alignments={alignments} />)
   return screen.queryByRole("table", { name: "Comportamento de cada tribunal" })
 }
 
@@ -61,12 +48,7 @@ describe("court behaviour table", () => {
       within(table)
         .getAllByRole("columnheader")
         .map((header) => header.textContent)
-    ).toEqual([
-      "Tribunal",
-      "Decisões",
-      "Alinhamento",
-      "Última decisão",
-    ])
+    ).toEqual(["Tribunal", "Decisões", "Alinhamento", "Última decisão"])
   })
 
   it("shows the decisions, the alignment and the last decision of each court", () => {
@@ -162,6 +144,8 @@ describe("court behaviour table", () => {
 
     expect(within(table).queryByText("Valor mediano")).not.toBeInTheDocument()
     expect(within(table).queryByText("sem fonte")).not.toBeInTheDocument()
-    expect(screen.queryByTestId("amount-unsourced-note")).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId("amount-unsourced-note")
+    ).not.toBeInTheDocument()
   })
 })
