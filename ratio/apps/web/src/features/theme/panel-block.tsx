@@ -10,6 +10,9 @@ import { formatCount, formatNumber, formatPercent } from "@/lib/format"
 
 const PANELS_PER_PAGE = 10
 
+const PAGE_BUTTON =
+  "tracking-[0.12em] uppercase underline decoration-[#C9C2B4] underline-offset-2 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-default disabled:no-underline disabled:opacity-40 disabled:hover:text-muted-foreground"
+
 function divergenceText(panel: PanelAlignment) {
   const points = formatNumber(Math.round(Math.abs(panel.distanceInPoints)))
   const side = panel.distanceInPoints > 0 ? "acima" : "abaixo"
@@ -52,9 +55,10 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
 
 function CourtBlock({ court }: { court: CourtPanels }) {
   const titleId = useId()
-  const [page] = useState(0)
+  const [page, setPage] = useState(0)
   const first = page * PANELS_PER_PAGE
   const shown = court.panels.slice(first, first + PANELS_PER_PAGE)
+  const last = first + shown.length >= court.panels.length
 
   return (
     <section aria-labelledby={titleId} className="pt-4">
@@ -78,12 +82,30 @@ function CourtBlock({ court }: { court: CourtPanels }) {
         ))}
       </ul>
       {court.panels.length > PANELS_PER_PAGE && (
-        <p
-          data-testid="panel-range"
-          className="pt-2 font-mono text-[11px] text-muted-foreground"
+        <nav
+          aria-label={`Páginas das câmaras do ${court.courtCode}`}
+          className="flex items-center gap-4 pt-2 font-mono text-[11px] text-muted-foreground"
         >
-          {`${first + 1}–${first + shown.length} de ${court.panels.length}`}
-        </p>
+          <button
+            type="button"
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+            className={PAGE_BUTTON}
+          >
+            Anterior
+          </button>
+          <span data-testid="panel-range">
+            {`${first + 1}–${first + shown.length} de ${court.panels.length}`}
+          </span>
+          <button
+            type="button"
+            disabled={last}
+            onClick={() => setPage(page + 1)}
+            className={PAGE_BUTTON}
+          >
+            Próxima
+          </button>
+        </nav>
       )}
       {court.outsidePanels > 0 && (
         <p
