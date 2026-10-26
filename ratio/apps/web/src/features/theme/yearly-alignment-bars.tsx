@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react"
 import type { YearlyAlignment, YearlyTrend } from "@/api/themes"
 import { formatNumber, formatPercent } from "@/lib/format"
 import { plainOutcome } from "@/lib/plain-outcome"
@@ -12,17 +11,10 @@ export function YearlyAlignmentBars({
   alignments,
   trend,
 }: YearlyAlignmentBarsProps) {
-  const box = useRef<HTMLDivElement>(null)
   const computedAlignments = alignments.filter(
     (alignment): alignment is YearlyAlignment & { percentage: number } =>
       alignment.percentage !== null
   )
-
-  useEffect(() => {
-    if (box.current) {
-      box.current.scrollTop = box.current.scrollHeight
-    }
-  }, [alignments])
 
   if (computedAlignments.length === 0) {
     return null
@@ -63,14 +55,13 @@ export function YearlyAlignmentBars({
         </p>
       )}
       <div
-        ref={box}
         role="region"
         tabIndex={0}
         aria-label="Anos do alinhamento, role para ver todos"
         className="mt-3 max-h-[320px] overflow-y-auto pr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <ul className="flex flex-col gap-3">
-          {computedAlignments.map((alignment) => (
+          {[...computedAlignments].reverse().map((alignment) => (
             <li
               key={alignment.year}
               data-testid="yearly-alignment-row"
