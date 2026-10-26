@@ -296,4 +296,29 @@ describe("panel block", () => {
       within(courtSection(block, "TJRJ")).getByTestId("panel-range")
     ).toHaveTextContent("1–10 de 12")
   })
+
+  it("shows the panel names in title case", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [
+        {
+          ...divergentCourt,
+          panels: [
+            {
+              ...divergentCourt.panels[0],
+              name: "4ª CÂMARA DE DIREITO PÚBLICO",
+            },
+          ],
+        },
+      ],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getByTestId("panel-row")).toHaveTextContent(
+      "4ª Câmara de Direito Público"
+    )
+  })
 })

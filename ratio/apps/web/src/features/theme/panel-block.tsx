@@ -6,6 +6,7 @@ import {
   type PanelAlignment,
   type ThemePanels,
 } from "@/api/panels"
+import { bodyName } from "@/lib/body-name"
 import { formatCount, formatNumber, formatPercent } from "@/lib/format"
 
 const PANELS_PER_PAGE = 10
@@ -31,7 +32,7 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
       }
     >
       <span className="font-sans text-[15px] text-foreground">
-        {panel.name}
+        {bodyName(panel.name)}
       </span>
       <span
         data-testid="panel-rate"
