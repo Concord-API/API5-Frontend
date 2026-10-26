@@ -10,7 +10,10 @@ describe("plain outcome", () => {
     ],
     ["acolhimento da pretensão de quem recorreu", "o recurso foi aceito"],
     ["provimento do recurso (pretensão do recorrente)", "o recurso foi aceito"],
-    ["provimento do recurso (pretensão de quem recorreu)", "o recurso foi aceito"],
+    [
+      "provimento do recurso (pretensão de quem recorreu)",
+      "o recurso foi aceito",
+    ],
     ["acolhimento da pretensão da Fazenda Pública", "a Fazenda Pública ganhou"],
     ["acolhimento da pretensão do credor/exequente", "o credor ganhou"],
     [
@@ -27,7 +30,9 @@ describe("plain outcome", () => {
 
   it("tells an appeal family apart", () => {
     expect(isAppeal("acolhimento da pretensão de quem recorreu")).toBe(true)
-    expect(isAppeal("provimento do recurso (pretensão do recorrente)")).toBe(true)
+    expect(isAppeal("provimento do recurso (pretensão do recorrente)")).toBe(
+      true
+    )
     expect(isAppeal("acolhimento da pretensão do autor")).toBe(false)
   })
 
@@ -36,12 +41,14 @@ describe("plain outcome", () => {
     ["Parcialmente procedente", "Recurso aceito em parte"],
     ["Improcedente", "Recurso negado"],
   ])("names the appeal outcome %s as %s", (outcome, plain) => {
-    expect(plainCategory("acolhimento da pretensão de quem recorreu", outcome)).toBe(plain)
+    expect(
+      plainCategory("acolhimento da pretensão de quem recorreu", outcome)
+    ).toBe(plain)
   })
 
   it("keeps the merit outcome names", () => {
-    expect(plainCategory("acolhimento da pretensão do autor", "Procedente")).toBe(
-      "Procedente"
-    )
+    expect(
+      plainCategory("acolhimento da pretensão do autor", "Procedente")
+    ).toBe("Procedente")
   })
 })

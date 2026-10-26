@@ -704,9 +704,9 @@ describe("outcome figure below the percentage floor", () => {
     await renderTheme()
 
     const rows = within(figureNumber(1)).getAllByTestId("outcome-row")
-    expect(rows[0]).toHaveTextContent("Procedente1 decisão")
-    expect(rows[1]).toHaveTextContent("Parcialmente procedente0 decisões")
-    expect(rows[2]).toHaveTextContent("Improcedente0 decisões")
+    expect(rows[0]).toHaveTextContent("Recurso aceito1 decisão")
+    expect(rows[1]).toHaveTextContent("Recurso aceito em parte0 decisões")
+    expect(rows[2]).toHaveTextContent("Recurso negado0 decisões")
   })
 
   it("names a one-decision figure in the singular", async () => {
@@ -751,7 +751,7 @@ describe("outcome figure below the percentage floor", () => {
     expect(figure).not.toHaveTextContent("%")
     expect(within(figure).queryByTestId("outcome-bar")).not.toBeInTheDocument()
     expect(within(figure).getAllByTestId("outcome-row")[0]).toHaveTextContent(
-      "Procedente2 decisões"
+      "Recurso aceito2 decisões"
     )
   })
 
