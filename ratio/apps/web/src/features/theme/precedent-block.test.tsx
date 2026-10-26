@@ -122,7 +122,9 @@ describe("STJ theses block", () => {
 
     await renderTheme()
 
-    expect(screen.queryByRole("region", { name: TITLE })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("region", { name: TITLE })
+    ).not.toBeInTheDocument()
   })
 
   it("keeps the theme page when the theses fail to load", async () => {
@@ -136,7 +138,9 @@ describe("STJ theses block", () => {
     await renderTheme()
 
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument()
-    expect(screen.queryByRole("region", { name: TITLE })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("region", { name: TITLE })
+    ).not.toBeInTheDocument()
   })
 
   it("shows a thesis without a judgment date", async () => {
@@ -144,12 +148,16 @@ describe("STJ theses block", () => {
     answerThemePrecedents({
       ...themePrecedents,
       source: precedentSource,
-      precedents: [thesis(1200, { judgedAt: null, judgingBody: null, status: "Afetado" })],
+      precedents: [
+        thesis(1200, { judgedAt: null, judgingBody: null, status: "Afetado" }),
+      ],
     })
 
     await renderTheme()
     const block = await findBlock()
 
-    expect(within(block).getByTestId("thesis-meta")).toHaveTextContent("Tema 1200 · Afetado")
+    expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
+      "Tema 1200 · Afetado"
+    )
   })
 })

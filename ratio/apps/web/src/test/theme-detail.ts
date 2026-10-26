@@ -346,7 +346,10 @@ export const precedentSource = {
   extractedAt: "2026-10-20T10:00:00+00:00",
 }
 
-export function thesis(number: number, overrides: Record<string, unknown> = {}) {
+export function thesis(
+  number: number,
+  overrides: Record<string, unknown> = {}
+) {
   return {
     kind: "Tema",
     number,
