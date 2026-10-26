@@ -1,4 +1,5 @@
 import { screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { renderRoute } from "../../test/render"
 import {
@@ -221,5 +222,60 @@ describe("panel block", () => {
     expect(
       within(court).queryByRole("button", { name: "Próxima" })
     ).not.toBeInTheDocument()
+  })
+  it("moves to the next panels of the court and back", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, divergentCourt],
+    })
+    const user = userEvent.setup()
+
+    await renderTheme()
+    const block = await findBlock()
+    const court = courtSection(block, "TJSP")
+
+    expect(
+      within(court).getByRole("button", { name: "Anterior" })
+    ).toBeDisabled()
+    await user.click(within(court).getByRole("button", { name: "Próxima" }))
+
+    const rows = within(court).getAllByTestId("panel-row")
+    expect(rows.map((row) => row.textContent)).toEqual([
+      expect.stringContaining("11ª Câmara de Direito Público"),
+      expect.stringContaining("12ª Câmara de Direito Público"),
+    ])
+    expect(within(court).getByTestId("panel-range")).toHaveTextContent(
+      "11–12 de 12"
+    )
+    expect(
+      within(court).getByRole("button", { name: "Próxima" })
+    ).toBeDisabled()
+
+    await user.click(within(court).getByRole("button", { name: "Anterior" }))
+
+    expect(within(court).getAllByTestId("panel-row")).toHaveLength(10)
+  })
+
+  it("pages one court without moving the others", async () => {
+    answerThemeDetail()
+    answerThemePanels({
+      ...themePanels,
+      courts: [crowdedCourt, { ...crowdedCourt, courtCode: "TJRJ" }],
+    })
+    const user = userEvent.setup()
+
+    await renderTheme()
+    const block = await findBlock()
+
+    await user.click(
+      within(courtSection(block, "TJSP")).getByRole("button", {
+        name: "Próxima",
+      })
+    )
+
+    expect(
+      within(courtSection(block, "TJRJ")).getByTestId("panel-range")
+    ).toHaveTextContent("1–10 de 12")
   })
 })
