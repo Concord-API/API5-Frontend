@@ -6,6 +6,7 @@ import {
   type PanelAlignment,
   type ThemePanels,
 } from "@/api/panels"
+import { bodyName } from "@/lib/body-name"
 import { formatCount, formatNumber, formatPercent } from "@/lib/format"
 
 function divergenceText(panel: PanelAlignment) {
@@ -26,7 +27,7 @@ function PanelRow({ panel }: { panel: PanelAlignment }) {
       }
     >
       <span className="font-sans text-[15px] text-foreground">
-        {panel.name}
+        {bodyName(panel.name)}
       </span>
       <span className="flex flex-col items-end gap-0.5">
         <span
