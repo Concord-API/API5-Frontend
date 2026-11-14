@@ -179,6 +179,8 @@ export const themeDetail = {
     methodologyVersion: "1.0",
   },
   scope: declaredScope,
+  citation:
+    "Inscrição indevida em cadastro de inadimplentes — Em 98,6% das 144 decisões julgadas, houve acolhimento da pretensão do autor. Fonte: DataJud/CNJ, 203 processos, extração de 28.08.2026. Escopo: TJMG, TJRJ e TJSP, matéria cível. Metodologia 1.0.",
 }
 
 export const themeNotFoundProblem = {
