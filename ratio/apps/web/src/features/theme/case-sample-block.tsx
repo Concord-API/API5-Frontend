@@ -7,7 +7,7 @@ import {
   type ThemeCases,
 } from "@/api/cases"
 import { findUnavailable } from "@/api/unavailable"
-import { formatDate } from "@/lib/format"
+import { formatDate, formatNumber } from "@/lib/format"
 
 const REPORTER_FALLBACK = "o relator não vem de forma estruturada na fonte."
 const AMOUNT_FALLBACK = "o valor depende do inteiro teor da decisão."
@@ -173,6 +173,14 @@ function SampleSection({ sample }: { sample: ThemeCases }) {
         >
           Exportar CSV
         </a>
+        {sample.total > sample.exportCeiling && (
+          <p
+            data-testid="export-ceiling"
+            className="pt-2 font-sans text-[13px] leading-relaxed text-muted-foreground italic"
+          >
+            {`A exportação traz as primeiras ${formatNumber(sample.exportCeiling)} de ${formatNumber(sample.total)} decisões.`}
+          </p>
+        )}
       </div>
     </section>
   )
