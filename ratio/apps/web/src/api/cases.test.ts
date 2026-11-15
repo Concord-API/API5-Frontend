@@ -37,6 +37,7 @@ const response = {
     "julgamento mais recente primeiro; empate pelo número do processo; processos em sigilo no fim",
   shown: 2,
   sampleLabel: "2 de 12.418 decisões",
+  exportCeiling: 10000,
   unavailable: [
     {
       block: "reporterJudge",
@@ -62,5 +63,16 @@ describe("themeCasesSchema", () => {
     delete withoutOrdering.ordering
 
     expect(themeCasesSchema.safeParse(withoutOrdering).success).toBe(false)
+  })
+
+  it("reads the export ceiling the API declares", () => {
+    expect(themeCasesSchema.parse(response).exportCeiling).toBe(10000)
+  })
+
+  it("refuses a sample without the export ceiling", () => {
+    const withoutCeiling: Record<string, unknown> = { ...response }
+    delete withoutCeiling.exportCeiling
+
+    expect(themeCasesSchema.safeParse(withoutCeiling).success).toBe(false)
   })
 })
