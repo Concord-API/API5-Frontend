@@ -23,29 +23,6 @@ function panelOf(sampleCase: SampleCase) {
     .join(" · ")
 }
 
-function CourtLink({ sampleCase }: { sampleCase: SampleCase }) {
-  if (sampleCase.sourceLink === null) {
-    return null
-  }
-
-  return (
-    <span className="block pt-1 font-sans text-[12px] text-muted-foreground">
-      <a
-        href={sampleCase.sourceLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Consultar no tribunal o processo ${sampleCase.caseNumber ?? ""}`.trim()}
-        className="text-primary underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-      >
-        consultar no tribunal
-      </a>
-      {sampleCase.sourceLinkType === "portal" && (
-        <span data-testid="portal-hint"> · cole o número no portal</span>
-      )}
-    </span>
-  )
-}
-
 function SealedRow() {
   return (
     <tr
@@ -73,7 +50,6 @@ function CaseRow({ sampleCase }: { sampleCase: SampleCase }) {
         <span className="block text-primary">
           {sampleCase.caseNumber ?? "—"}
         </span>
-        <CourtLink sampleCase={sampleCase} />
       </td>
       <td className={MONO}>{panelOf(sampleCase) || "—"}</td>
       <td className={UNSOURCED}>sem fonte</td>
