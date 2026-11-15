@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useId } from "react"
 import {
   themeCasesQueryOptions,
+  themeExportUrl,
   type SampleCase,
   type ThemeCases,
 } from "@/api/cases"
@@ -164,6 +165,15 @@ function SampleSection({ sample }: { sample: ThemeCases }) {
       >
         {`Relator: ${reporter?.message ?? REPORTER_FALLBACK} Valor: ${amount?.message ?? AMOUNT_FALLBACK}`}
       </p>
+      <div className="mt-4 border-t border-[#DCD6C9] pt-3">
+        <a
+          href={themeExportUrl(sample.themeKey)}
+          download
+          className="inline-block rounded-[3px] border border-[#C9C2B4] px-4 py-2 font-mono text-xs font-semibold tracking-[0.14em] text-foreground uppercase hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          Exportar CSV
+        </a>
+      </div>
     </section>
   )
 }
