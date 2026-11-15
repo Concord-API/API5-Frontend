@@ -24,6 +24,7 @@ export const themeCasesSchema = z.object({
   ordering: z.string().min(1),
   shown: z.number().int(),
   sampleLabel: z.string().min(1),
+  exportCeiling: z.number().int(),
   unavailable: z.array(unavailableBlockSchema),
 })
 
