@@ -149,6 +149,7 @@ export const themeDetailSchema = z.object({
   relatedDoctrine: relatedDoctrineSchema,
   provenance: provenanceSchema,
   scope: scopeSchema,
+  citation: z.string().nullable(),
 })
 
 export type ThemeSummary = z.infer<typeof themeSummarySchema>
