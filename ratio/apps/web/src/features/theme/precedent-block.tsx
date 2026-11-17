@@ -38,9 +38,26 @@ function statusOf(precedent: ThemePrecedent) {
     : `Situação: ${precedent.status}, atualizada em ${statusDate}`
 }
 
+function isCancelled(precedent: ThemePrecedent) {
+  return /^cancelad/i.test(precedent.status.trim())
+}
+
 function ThesisItem({ precedent }: { precedent: ThemePrecedent }) {
+  const cancelled = isCancelled(precedent)
+
   return (
-    <li className="flex flex-col gap-2 border-t border-[#E8E3D8] py-4 first:border-t-0">
+    <li
+      data-cancelled={cancelled}
+      className="flex flex-col gap-2 border-t border-[#E8E3D8] py-4 first:border-t-0"
+    >
+      {cancelled && (
+        <span
+          data-testid="thesis-cancelled"
+          className="self-start rounded-[3px] bg-primary px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.12em] text-primary-foreground uppercase"
+        >
+          Cancelado
+        </span>
+      )}
       <p
         data-testid="thesis-meta"
         className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase"
@@ -53,9 +70,25 @@ function ThesisItem({ precedent }: { precedent: ThemePrecedent }) {
       >
         {statusOf(precedent)}
       </p>
+      {precedent.suspendsCases === true && (
+        <p
+          data-testid="thesis-suspension"
+          className="font-sans text-[13px] font-semibold text-foreground"
+        >
+          Suspensão de processos ativa
+        </p>
+      )}
       <blockquote className="border-l-2 border-primary pl-4 font-sans text-[16px] leading-relaxed text-foreground">
         {precedent.thesis}
       </blockquote>
+      {precedent.leadingCases.length > 0 && (
+        <p
+          data-testid="leading-cases"
+          className="font-mono text-[11px] text-muted-foreground"
+        >
+          {`Processos paradigma: ${precedent.leadingCases.join(", ")}`}
+        </p>
+      )}
       <a
         href={precedent.link}
         target="_blank"
