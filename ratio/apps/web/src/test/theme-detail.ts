@@ -376,6 +376,10 @@ export function thesis(
     judgedAt: "2016-12-14",
     judgingBody: "Segunda Seção",
     link: temaLink(number),
+    type: "tema_repetitivo",
+    statusDate: "2017-03-02",
+    suspendsCases: false,
+    leadingCases: [],
     ...overrides,
   }
 }

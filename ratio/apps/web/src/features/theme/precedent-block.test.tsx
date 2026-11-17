@@ -48,7 +48,7 @@ describe("STJ theses block", () => {
     )
   })
 
-  it("names the theme, the judging body, the date and the status", async () => {
+  it("names the type, the number, the court, the judging body and the date", async () => {
     answerThemeDetail()
     answerThemePrecedents()
 
@@ -56,7 +56,49 @@ describe("STJ theses block", () => {
     const block = await findBlock()
 
     expect(within(block).getAllByTestId("thesis-meta")[0]).toHaveTextContent(
-      "Tema 952 · Segunda Seção · julgado em 14.12.2016 · Trânsito em Julgado"
+      "Tema repetitivo 952 · STJ · Segunda Seção · julgado em 14.12.2016"
+    )
+  })
+
+  it("shows the status with the date it was last updated", async () => {
+    answerThemeDetail()
+    answerThemePrecedents()
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getAllByTestId("thesis-status")[0]).toHaveTextContent(
+      "Situação: Trânsito em Julgado, atualizada em 02.03.2017"
+    )
+  })
+
+  it("names the court of a general repercussion as the STF", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(1046, { type: "repercussao_geral", kind: "Tema" })],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
+      "Repercussão geral 1046 · STF"
+    )
+  })
+
+  it("shows the kind and no court when the source gives no type", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(952, { type: null })],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
+      /^Tema 952 · Segunda Seção · julgado em 14\.12\.2016$/
     )
   })
 
@@ -149,7 +191,12 @@ describe("STJ theses block", () => {
       ...themePrecedents,
       source: precedentSource,
       precedents: [
-        thesis(1200, { judgedAt: null, judgingBody: null, status: "Afetado" }),
+        thesis(1200, {
+          judgedAt: null,
+          judgingBody: null,
+          status: "Afetado",
+          statusDate: null,
+        }),
       ],
     })
 
@@ -157,7 +204,10 @@ describe("STJ theses block", () => {
     const block = await findBlock()
 
     expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
-      "Tema 1200 · Afetado"
+      /^Tema repetitivo 1200 · STJ$/
+    )
+    expect(within(block).getByTestId("thesis-status")).toHaveTextContent(
+      /^Situação: Afetado$/
     )
   })
 })
