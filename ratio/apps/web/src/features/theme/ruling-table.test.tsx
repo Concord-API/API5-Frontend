@@ -86,14 +86,25 @@ describe("court rulings table", () => {
     )
   })
 
-  it("shows nothing when the theme has no rulings", async () => {
+  it("explains when a court has no authorized rulings source", async () => {
     answerThemeDetail()
     answerThemeRulings(noRulings)
 
     await renderTheme()
+    const block = await findBlock()
 
-    expect(
-      screen.queryByRole("region", { name: "Acórdãos do tema" })
-    ).toBeNull()
+    expect(block).toHaveTextContent(
+      "Não há acórdãos disponíveis para este tema na fonte carregada."
+    )
+    expect(block).toHaveTextContent(
+      "TJMG, TJRJ e TJSP não possuem fonte oficial autorizada para coleta automatizada neste produto."
+    )
+    expect(block).toHaveTextContent(
+      "Isso não significa que esses tribunais não tenham decisões sobre o tema."
+    )
+    expect(within(block).getByRole("link")).toHaveTextContent(
+      "Entenda por que este dado falta"
+    )
+    expect(block).not.toHaveTextContent("0 decisões")
   })
 })

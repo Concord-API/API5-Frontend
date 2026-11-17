@@ -6,6 +6,7 @@ import {
   type CourtRuling,
   type ThemeRulings,
 } from "@/api/rulings"
+import { EmptyState } from "@/components/empty-state"
 import { formatDate, formatExtractionDate } from "@/lib/format"
 
 const HEADER =
@@ -124,11 +125,52 @@ function RulingSection({ data }: { data: ThemeRulings }) {
   )
 }
 
-export function RulingTable({ themeKey }: { themeKey: number }) {
+function RulingUnavailableSection({ courtCodes }: { courtCodes: string[] }) {
+  const titleId = useId()
+  const courtScope = new Intl.ListFormat("pt-BR", {
+    style: "long",
+    type: "conjunction",
+  }).format(courtCodes)
+
+  return (
+    <section
+      aria-labelledby={titleId}
+      className="mt-10 w-full max-w-[1110px] min-w-0 border border-[#DCD6C9] bg-card px-5 py-4"
+    >
+      <h2
+        id={titleId}
+        className="border-b border-foreground pb-2 font-sans text-[15px] font-bold text-foreground"
+      >
+        Acórdãos do tema
+      </h2>
+      <div className="pt-3">
+        <EmptyState
+          item={{
+            block: "Acórdãos do tema",
+            reason: "sourceUnavailable",
+            message: `Não há acórdãos disponíveis para este tema na fonte carregada. ${courtScope} não possuem fonte oficial autorizada para coleta automatizada neste produto. Isso não significa que esses tribunais não tenham decisões sobre o tema.`,
+          }}
+        />
+      </div>
+    </section>
+  )
+}
+
+export function RulingTable({
+  themeKey,
+  courtCodes,
+}: {
+  themeKey: number
+  courtCodes: string[]
+}) {
   const { data } = useQuery(themeRulingsQueryOptions(themeKey))
 
-  if (data === undefined || data.rulings.length === 0) {
+  if (data === undefined) {
     return null
+  }
+
+  if (data.rulings.length === 0) {
+    return <RulingUnavailableSection courtCodes={courtCodes} />
   }
 
   return <RulingSection data={data} />

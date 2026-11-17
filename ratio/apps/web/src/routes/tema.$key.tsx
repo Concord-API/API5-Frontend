@@ -95,7 +95,10 @@ function Theme() {
               doctrine={data.relatedDoctrine}
               unavailable={data.unavailable}
             />
-            <RulingTable themeKey={data.themeKey} />
+            <RulingTable
+              themeKey={data.themeKey}
+              courtCodes={data.scope.courts.map((court) => court.code)}
+            />
             <CaseSampleBlock themeKey={data.themeKey} />
           </>
         }
