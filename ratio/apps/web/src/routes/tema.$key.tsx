@@ -11,6 +11,7 @@ import { CopyCitationButton } from "@/features/theme/copy-citation-button"
 import { CourtBehaviourTable } from "@/features/theme/court-behaviour-table"
 import { PanelBlock } from "@/features/theme/panel-block"
 import { PrecedentBlock } from "@/features/theme/precedent-block"
+import { RulingTable } from "@/features/theme/ruling-table"
 import { ThemeArticle } from "@/features/theme/theme-article"
 import { ThemeBackLink } from "@/features/theme/theme-back-link"
 import { ThemeFrame } from "@/features/theme/theme-frame"
@@ -94,6 +95,7 @@ function Theme() {
               doctrine={data.relatedDoctrine}
               unavailable={data.unavailable}
             />
+            <RulingTable themeKey={data.themeKey} />
             <CaseSampleBlock themeKey={data.themeKey} />
           </>
         }
