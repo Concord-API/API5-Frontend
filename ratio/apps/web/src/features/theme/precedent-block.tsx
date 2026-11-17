@@ -10,16 +10,32 @@ import { formatDate, formatExtractionDate } from "@/lib/format"
 
 const VISIBLE = 3
 
+const TYPES: Record<string, { label: string; court: string | null }> = {
+  sumula: { label: "Súmula", court: null },
+  tema_repetitivo: { label: "Tema repetitivo", court: "STJ" },
+  irdr: { label: "IRDR", court: null },
+  iac: { label: "IAC", court: null },
+  repercussao_geral: { label: "Repercussão geral", court: "STF" },
+}
+
 function metaOf(precedent: ThemePrecedent) {
+  const type = precedent.type === null ? undefined : TYPES[precedent.type]
   const judgedAt = formatDate(precedent.judgedAt)
   return [
-    `${precedent.kind} ${precedent.number}`,
+    `${type?.label ?? precedent.kind} ${precedent.number}`,
+    type?.court ?? null,
     precedent.judgingBody,
     judgedAt === null ? null : `julgado em ${judgedAt}`,
-    precedent.status,
   ]
     .filter((part) => part !== null)
     .join(" · ")
+}
+
+function statusOf(precedent: ThemePrecedent) {
+  const statusDate = formatDate(precedent.statusDate)
+  return statusDate === null
+    ? `Situação: ${precedent.status}`
+    : `Situação: ${precedent.status}, atualizada em ${statusDate}`
 }
 
 function ThesisItem({ precedent }: { precedent: ThemePrecedent }) {
@@ -30,6 +46,12 @@ function ThesisItem({ precedent }: { precedent: ThemePrecedent }) {
         className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase"
       >
         {metaOf(precedent)}
+      </p>
+      <p
+        data-testid="thesis-status"
+        className="font-sans text-[13px] text-muted-foreground"
+      >
+        {statusOf(precedent)}
       </p>
       <blockquote className="border-l-2 border-primary pl-4 font-sans text-[16px] leading-relaxed text-foreground">
         {precedent.thesis}
