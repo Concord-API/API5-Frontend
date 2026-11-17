@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query"
 import { z } from "zod"
-import { getJson } from "./client"
+import { apiUrl, getJson } from "./client"
 import { unavailableBlockSchema } from "./unavailable"
 
 export const sampleCaseSchema = z.object({
@@ -24,6 +24,7 @@ export const themeCasesSchema = z.object({
   ordering: z.string().min(1),
   shown: z.number().int(),
   sampleLabel: z.string().min(1),
+  exportCeiling: z.number().int(),
   unavailable: z.array(unavailableBlockSchema),
 })
 
@@ -32,6 +33,10 @@ export type ThemeCases = z.infer<typeof themeCasesSchema>
 
 export function fetchThemeCases(key: number) {
   return getJson(`/api/themes/${key}/cases`, themeCasesSchema)
+}
+
+export function themeExportUrl(key: number) {
+  return apiUrl(`/api/themes/${key}/export?format=csv`)
 }
 
 export function themeCasesQueryOptions(key: number) {

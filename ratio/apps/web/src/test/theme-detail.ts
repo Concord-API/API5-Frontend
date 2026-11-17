@@ -319,6 +319,7 @@ export const themeCases = {
     "julgamento mais recente primeiro; empate pelo número do processo; processos em sigilo no fim",
   shown: 3,
   sampleLabel: "3 de 145 decisões",
+  exportCeiling: 10000,
   unavailable: [
     {
       block: "reporterJudge",
