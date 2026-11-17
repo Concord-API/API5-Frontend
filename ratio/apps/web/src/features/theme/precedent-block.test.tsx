@@ -72,6 +72,65 @@ describe("STJ theses block", () => {
     )
   })
 
+  it("warns when the precedent suspends the related cases", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(952, { suspendsCases: true }), thesis(1016)],
+    })
+
+    await renderTheme()
+    const [suspending, other] = within(await findBlock()).getAllByRole(
+      "listitem"
+    )
+
+    expect(
+      within(suspending).getByTestId("thesis-suspension")
+    ).toHaveTextContent("Suspensão de processos ativa")
+    expect(within(other).queryByTestId("thesis-suspension")).toBeNull()
+  })
+
+  it("lists the leading cases of the precedent", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [
+        thesis(952, { leadingCases: ["REsp 1568244/RJ", "REsp 1280211/SP"] }),
+        thesis(1016),
+      ],
+    })
+
+    await renderTheme()
+    const [withCases, withoutCases] = within(await findBlock()).getAllByRole(
+      "listitem"
+    )
+
+    expect(within(withCases).getByTestId("leading-cases")).toHaveTextContent(
+      "Processos paradigma: REsp 1568244/RJ, REsp 1280211/SP"
+    )
+    expect(within(withoutCases).queryByTestId("leading-cases")).toBeNull()
+  })
+
+  it("marks a cancelled precedent so it is not cited by mistake", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(400, { status: "Cancelado" }), thesis(1016)],
+    })
+
+    await renderTheme()
+    const [cancelled, current] = within(await findBlock()).getAllByRole(
+      "listitem"
+    )
+
+    expect(cancelled).toHaveAttribute("data-cancelled", "true")
+    expect(within(cancelled).getByTestId("thesis-cancelled")).toHaveTextContent(
+      "Cancelado"
+    )
+    expect(current).toHaveAttribute("data-cancelled", "false")
+    expect(within(current).queryByTestId("thesis-cancelled")).toBeNull()
+  })
+
   it("names the court of a general repercussion as the STF", async () => {
     answerThemeDetail()
     answerThemePrecedents({
