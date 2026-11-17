@@ -6,6 +6,7 @@ import {
   type ThemePrecedent,
   type ThemePrecedents,
 } from "@/api/precedents"
+import { EmptyState } from "@/components/empty-state"
 import { formatDate, formatExtractionDate } from "@/lib/format"
 
 const VISIBLE = 3
@@ -156,11 +157,45 @@ function PrecedentSection({ data }: { data: ThemePrecedents }) {
   )
 }
 
+const NO_RELATED_PRECEDENT =
+  "Nenhum precedente qualificado foi relacionado aos assuntos deste tema. A fonte carregada traz os temas repetitivos do STJ; súmulas, IRDR, IAC e repercussão geral ainda não têm fonte autorizada para coleta neste produto."
+
+function PrecedentUnavailableSection() {
+  const titleId = useId()
+
+  return (
+    <section
+      aria-labelledby={titleId}
+      className="mt-10 w-full max-w-[690px] border border-[#DCD6C9] bg-card px-5 py-4"
+    >
+      <h2
+        id={titleId}
+        className="border-b border-foreground pb-2 font-sans text-[15px] font-bold text-foreground"
+      >
+        O que o STJ já decidiu sobre o assunto
+      </h2>
+      <div className="pt-3">
+        <EmptyState
+          item={{
+            block: "relatedPrecedents",
+            reason: "notApplicable",
+            message: NO_RELATED_PRECEDENT,
+          }}
+        />
+      </div>
+    </section>
+  )
+}
+
 export function PrecedentBlock({ themeKey }: { themeKey: number }) {
   const { data } = useQuery(themePrecedentsQueryOptions(themeKey))
 
-  if (data === undefined || data.precedents.length === 0) {
+  if (data === undefined) {
     return null
+  }
+
+  if (data.precedents.length === 0) {
+    return <PrecedentUnavailableSection />
   }
 
   return <PrecedentSection data={data} />
