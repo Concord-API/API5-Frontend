@@ -10,30 +10,85 @@ import { formatDate, formatExtractionDate } from "@/lib/format"
 
 const VISIBLE = 3
 
+const TYPES: Record<string, { label: string; court: string | null }> = {
+  sumula: { label: "Súmula", court: null },
+  tema_repetitivo: { label: "Tema repetitivo", court: "STJ" },
+  irdr: { label: "IRDR", court: null },
+  iac: { label: "IAC", court: null },
+  repercussao_geral: { label: "Repercussão geral", court: "STF" },
+}
+
 function metaOf(precedent: ThemePrecedent) {
+  const type = precedent.type === null ? undefined : TYPES[precedent.type]
   const judgedAt = formatDate(precedent.judgedAt)
   return [
-    `${precedent.kind} ${precedent.number}`,
+    `${type?.label ?? precedent.kind} ${precedent.number}`,
+    type?.court ?? null,
     precedent.judgingBody,
     judgedAt === null ? null : `julgado em ${judgedAt}`,
-    precedent.status,
   ]
     .filter((part) => part !== null)
     .join(" · ")
 }
 
+function statusOf(precedent: ThemePrecedent) {
+  const statusDate = formatDate(precedent.statusDate)
+  return statusDate === null
+    ? `Situação: ${precedent.status}`
+    : `Situação: ${precedent.status}, atualizada em ${statusDate}`
+}
+
+function isCancelled(precedent: ThemePrecedent) {
+  return /^cancelad/i.test(precedent.status.trim())
+}
+
 function ThesisItem({ precedent }: { precedent: ThemePrecedent }) {
+  const cancelled = isCancelled(precedent)
+
   return (
-    <li className="flex flex-col gap-2 border-t border-[#E8E3D8] py-4 first:border-t-0">
+    <li
+      data-cancelled={cancelled}
+      className="flex flex-col gap-2 border-t border-[#E8E3D8] py-4 first:border-t-0"
+    >
+      {cancelled && (
+        <span
+          data-testid="thesis-cancelled"
+          className="self-start rounded-[3px] bg-primary px-2 py-0.5 font-mono text-[10px] font-semibold tracking-[0.12em] text-primary-foreground uppercase"
+        >
+          Cancelado
+        </span>
+      )}
       <p
         data-testid="thesis-meta"
         className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase"
       >
         {metaOf(precedent)}
       </p>
+      <p
+        data-testid="thesis-status"
+        className="font-sans text-[13px] text-muted-foreground"
+      >
+        {statusOf(precedent)}
+      </p>
+      {precedent.suspendsCases === true && (
+        <p
+          data-testid="thesis-suspension"
+          className="font-sans text-[13px] font-semibold text-foreground"
+        >
+          Suspensão de processos ativa
+        </p>
+      )}
       <blockquote className="border-l-2 border-primary pl-4 font-sans text-[16px] leading-relaxed text-foreground">
         {precedent.thesis}
       </blockquote>
+      {precedent.leadingCases.length > 0 && (
+        <p
+          data-testid="leading-cases"
+          className="font-mono text-[11px] text-muted-foreground"
+        >
+          {`Processos paradigma: ${precedent.leadingCases.join(", ")}`}
+        </p>
+      )}
       <a
         href={precedent.link}
         target="_blank"

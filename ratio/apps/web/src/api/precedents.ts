@@ -11,6 +11,10 @@ export const themePrecedentSchema = z.object({
   judgedAt: z.string().nullable(),
   judgingBody: z.string().nullable(),
   link: z.url({ protocol: /^https$/ }),
+  type: z.string().nullable(),
+  statusDate: z.string().nullable(),
+  suspendsCases: z.boolean().nullable(),
+  leadingCases: z.array(z.string()),
 })
 
 export const themePrecedentsSchema = z.object({
