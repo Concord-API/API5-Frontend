@@ -217,15 +217,33 @@ describe("STJ theses block", () => {
     expect(within(block).getAllByRole("listitem")).toHaveLength(5)
   })
 
-  it("shows no block for a theme without a thesis", async () => {
+  it("explains in the block why a theme has no related precedent", async () => {
     answerThemeDetail()
     answerThemePrecedents(noPrecedents)
 
     await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).queryAllByRole("listitem")).toHaveLength(0)
+    const note = within(block).getByRole("note")
+    expect(note).toHaveAttribute("data-reason", "notApplicable")
+    expect(note).toHaveTextContent(
+      "Nenhum precedente qualificado foi relacionado aos assuntos deste tema. A fonte carregada traz os temas repetitivos do STJ; súmulas, IRDR, IAC e repercussão geral ainda não têm fonte autorizada para coleta neste produto."
+    )
+  })
+
+  it("links the explanation of a theme without precedents to the limitations page", async () => {
+    answerThemeDetail()
+    answerThemePrecedents(noPrecedents)
+
+    await renderTheme()
+    const block = await findBlock()
 
     expect(
-      screen.queryByRole("region", { name: TITLE })
-    ).not.toBeInTheDocument()
+      within(block).getByRole("link", {
+        name: "Entenda por que este dado falta",
+      })
+    ).toHaveAttribute("href", "/limitacoes#notApplicable")
   })
 
   it("keeps the theme page when the theses fail to load", async () => {
