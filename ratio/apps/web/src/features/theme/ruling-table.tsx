@@ -7,7 +7,11 @@ import {
   type ThemeRulings,
 } from "@/api/rulings"
 import { EmptyState } from "@/components/empty-state"
-import { formatDate, formatExtractionDate } from "@/lib/format"
+import {
+  formatDate,
+  formatExtractionDate,
+  formatSimilarity,
+} from "@/lib/format"
 
 const HEADER =
   "border-b border-foreground px-3 py-2 font-sans text-[13px] font-semibold tracking-[0.04em] text-foreground [font-variant-caps:all-small-caps]"
@@ -18,6 +22,17 @@ function bodyOf(ruling: CourtRuling) {
   return [ruling.court, ruling.judgingBody]
     .filter((part) => part !== null)
     .join(" · ")
+}
+
+function tieOf({ tie }: CourtRuling) {
+  if (tie.method === "caseNumber") {
+    return "Ligado ao tema pelo número do processo"
+  }
+  const similarity =
+    tie.similarity === null ? "" : ` ${formatSimilarity(tie.similarity)}`
+  const threshold =
+    tie.threshold === null ? "" : ` (limite ${formatSimilarity(tie.threshold)})`
+  return `Relacionado ao tema por similaridade semântica${similarity}${threshold}`
 }
 
 function RulingRow({ ruling }: { ruling: CourtRuling }) {
@@ -44,6 +59,12 @@ function RulingRow({ ruling }: { ruling: CourtRuling }) {
       </td>
       <td className={`${CELL} min-w-[320px] leading-relaxed`}>
         {ruling.summary}
+        <span
+          data-testid="ruling-tie"
+          className="block pt-1 font-mono text-[11px] text-muted-foreground"
+        >
+          {tieOf(ruling)}
+        </span>
       </td>
     </tr>
   )

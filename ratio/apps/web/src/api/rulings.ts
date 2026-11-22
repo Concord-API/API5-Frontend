@@ -10,6 +10,11 @@ export const courtRulingSchema = z.object({
   judgedAt: z.string().nullable(),
   summary: z.string().min(1),
   link: z.url({ protocol: /^https$/ }),
+  tie: z.object({
+    method: z.enum(["caseNumber", "similarity"]),
+    similarity: z.number().min(0).max(1).nullable(),
+    threshold: z.number().min(0).max(1).nullable(),
+  }),
 })
 
 export const themeRulingsSchema = z.object({
