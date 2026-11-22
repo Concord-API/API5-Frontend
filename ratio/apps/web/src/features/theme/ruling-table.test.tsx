@@ -43,6 +43,22 @@ describe("court rulings table", () => {
     expect(second).toHaveTextContent("Ementa anterior publicada pelo STJ.")
   })
 
+  it("declares how each ruling is tied to the theme", async () => {
+    answerThemeDetail()
+    answerThemeRulings()
+
+    await renderTheme()
+    const block = await findBlock()
+    const [, first, second] = within(block).getAllByRole("row")
+
+    expect(within(first).getByTestId("ruling-tie")).toHaveTextContent(
+      "Ligado ao tema pelo número do processo"
+    )
+    expect(within(second).getByTestId("ruling-tie")).toHaveTextContent(
+      "Relacionado ao tema por similaridade semântica 0,72 (limite 0,55)"
+    )
+  })
+
   it("states the sample, ordering, source and extraction date", async () => {
     answerThemeDetail()
     answerThemeRulings()

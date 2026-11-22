@@ -17,6 +17,7 @@ const response = {
       judgedAt: "2025-02-10",
       summary: "Ementa publicada pelo tribunal.",
       link: "https://processo.stj.jus.br/123",
+      tie: { method: "similarity", similarity: 0.72, threshold: 0.55 },
     },
   ],
   total: 12,
@@ -27,6 +28,20 @@ const response = {
 }
 
 describe("themeRulingsSchema", () => {
+  it("rejects a ruling without its declared tie to the theme", () => {
+    const result = themeRulingsSchema.safeParse({
+      ...response,
+      rulings: [
+        {
+          ...response.rulings[0],
+          tie: { method: "guess", similarity: null, threshold: null },
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+  })
+
   it("reads the court rulings contract", () => {
     expect(themeRulingsSchema.parse(response)).toEqual(response)
   })
