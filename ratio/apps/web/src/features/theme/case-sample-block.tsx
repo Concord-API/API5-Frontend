@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { useId } from "react"
 import {
   themeCasesQueryOptions,
@@ -36,7 +37,36 @@ function SealedRow() {
   )
 }
 
-function CaseRow({ sampleCase }: { sampleCase: SampleCase }) {
+function CaseNumber({
+  sampleCase,
+  themeKey,
+}: {
+  sampleCase: SampleCase
+  themeKey: number
+}) {
+  if (sampleCase.caseNumber === null) {
+    return <span className="block text-primary">—</span>
+  }
+
+  return (
+    <Link
+      to="/processo/$numero"
+      params={{ numero: sampleCase.caseNumber }}
+      search={{ tema: themeKey }}
+      className="block text-primary underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      {sampleCase.caseNumber}
+    </Link>
+  )
+}
+
+function CaseRow({
+  sampleCase,
+  themeKey,
+}: {
+  sampleCase: SampleCase
+  themeKey: number
+}) {
   if (sampleCase.sealed) {
     return <SealedRow />
   }
@@ -47,9 +77,7 @@ function CaseRow({ sampleCase }: { sampleCase: SampleCase }) {
       className="border-b border-[#E8E3D8] last:border-b-0"
     >
       <td className={MONO}>
-        <span className="block text-primary">
-          {sampleCase.caseNumber ?? "—"}
-        </span>
+        <CaseNumber sampleCase={sampleCase} themeKey={themeKey} />
       </td>
       <td className={MONO}>{panelOf(sampleCase) || "—"}</td>
       <td className={UNSOURCED}>sem fonte</td>
@@ -123,6 +151,7 @@ function SampleSection({ sample }: { sample: ThemeCases }) {
               <CaseRow
                 key={sampleCase.caseNumber ?? `sigilo-${index}`}
                 sampleCase={sampleCase}
+                themeKey={sample.themeKey}
               />
             ))}
           </tbody>
