@@ -68,7 +68,7 @@ function Case() {
   return (
     <ThemeFrame>
       <CaseBackLink themeKey={tema} />
-      <CaseView detail={data} />
+      <CaseView detail={data} number={numero} />
     </ThemeFrame>
   )
 }

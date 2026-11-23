@@ -54,3 +54,23 @@ export function answerCaseNotFound() {
     )
   )
 }
+
+export function unavailableCase(
+  status: string,
+  message: string,
+  overrides: Record<string, unknown> = {}
+) {
+  return {
+    ...caseDetail,
+    caseNumber: null,
+    court: null,
+    courtLevel: null,
+    status,
+    message,
+    fields: null,
+    missingFields: [],
+    movements: [],
+    source: null,
+    ...overrides,
+  }
+}
