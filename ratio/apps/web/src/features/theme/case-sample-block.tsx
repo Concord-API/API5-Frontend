@@ -3,11 +3,12 @@ import { Link } from "@tanstack/react-router"
 import { useId } from "react"
 import {
   themeCasesQueryOptions,
+  themeExportUrl,
   type SampleCase,
   type ThemeCases,
 } from "@/api/cases"
 import { findUnavailable } from "@/api/unavailable"
-import { formatDate } from "@/lib/format"
+import { formatDate, formatNumber } from "@/lib/format"
 
 const REPORTER_FALLBACK = "o relator não vem de forma estruturada na fonte."
 const AMOUNT_FALLBACK = "o valor depende do inteiro teor da decisão."
@@ -169,6 +170,23 @@ function SampleSection({ sample }: { sample: ThemeCases }) {
       >
         {`Relator: ${reporter?.message ?? REPORTER_FALLBACK} Valor: ${amount?.message ?? AMOUNT_FALLBACK}`}
       </p>
+      <div className="mt-4 border-t border-[#DCD6C9] pt-3">
+        <a
+          href={themeExportUrl(sample.themeKey)}
+          download
+          className="inline-block rounded-[3px] border border-[#C9C2B4] px-4 py-2 font-mono text-xs font-semibold tracking-[0.14em] text-foreground uppercase hover:border-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          Exportar CSV
+        </a>
+        {sample.total > sample.exportCeiling && (
+          <p
+            data-testid="export-ceiling"
+            className="pt-2 font-sans text-[13px] leading-relaxed text-muted-foreground italic"
+          >
+            {`A exportação traz as primeiras ${formatNumber(sample.exportCeiling)} de ${formatNumber(sample.total)} decisões.`}
+          </p>
+        )}
+      </div>
     </section>
   )
 }

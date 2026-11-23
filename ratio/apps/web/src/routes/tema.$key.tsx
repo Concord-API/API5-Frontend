@@ -7,6 +7,7 @@ import { ScopeStatement } from "@/components/scope-statement"
 import { DoctrineBlock } from "@/features/theme/doctrine-block"
 import { CourtAlignmentList } from "@/features/theme/court-alignment-list"
 import { CaseSampleBlock } from "@/features/theme/case-sample-block"
+import { CopyCitationButton } from "@/features/theme/copy-citation-button"
 import { CourtBehaviourTable } from "@/features/theme/court-behaviour-table"
 import { PanelBlock } from "@/features/theme/panel-block"
 import { PrecedentBlock } from "@/features/theme/precedent-block"
@@ -53,7 +54,7 @@ function Theme() {
   }
 
   return (
-    <ThemeFrame>
+    <ThemeFrame actions={<CopyCitationButton citation={data.citation} />}>
       <ThemeBackLink />
       <ThemeHeader theme={data} />
       <ThemeTabs
