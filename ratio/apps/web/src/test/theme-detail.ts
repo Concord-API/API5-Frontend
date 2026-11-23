@@ -370,6 +370,7 @@ export const themeRulings = {
       judgedAt: "2025-02-10",
       summary: "Ementa mais recente publicada pelo STJ.",
       link: "https://processo.stj.jus.br/2",
+      tie: { method: "caseNumber", similarity: null, threshold: null },
     },
     {
       sourceId: "1",
@@ -379,6 +380,7 @@ export const themeRulings = {
       judgedAt: "2024-01-05",
       summary: "Ementa anterior publicada pelo STJ.",
       link: "https://processo.stj.jus.br/1",
+      tie: { method: "similarity", similarity: 0.7213, threshold: 0.55 },
     },
   ],
   total: 12,
