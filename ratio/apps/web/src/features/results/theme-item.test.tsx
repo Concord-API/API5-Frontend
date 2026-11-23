@@ -109,6 +109,20 @@ describe("ThemeItem", () => {
     expect(within(link).queryByText(/%/)).toBeNull()
   })
 
+  it("says which courts the numbers come from when a court filter narrows them", async () => {
+    await renderItem({ ...completeTheme, numbersCourts: ["STF", "STJ"] })
+
+    expect(screen.getByTestId("numbers-courts")).toHaveTextContent(
+      "Números de STF e STJ"
+    )
+  })
+
+  it("says nothing about the courts when the numbers cover the whole theme", async () => {
+    await renderItem({ ...completeTheme, numbersCourts: null })
+
+    expect(screen.queryByTestId("numbers-courts")).toBeNull()
+  })
+
   it("shows the score without a textual grade below the minimum", async () => {
     await renderItem({ ...completeTheme, level: null })
 
