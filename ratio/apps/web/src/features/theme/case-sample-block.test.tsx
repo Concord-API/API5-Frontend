@@ -5,6 +5,7 @@ import {
   answerThemeCases,
   answerThemeDetail,
   noCases,
+  themeCases,
 } from "../../test/theme-detail"
 
 async function renderTheme() {
