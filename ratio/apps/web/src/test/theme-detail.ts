@@ -354,6 +354,64 @@ export function answerThemeCases(body: Record<string, unknown> = themeCases) {
   return requests
 }
 
+export const themeRulings = {
+  themeKey: 412,
+  source: {
+    name: "STJ, Espelhos de acórdãos",
+    url: "https://dadosabertos.web.stj.jus.br/dataset/espelhos-de-acordaos-primeira-secao",
+    extractedAt: "2026-11-01T10:00:00+00:00",
+  },
+  rulings: [
+    {
+      sourceId: "2",
+      caseNumber: "0000002-00.2020.3.00.0000",
+      court: "STJ",
+      judgingBody: "Segunda Seção",
+      judgedAt: "2025-02-10",
+      summary: "Ementa mais recente publicada pelo STJ.",
+      link: "https://processo.stj.jus.br/2",
+      tie: { method: "caseNumber", similarity: null, threshold: null },
+    },
+    {
+      sourceId: "1",
+      caseNumber: "0000001-00.2020.3.00.0000",
+      court: "STJ",
+      judgingBody: "Terceira Turma",
+      judgedAt: "2024-01-05",
+      summary: "Ementa anterior publicada pelo STJ.",
+      link: "https://processo.stj.jus.br/1",
+      tie: { method: "similarity", similarity: 0.7213, threshold: 0.55 },
+    },
+  ],
+  total: 12,
+  ordering:
+    "julgamento mais recente primeiro; empate pelo tribunal e identificador da fonte",
+  shown: 2,
+  sampleLabel: "2 de 12 decisões",
+}
+
+export const noRulings = {
+  ...themeRulings,
+  source: { ...themeRulings.source, extractedAt: null },
+  rulings: [],
+  total: 0,
+  shown: 0,
+  sampleLabel: "0 de 0 decisões",
+}
+
+export function answerThemeRulings(
+  body: Record<string, unknown> = themeRulings
+) {
+  const requests: URL[] = []
+  server.use(
+    http.get("/api/themes/:key/rulings", ({ request }) => {
+      requests.push(new URL(request.url))
+      return HttpResponse.json(body)
+    })
+  )
+  return requests
+}
+
 const temaLink = (number: number) =>
   `https://processo.stj.jus.br/repetitivos/temas_repetitivos/pesquisa.jsp?novaConsulta=true&tipo_pesquisa=T&cod_tema_inicial=${number}&cod_tema_final=${number}`
 
@@ -419,6 +477,7 @@ export function answerThemeDetail(body: Record<string, unknown> = themeDetail) {
     http.get("/api/themes/:key/precedents", () =>
       HttpResponse.json(noPrecedents)
     ),
+    http.get("/api/themes/:key/rulings", () => HttpResponse.json(noRulings)),
     http.get("/api/themes/:key", ({ request }) => {
       requests.push(new URL(request.url))
       return HttpResponse.json(body)
