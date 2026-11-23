@@ -56,6 +56,7 @@ export const themeSummarySchema = z.object({
   lastDecisionDate: z.string().nullable(),
   courts: z.array(z.string()),
   additionalCourtCount: z.number().int(),
+  numbersCourts: z.array(z.string()).nullish(),
   summary: themeResultSummarySchema.nullable(),
 })
 
