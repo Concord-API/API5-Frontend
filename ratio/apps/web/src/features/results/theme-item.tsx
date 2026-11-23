@@ -76,6 +76,14 @@ export function ThemeItem({ theme, fromSearch }: ThemeItemProps) {
                 </span>
               )}
             </div>
+            {theme.numbersCourts != null && (
+              <span
+                data-testid="numbers-courts"
+                className="font-mono text-[11px] text-muted-foreground"
+              >
+                {`Números de ${new Intl.ListFormat("pt-BR", { style: "long", type: "conjunction" }).format(theme.numbersCourts)}`}
+              </span>
+            )}
             <AlignmentBar
               ratio={theme.outcome.upheldRatio}
               polarityLabel={theme.outcome.polarityLabel}
