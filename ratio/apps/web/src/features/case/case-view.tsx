@@ -163,24 +163,59 @@ function Movements({ detail }: { detail: CaseDetail }) {
   )
 }
 
-export function CaseView({ detail }: { detail: CaseDetail }) {
+function headingOf(detail: CaseDetail, number: string) {
+  return detail.status === "sealed"
+    ? "Processo em sigilo"
+    : `Processo ${detail.caseNumber ?? number}`
+}
+
+function UnavailableNote({ detail }: { detail: CaseDetail }) {
+  if (detail.status === "available" || detail.message === null) {
+    return null
+  }
+
+  return (
+    <p
+      role="note"
+      data-reason={detail.status}
+      className="mt-6 border-l-2 border-[#C9C2B4] bg-[#FBF9F4] px-[18px] py-4 font-sans text-[15px] leading-relaxed text-muted-foreground"
+    >
+      {detail.message}
+    </p>
+  )
+}
+
+export function CaseView({
+  detail,
+  number,
+}: {
+  detail: CaseDetail
+  number: string
+}) {
+  const court = courtLine(detail)
+
   return (
     <article>
       <h1 className="font-mono text-2xl text-foreground">
-        {`Processo ${detail.caseNumber ?? ""}`.trim()}
+        {headingOf(detail, number)}
       </h1>
-      <p
-        data-testid="case-court"
-        className="mt-2 font-mono text-[12px] tracking-[0.12em] text-muted-foreground uppercase"
-      >
-        {courtLine(detail)}
-      </p>
-      {detail.fields !== null && <FieldList fields={detail.fields} />}
-      {detail.missingFields.length > 0 && detail.message !== null && (
-        <p className="mt-4 font-sans text-[13px] text-muted-foreground italic">
-          {detail.message}
+      {court !== "" && (
+        <p
+          data-testid="case-court"
+          className="mt-2 font-mono text-[12px] tracking-[0.12em] text-muted-foreground uppercase"
+        >
+          {court}
         </p>
       )}
+      <UnavailableNote detail={detail} />
+      {detail.fields !== null && <FieldList fields={detail.fields} />}
+      {detail.status === "available" &&
+        detail.missingFields.length > 0 &&
+        detail.message !== null && (
+          <p className="mt-4 font-sans text-[13px] text-muted-foreground italic">
+            {detail.message}
+          </p>
+        )}
       <Movements detail={detail} />
       {detail.source !== null && (
         <p
