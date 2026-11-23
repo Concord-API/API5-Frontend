@@ -105,17 +105,19 @@ describe("auditable sample block", () => {
     )
   })
 
-  it("shows the case number without a link to the court, even when the API sends one", async () => {
+  it("opens each case inside Ratio, never on the court site, even when the API sends a court link", async () => {
     answerThemeDetail()
     answerThemeCases()
 
     await renderTheme()
     const [first, second] = bodyRows(await findBlock())
 
-    expect(first).toHaveTextContent("1004832-11.2024.8.26.0100")
-    expect(second).toHaveTextContent("5009127-64.2023.8.13.0024")
-    expect(within(first).queryByRole("link")).toBeNull()
-    expect(within(second).queryByRole("link")).toBeNull()
+    expect(
+      within(first).getByRole("link", { name: "1004832-11.2024.8.26.0100" })
+    ).toHaveAttribute("href", "/processo/1004832-11.2024.8.26.0100?tema=412")
+    expect(
+      within(second).getByRole("link", { name: "5009127-64.2023.8.13.0024" })
+    ).toHaveAttribute("href", "/processo/5009127-64.2023.8.13.0024?tema=412")
   })
 
   it("shows no court link text and no portal hint", async () => {
