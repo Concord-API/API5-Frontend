@@ -48,7 +48,7 @@ describe("STJ theses block", () => {
     )
   })
 
-  it("names the theme, the judging body, the date and the status", async () => {
+  it("names the type, the number, the court, the judging body and the date", async () => {
     answerThemeDetail()
     answerThemePrecedents()
 
@@ -56,7 +56,108 @@ describe("STJ theses block", () => {
     const block = await findBlock()
 
     expect(within(block).getAllByTestId("thesis-meta")[0]).toHaveTextContent(
-      "Tema 952 · Segunda Seção · julgado em 14.12.2016 · Trânsito em Julgado"
+      "Tema repetitivo 952 · STJ · Segunda Seção · julgado em 14.12.2016"
+    )
+  })
+
+  it("shows the status with the date it was last updated", async () => {
+    answerThemeDetail()
+    answerThemePrecedents()
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getAllByTestId("thesis-status")[0]).toHaveTextContent(
+      "Situação: Trânsito em Julgado, atualizada em 02.03.2017"
+    )
+  })
+
+  it("warns when the precedent suspends the related cases", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(952, { suspendsCases: true }), thesis(1016)],
+    })
+
+    await renderTheme()
+    const [suspending, other] = within(await findBlock()).getAllByRole(
+      "listitem"
+    )
+
+    expect(
+      within(suspending).getByTestId("thesis-suspension")
+    ).toHaveTextContent("Suspensão de processos ativa")
+    expect(within(other).queryByTestId("thesis-suspension")).toBeNull()
+  })
+
+  it("lists the leading cases of the precedent", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [
+        thesis(952, { leadingCases: ["REsp 1568244/RJ", "REsp 1280211/SP"] }),
+        thesis(1016),
+      ],
+    })
+
+    await renderTheme()
+    const [withCases, withoutCases] = within(await findBlock()).getAllByRole(
+      "listitem"
+    )
+
+    expect(within(withCases).getByTestId("leading-cases")).toHaveTextContent(
+      "Processos paradigma: REsp 1568244/RJ, REsp 1280211/SP"
+    )
+    expect(within(withoutCases).queryByTestId("leading-cases")).toBeNull()
+  })
+
+  it("marks a cancelled precedent so it is not cited by mistake", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(400, { status: "Cancelado" }), thesis(1016)],
+    })
+
+    await renderTheme()
+    const [cancelled, current] = within(await findBlock()).getAllByRole(
+      "listitem"
+    )
+
+    expect(cancelled).toHaveAttribute("data-cancelled", "true")
+    expect(within(cancelled).getByTestId("thesis-cancelled")).toHaveTextContent(
+      "Cancelado"
+    )
+    expect(current).toHaveAttribute("data-cancelled", "false")
+    expect(within(current).queryByTestId("thesis-cancelled")).toBeNull()
+  })
+
+  it("names the court of a general repercussion as the STF", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(1046, { type: "repercussao_geral", kind: "Tema" })],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
+      "Repercussão geral 1046 · STF"
+    )
+  })
+
+  it("shows the kind and no court when the source gives no type", async () => {
+    answerThemeDetail()
+    answerThemePrecedents({
+      ...themePrecedents,
+      precedents: [thesis(952, { type: null })],
+    })
+
+    await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
+      /^Tema 952 · Segunda Seção · julgado em 14\.12\.2016$/
     )
   })
 
@@ -116,15 +217,33 @@ describe("STJ theses block", () => {
     expect(within(block).getAllByRole("listitem")).toHaveLength(5)
   })
 
-  it("shows no block for a theme without a thesis", async () => {
+  it("explains in the block why a theme has no related precedent", async () => {
     answerThemeDetail()
     answerThemePrecedents(noPrecedents)
 
     await renderTheme()
+    const block = await findBlock()
+
+    expect(within(block).queryAllByRole("listitem")).toHaveLength(0)
+    const note = within(block).getByRole("note")
+    expect(note).toHaveAttribute("data-reason", "notApplicable")
+    expect(note).toHaveTextContent(
+      "Nenhum precedente qualificado foi relacionado aos assuntos deste tema. A fonte carregada traz os temas repetitivos do STJ; súmulas, IRDR, IAC e repercussão geral ainda não têm fonte autorizada para coleta neste produto."
+    )
+  })
+
+  it("links the explanation of a theme without precedents to the limitations page", async () => {
+    answerThemeDetail()
+    answerThemePrecedents(noPrecedents)
+
+    await renderTheme()
+    const block = await findBlock()
 
     expect(
-      screen.queryByRole("region", { name: TITLE })
-    ).not.toBeInTheDocument()
+      within(block).getByRole("link", {
+        name: "Entenda por que este dado falta",
+      })
+    ).toHaveAttribute("href", "/limitacoes#notApplicable")
   })
 
   it("keeps the theme page when the theses fail to load", async () => {
@@ -149,7 +268,12 @@ describe("STJ theses block", () => {
       ...themePrecedents,
       source: precedentSource,
       precedents: [
-        thesis(1200, { judgedAt: null, judgingBody: null, status: "Afetado" }),
+        thesis(1200, {
+          judgedAt: null,
+          judgingBody: null,
+          status: "Afetado",
+          statusDate: null,
+        }),
       ],
     })
 
@@ -157,7 +281,10 @@ describe("STJ theses block", () => {
     const block = await findBlock()
 
     expect(within(block).getByTestId("thesis-meta")).toHaveTextContent(
-      "Tema 1200 · Afetado"
+      /^Tema repetitivo 1200 · STJ$/
+    )
+    expect(within(block).getByTestId("thesis-status")).toHaveTextContent(
+      /^Situação: Afetado$/
     )
   })
 })
