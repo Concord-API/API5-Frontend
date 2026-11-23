@@ -429,6 +429,8 @@ const detailExample = {
   },
   provenance,
   scope,
+  citation:
+    "Inscrição indevida em cadastro de inadimplentes — Em 98,6% das 144 decisões julgadas, houve acolhimento da pretensão do autor. Fonte: DataJud/CNJ, 12.418 processos, extração de 28.08.2026. Escopo: TJMG, TJRJ e TJSP, matéria cível. Metodologia 1.0.",
 }
 
 const relatedDoctrine = detailExample.relatedDoctrine
@@ -474,12 +476,14 @@ describe("fetchThemeDetail", () => {
       periodEndYear: null,
       lastDecisionDate: null,
       summary: null,
+      citation: null,
     })
 
     const detail = await fetchThemeDetail(412)
 
     expect(detail.lastDecisionDate).toBeNull()
     expect(detail.summary).toBeNull()
+    expect(detail.citation).toBeNull()
   })
 
   it("breaks on the parse when the provenance is missing", async () => {
