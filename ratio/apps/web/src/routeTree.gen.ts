@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BuscaRouteImport } from './routes/busca'
 import { Route as LimitacoesRouteImport } from './routes/limitacoes'
+import { Route as ProcessoNumeroRouteImport } from './routes/processo.$numero'
 import { Route as TemaKeyRouteImport } from './routes/tema.$key'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const LimitacoesRoute = LimitacoesRouteImport.update({
   path: '/limitacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProcessoNumeroRoute = ProcessoNumeroRouteImport.update({
+  id: '/processo/$numero',
+  path: '/processo/$numero',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemaKeyRoute = TemaKeyRouteImport.update({
   id: '/tema/$key',
   path: '/tema/$key',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/busca': typeof BuscaRoute
   '/limitacoes': typeof LimitacoesRoute
+  '/processo/$numero': typeof ProcessoNumeroRoute
   '/tema/$key': typeof TemaKeyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/busca': typeof BuscaRoute
   '/limitacoes': typeof LimitacoesRoute
+  '/processo/$numero': typeof ProcessoNumeroRoute
   '/tema/$key': typeof TemaKeyRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/busca': typeof BuscaRoute
   '/limitacoes': typeof LimitacoesRoute
+  '/processo/$numero': typeof ProcessoNumeroRoute
   '/tema/$key': typeof TemaKeyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/busca' | '/limitacoes' | '/tema/$key'
+  fullPaths: '/' | '/busca' | '/limitacoes' | '/processo/$numero' | '/tema/$key'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/busca' | '/limitacoes' | '/tema/$key'
-  id: '__root__' | '/' | '/busca' | '/limitacoes' | '/tema/$key'
+  to: '/' | '/busca' | '/limitacoes' | '/processo/$numero' | '/tema/$key'
+  id:
+    | '__root__'
+    | '/'
+    | '/busca'
+    | '/limitacoes'
+    | '/processo/$numero'
+    | '/tema/$key'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuscaRoute: typeof BuscaRoute
   LimitacoesRoute: typeof LimitacoesRoute
+  ProcessoNumeroRoute: typeof ProcessoNumeroRoute
   TemaKeyRoute: typeof TemaKeyRoute
 }
 
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LimitacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/processo/$numero': {
+      id: '/processo/$numero'
+      path: '/processo/$numero'
+      fullPath: '/processo/$numero'
+      preLoaderRoute: typeof ProcessoNumeroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tema/$key': {
       id: '/tema/$key'
       path: '/tema/$key'
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuscaRoute: BuscaRoute,
   LimitacoesRoute: LimitacoesRoute,
+  ProcessoNumeroRoute: ProcessoNumeroRoute,
   TemaKeyRoute: TemaKeyRoute,
 }
 export const routeTree = rootRouteImport

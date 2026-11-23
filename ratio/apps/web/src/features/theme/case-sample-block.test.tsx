@@ -6,8 +6,6 @@ import {
   answerThemeDetail,
   noCases,
   themeCases,
-  tjmgCase,
-  tjspCase,
 } from "../../test/theme-detail"
 
 async function renderTheme() {
@@ -108,53 +106,31 @@ describe("auditable sample block", () => {
     )
   })
 
-  it("links a case to its page at the court when the link opens the case", async () => {
+  it("opens each case inside Ratio, never on the court site, even when the API sends a court link", async () => {
     answerThemeDetail()
     answerThemeCases()
 
     await renderTheme()
-    const [first] = bodyRows(await findBlock())
-
-    const link = within(first).getByRole("link", {
-      name: "Consultar no tribunal o processo 1004832-11.2024.8.26.0100",
-    })
-    expect(link).toHaveTextContent(/^consultar no tribunal$/)
-    expect(link).toHaveAttribute("href", tjspCase.sourceLink)
-    expect(link).toHaveAttribute("target", "_blank")
-    expect(link).toHaveAttribute("rel", "noopener noreferrer")
-    expect(within(first).queryByTestId("portal-hint")).toBeNull()
-  })
-
-  it("links a case to the court portal and asks to paste the formatted number", async () => {
-    answerThemeDetail()
-    answerThemeCases()
-
-    await renderTheme()
-    const [, second] = bodyRows(await findBlock())
+    const [first, second] = bodyRows(await findBlock())
 
     expect(
-      within(second).getByRole("link", {
-        name: "Consultar no tribunal o processo 5009127-64.2023.8.13.0024",
-      })
-    ).toHaveAttribute("href", tjmgCase.sourceLink)
-    expect(within(second).getByTestId("portal-hint")).toHaveTextContent(
-      "cole o número no portal"
-    )
-    expect(second).toHaveTextContent("5009127-64.2023.8.13.0024")
+      within(first).getByRole("link", { name: "1004832-11.2024.8.26.0100" })
+    ).toHaveAttribute("href", "/processo/1004832-11.2024.8.26.0100?tema=412")
+    expect(
+      within(second).getByRole("link", { name: "5009127-64.2023.8.13.0024" })
+    ).toHaveAttribute("href", "/processo/5009127-64.2023.8.13.0024?tema=412")
   })
 
-  it("shows the number without a link when the source has none", async () => {
+  it("shows no court link text and no portal hint", async () => {
     answerThemeDetail()
-    answerThemeCases({
-      ...themeCases,
-      cases: [{ ...tjspCase, sourceLink: null, sourceLinkType: null }],
-    })
+    answerThemeCases()
 
     await renderTheme()
-    const [first] = bodyRows(await findBlock())
+    const block = await findBlock()
 
-    expect(first).toHaveTextContent("1004832-11.2024.8.26.0100")
-    expect(within(first).queryByRole("link")).toBeNull()
+    expect(block).not.toHaveTextContent(/consultar no tribunal/i)
+    expect(block).not.toHaveTextContent(/cole o número no portal/i)
+    expect(within(block).queryByTestId("portal-hint")).toBeNull()
   })
 
   it("never calls the link a view of the decision", async () => {

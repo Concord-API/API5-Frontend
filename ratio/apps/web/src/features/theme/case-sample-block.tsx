@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { useId } from "react"
 import {
   themeCasesQueryOptions,
@@ -24,29 +25,6 @@ function panelOf(sampleCase: SampleCase) {
     .join(" · ")
 }
 
-function CourtLink({ sampleCase }: { sampleCase: SampleCase }) {
-  if (sampleCase.sourceLink === null) {
-    return null
-  }
-
-  return (
-    <span className="block pt-1 font-sans text-[12px] text-muted-foreground">
-      <a
-        href={sampleCase.sourceLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Consultar no tribunal o processo ${sampleCase.caseNumber ?? ""}`.trim()}
-        className="text-primary underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-      >
-        consultar no tribunal
-      </a>
-      {sampleCase.sourceLinkType === "portal" && (
-        <span data-testid="portal-hint"> · cole o número no portal</span>
-      )}
-    </span>
-  )
-}
-
 function SealedRow() {
   return (
     <tr
@@ -60,7 +38,36 @@ function SealedRow() {
   )
 }
 
-function CaseRow({ sampleCase }: { sampleCase: SampleCase }) {
+function CaseNumber({
+  sampleCase,
+  themeKey,
+}: {
+  sampleCase: SampleCase
+  themeKey: number
+}) {
+  if (sampleCase.caseNumber === null) {
+    return <span className="block text-primary">—</span>
+  }
+
+  return (
+    <Link
+      to="/processo/$numero"
+      params={{ numero: sampleCase.caseNumber }}
+      search={{ tema: themeKey }}
+      className="block text-primary underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    >
+      {sampleCase.caseNumber}
+    </Link>
+  )
+}
+
+function CaseRow({
+  sampleCase,
+  themeKey,
+}: {
+  sampleCase: SampleCase
+  themeKey: number
+}) {
   if (sampleCase.sealed) {
     return <SealedRow />
   }
@@ -71,10 +78,7 @@ function CaseRow({ sampleCase }: { sampleCase: SampleCase }) {
       className="border-b border-[#E8E3D8] last:border-b-0"
     >
       <td className={MONO}>
-        <span className="block text-primary">
-          {sampleCase.caseNumber ?? "—"}
-        </span>
-        <CourtLink sampleCase={sampleCase} />
+        <CaseNumber sampleCase={sampleCase} themeKey={themeKey} />
       </td>
       <td className={MONO}>{panelOf(sampleCase) || "—"}</td>
       <td className={UNSOURCED}>sem fonte</td>
@@ -148,6 +152,7 @@ function SampleSection({ sample }: { sample: ThemeCases }) {
               <CaseRow
                 key={sampleCase.caseNumber ?? `sigilo-${index}`}
                 sampleCase={sampleCase}
+                themeKey={sample.themeKey}
               />
             ))}
           </tbody>
